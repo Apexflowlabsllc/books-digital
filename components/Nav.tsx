@@ -103,13 +103,21 @@ export function Nav({ userEmail }: NavProps = {}) {
                 <NavUserMenu email={userEmail} />
               </div>
             ) : (
-              <Link
-                href="/sign-in"
-                className="cta-secondary hidden md:inline-flex"
-                data-cursor-label="Open"
-              >
-                <span>Sign in</span>
-              </Link>
+              <div className="hidden md:flex items-center gap-3">
+                <Link
+                  href="/sign-in"
+                  className="font-mono text-[10px] uppercase tracking-[0.3em] text-ink-dim transition-colors hover:text-accent"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  href="/sign-up"
+                  className="cta-secondary inline-flex"
+                  data-cursor-label="Open"
+                >
+                  <span>Sign up</span>
+                </Link>
+              </div>
             )}
 
             {/* Hamburger — mobile only */}
@@ -213,13 +221,22 @@ export function Nav({ userEmail }: NavProps = {}) {
                 </Link>
               </>
             ) : (
-              <Link
-                href="/sign-in"
-                onClick={() => setMenuOpen(false)}
-                className="cta-primary w-full justify-center"
-              >
-                <span>Sign in</span>
-              </Link>
+              <div className="grid grid-cols-2 gap-3">
+                <Link
+                  href="/sign-in"
+                  onClick={() => setMenuOpen(false)}
+                  className="cta-secondary w-full justify-center"
+                >
+                  <span>Sign in</span>
+                </Link>
+                <Link
+                  href="/sign-up"
+                  onClick={() => setMenuOpen(false)}
+                  className="cta-primary w-full justify-center"
+                >
+                  <span>Sign up</span>
+                </Link>
+              </div>
             )}
             <button
               type="button"

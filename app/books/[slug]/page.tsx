@@ -10,8 +10,7 @@ import { EmailGate } from '@/components/EmailGate';
 import { JsonLdSchema } from '@/components/JsonLdSchema';
 import { getBook, getBookSeo } from '@/lib/api';
 import { buildMetadata, fallbackBookSchema } from '@/lib/seo';
-import { audioStream, imageProxy, intensityGlyphs, waveLabel } from '@/lib/utils';
-import { empty } from '@/lib/voice';
+import { imageProxy, intensityGlyphs, waveLabel } from '@/lib/utils';
 
 interface BookRouteProps {
   params: Promise<{ slug: string }>;
@@ -42,8 +41,6 @@ export default async function BookDetailPage({ params }: BookRouteProps) {
   const [book, seo] = await Promise.all([getBook(slug), getBookSeo(slug)]);
 
   if (!book) notFound();
-
-  const sampleAudio = book.audiobook?.sample_url || audioStream(book.slug, 'sample');
 
   return (
     <PageShell seriesColor={book.series_color}>
@@ -126,18 +123,18 @@ export default async function BookDetailPage({ params }: BookRouteProps) {
         </div>
       </section>
 
-      {/* Audiobook sample — only renders when the R2 audio is live; until
-          then we skip the section entirely (no "coming soon" copy). */}
+      {/* Audiobook — full Polly Neural narration, served via signed R2 redirect.
+          Only renders when audio is live; until then we skip the section. */}
       {book.audio_status === 'live' && book.audiobook?.full_url ? (
         <section className="border-y border-line bg-bg-subtle">
           <div className="container-x grid gap-6 py-10 md:grid-cols-[auto_1fr] md:items-center">
             <div className="flex items-center gap-3 text-series">
               <Headphones className="h-8 w-8" aria-hidden />
-              <p className="font-display text-2xl text-ink">Hear chapter one</p>
+              <p className="font-display text-2xl text-ink">Listen to the audiobook</p>
             </div>
             <AudioPlayer
-              src={sampleAudio}
-              title={`${book.title} — chapter 1 (30-sec preview)`}
+              src={book.audiobook.full_url}
+              title={`${book.title} — full audiobook`}
               description="Polly Neural narration · supervised by Brian"
               variant="full"
             />

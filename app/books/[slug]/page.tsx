@@ -126,28 +126,24 @@ export default async function BookDetailPage({ params }: BookRouteProps) {
         </div>
       </section>
 
-      {/* Audiobook sample — gated on real mp3 availability */}
-      <section className="border-y border-line bg-bg-subtle">
-        <div className="container-x grid gap-6 py-10 md:grid-cols-[auto_1fr] md:items-center">
-          <div className="flex items-center gap-3 text-series">
-            <Headphones className="h-8 w-8" aria-hidden />
-            <p className="font-display text-2xl text-ink">Hear chapter one</p>
-          </div>
-
-          {book.audio_status === 'live' ? (
+      {/* Audiobook sample — only renders when the R2 audio is live; until
+          then we skip the section entirely (no "coming soon" copy). */}
+      {book.audio_status === 'live' && book.audiobook?.full_url ? (
+        <section className="border-y border-line bg-bg-subtle">
+          <div className="container-x grid gap-6 py-10 md:grid-cols-[auto_1fr] md:items-center">
+            <div className="flex items-center gap-3 text-series">
+              <Headphones className="h-8 w-8" aria-hidden />
+              <p className="font-display text-2xl text-ink">Hear chapter one</p>
+            </div>
             <AudioPlayer
               src={sampleAudio}
               title={`${book.title} — chapter 1 (30-sec preview)`}
               description="Polly Neural narration · supervised by Brian"
               variant="full"
             />
-          ) : (
-            <p className="text-sm text-ink-dim">
-              {book.audio_status === 'production' ? empty.audioPending : empty.audioQueued}
-            </p>
-          )}
-        </div>
-      </section>
+          </div>
+        </section>
+      ) : null}
 
       {/* Podcast episode — every book ships with a podcast even when the
           full audiobook is still queued. Works as the audio preview while

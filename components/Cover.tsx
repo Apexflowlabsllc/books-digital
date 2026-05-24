@@ -48,7 +48,7 @@ export function Cover({ r2Key, alt, priority, className, sizes, tilt }: CoverPro
   return (
     <div
       className={cn(
-        'relative aspect-[2/3] w-full overflow-hidden',
+        'relative aspect-[2/3] w-full overflow-hidden rounded-md',
         tilt && 'tilt-card',
         className,
       )}
@@ -57,17 +57,9 @@ export function Cover({ r2Key, alt, priority, className, sizes, tilt }: CoverPro
         src={src}
         alt={alt}
         fill
-        sizes={sizes ?? '(min-width: 1024px) 16rem, (min-width: 640px) 33vw, 50vw'}
+        sizes={sizes ?? '(min-width: 1024px) 22rem, (min-width: 640px) 33vw, 50vw'}
         priority={priority}
         className="object-cover"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, transparent 35%, transparent 65%, rgba(0,0,0,0.35) 100%)',
-        }}
       />
     </div>
   );

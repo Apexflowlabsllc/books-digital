@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import Image, { type StaticImageData } from 'next/image';
+import type { SeriesSummary } from '@/lib/types';
 
 import b1 from '../public/b1.png';
 import b2 from '../public/b2.png';
@@ -24,27 +25,56 @@ type SeriesTile = {
   cover: StaticImageData;
 };
 
-// Locked 12 series — number, name, tagline, cover.
-const ROSTER: SeriesTile[] = [
-  { num: 'S01', name: 'The Discipline Blueprint',    tag: 'For the guy who’s been "starting Monday" for years.', slug: 'discipline',    cover: b1 },
-  { num: 'S02', name: 'The Comeback Blueprint',      tag: 'For the guy who got knocked on his ass.',             slug: 'comeback',      cover: b2 },
-  { num: 'S03', name: 'The Mind Reset Blueprint',    tag: 'For the guy whose brain won’t shut up at 2 AM.',      slug: 'mind-reset',    cover: b3 },
-  { num: 'S04', name: 'The Success Blueprint',       tag: 'For the guy who reads business books and is broke.',  slug: 'success',       cover: b4 },
-  { num: 'S05', name: 'The Elite Blueprint',         tag: 'For the guy who’s good and wants to be way better.',  slug: 'elite',         cover: b5 },
-  { num: 'S06', name: 'The Unstoppable Blueprint',   tag: 'For the guy with all the motivation, no progress.',   slug: 'unstoppable',   cover: b6 },
-  { num: 'S07', name: 'The Nervous System Blueprint', tag: 'For the guy who’s been "fine" too long.',            slug: 'nervous-system', cover: b7 },
-  { num: 'S08', name: 'The Connection Blueprint',    tag: 'For the guy whose wife says "we need to talk."',      slug: 'connection',    cover: b8 },
-  { num: 'S09', name: 'The Power Blueprint',         tag: 'For the guy who keeps getting walked on.',            slug: 'power',         cover: b9 },
-  { num: 'S10', name: 'The Purpose Blueprint',       tag: 'For the guy with a good life he can’t enjoy.',        slug: 'purpose',       cover: b10 },
-  { num: 'S11', name: 'The Warrior Blueprint',       tag: 'For the guy carrying everybody, running on fumes.',   slug: 'warrior',       cover: b11 },
-  { num: 'S12', name: 'The Legend Blueprint',        tag: 'For the guy who knows he’ll die someday.',            slug: 'legend',        cover: b12 },
+const LOCAL_COVERS: StaticImageData[] = [b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11, b12];
+
+// Fallback used only when the backend series list is cold. Real data wins
+// via the `seriesList` prop.
+const FALLBACK_ROSTER: SeriesTile[] = [
+  { num: 'S01', name: 'The Discipline Blueprint',     tag: 'For the guy who’s been "starting Monday" for years.', slug: 'discipline-blueprint',     cover: b1 },
+  { num: 'S02', name: 'The Comeback Blueprint',       tag: 'For the guy who got knocked on his ass.',             slug: 'comeback-blueprint',       cover: b2 },
+  { num: 'S03', name: 'The Mind Reset Blueprint',     tag: 'For the guy whose brain won’t shut up at 2 AM.',      slug: 'mind-reset-blueprint',     cover: b3 },
+  { num: 'S04', name: 'The Success Blueprint',        tag: 'For the guy who reads business books and is broke.',  slug: 'success-blueprint',        cover: b4 },
+  { num: 'S05', name: 'The Elite Blueprint',          tag: 'For the guy who’s good and wants to be way better.',  slug: 'elite-blueprint',          cover: b5 },
+  { num: 'S06', name: 'The Unstoppable Blueprint',    tag: 'For the guy with all the motivation, no progress.',   slug: 'unstoppable-blueprint',    cover: b6 },
+  { num: 'S07', name: 'The Nervous System Blueprint', tag: 'For the guy who’s been "fine" too long.',             slug: 'nervous-system-blueprint', cover: b7 },
+  { num: 'S08', name: 'The Connection Blueprint',     tag: 'For the guy whose wife says "we need to talk."',      slug: 'connection-blueprint',     cover: b8 },
+  { num: 'S09', name: 'The Power Blueprint',          tag: 'For the guy who keeps getting walked on.',            slug: 'power-blueprint',          cover: b9 },
+  { num: 'S10', name: 'The Purpose Blueprint',        tag: 'For the guy with a good life he can’t enjoy.',        slug: 'purpose-blueprint',        cover: b10 },
+  { num: 'S11', name: 'The Warrior Blueprint',        tag: 'For the guy carrying everybody, running on fumes.',   slug: 'warrior-blueprint',        cover: b11 },
+  { num: 'S12', name: 'The Legend Blueprint',         tag: 'For the guy who knows he’ll die someday.',            slug: 'legend-blueprint',         cover: b12 },
 ];
 
-// Split into two rows so each can scroll in an opposite direction.
-const ROW_A = ROSTER.slice(0, 6);
-const ROW_B = ROSTER.slice(6);
+// Plain-Brian taglines per series, indexed by wave (1-4). The backend
+// promise field is the same across all books in a series — too long for a
+// tile. These short hooks read better in the marquee.
+const TAGLINE_BY_WAVE: Record<number, string> = {
+  1: 'Foundation. Start where the ground is wet.',
+  2: 'Pressure. When the company starts pulling.',
+  3: 'Edge. Where most operators break.',
+  4: 'Apex. The boring kind of winning.',
+};
 
-export function SeriesRosterMarquee() {
+interface SeriesRosterMarqueeProps {
+  // Real series from the live backend. When provided, tiles use real names
+  // and slugs; the visual cover is the locked b1-b12 local image (cycled).
+  seriesList?: SeriesSummary[];
+}
+
+export function SeriesRosterMarquee({ seriesList }: SeriesRosterMarqueeProps = {}) {
+  const ROSTER: SeriesTile[] =
+    seriesList && seriesList.length > 0
+      ? seriesList.slice(0, 12).map((s, i) => ({
+          num: `S${String(i + 1).padStart(2, '0')}`,
+          name: FALLBACK_ROSTER[i]?.name ?? s.name,
+          tag: TAGLINE_BY_WAVE[s.wave] ?? s.short_desc ?? '',
+          slug: s.slug,
+          cover: LOCAL_COVERS[i % LOCAL_COVERS.length]!,
+        }))
+      : FALLBACK_ROSTER;
+
+  // Split into two rows so each can scroll in an opposite direction.
+  const ROW_A = ROSTER.slice(0, 6);
+  const ROW_B = ROSTER.slice(6);
   return (
     <section className="relative z-10 overflow-hidden border-t border-white/5 bg-gradient-to-b from-transparent to-[#0a0a07]/60 py-12 sm:py-20 lg:py-28">
       <div className="container-x mb-10 sm:mb-16 max-w-2xl">

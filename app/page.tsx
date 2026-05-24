@@ -127,7 +127,7 @@ export default async function HomePage() {
           </div>
         </section>
       ) : (
-        <FeaturedShowcase totalBooks={totalBooks} />
+        <FeaturedShowcase totalBooks={totalBooks} books={featured} />
       )}
 
       {/* The 12 series — 4 wave tiles, digital-art categories style */}
@@ -171,8 +171,9 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* All 12 series — animated marquee using the locked b1–b12 covers */}
-      <SeriesRosterMarquee />
+      {/* All 12 series — real series data from the live backend, displayed
+          via the locked b1–b12 local covers. */}
+      <SeriesRosterMarquee seriesList={allSeries} />
 
       {/* Authority — real-world proof, gradient bg */}
       <section className="relative z-10 overflow-hidden border-t border-white/5 px-6 py-12 sm:py-28 lg:py-36">

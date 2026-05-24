@@ -6,6 +6,7 @@ import Image, { type StaticImageData } from 'next/image';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowLeft, ArrowRight, ArrowUpRight } from 'lucide-react';
+import type { BookSummary } from '@/lib/types';
 
 import b1 from '../public/b1.png';
 import b2 from '../public/b2.png';
@@ -20,29 +21,48 @@ if (typeof window !== 'undefined') {
 
 interface FeaturedShowcaseProps {
   totalBooks: number;
+  // First 6 real books from the live catalog. Titles, series names, and
+  // slug links come from here; the visual cover is the local b1-b6 image
+  // (cycled), not the backend's remote cover URL.
+  books?: BookSummary[];
 }
 
 type Cover = {
   src: StaticImageData;
   title: string;
   series: string;
-  titlePos: 'above' | 'below';
+  slug: string;
 };
 
-// 6 covers — operator-grade titles. No therapist-speak. No "blueprint" filler.
-// R-rated voice; the brand line is "war manual," so titles read like orders.
-const COVERS: Cover[] = [
-  { src: b1, title: 'Burn The Drift.',         series: 'Series I · Foundation · 18+',  titlePos: 'below' },
-  { src: b2, title: 'Eat The Hard Day.',       series: 'Series II · Pressure · 18+',   titlePos: 'above' },
-  { src: b3, title: 'No Coddling. No Drip.',   series: 'Series III · Edge · 18+',      titlePos: 'below' },
-  { src: b4, title: 'Carry The Weight.',       series: 'Series IV · Apex · 18+',       titlePos: 'above' },
-  { src: b5, title: 'Run It Anyway.',          series: 'Series V · Pressure · 18+',    titlePos: 'below' },
-  { src: b6, title: 'Outlast Everyone.',       series: 'Series VI · Apex · 18+',       titlePos: 'above' },
+const LOCAL_COVERS: StaticImageData[] = [b1, b2, b3, b4, b5, b6];
+
+// Fallback used only on cold-backend renders so the carousel still shows
+// something. Real data wins via the `books` prop.
+const FALLBACK: Cover[] = [
+  { src: b1, title: 'The Discipline Blueprint',  series: 'Discipline',   slug: 'the-discipline-blueprint' },
+  { src: b2, title: 'The Comeback Blueprint',    series: 'Comeback',     slug: 'the-comeback-blueprint' },
+  { src: b3, title: 'The Mind Reset Blueprint',  series: 'Mind Reset',   slug: 'the-mind-reset-blueprint' },
+  { src: b4, title: 'The Success Blueprint',     series: 'Success',      slug: 'the-success-blueprint' },
+  { src: b5, title: 'The Elite Blueprint',       series: 'Elite',        slug: 'the-elite-blueprint' },
+  { src: b6, title: 'The Unstoppable Blueprint', series: 'Unstoppable',  slug: 'the-unstoppable-blueprint' },
 ];
 
-export function FeaturedShowcase({ totalBooks }: FeaturedShowcaseProps) {
+export function FeaturedShowcase({ totalBooks, books }: FeaturedShowcaseProps) {
   const root = useRef<HTMLElement | null>(null);
   const [active, setActive] = useState(0);
+
+  // Build the cover list from real backend data when available — real titles,
+  // real series names, real slug links — but mapped to a local b1-b6 image
+  // (cycled) so the visual cover is the locked design asset, not the remote
+  // book cover. Fall back to canonical 6 if the catalog is cold.
+  const COVERS: Cover[] = (books && books.length > 0
+    ? books.slice(0, 6).map((b, i) => ({
+        src: LOCAL_COVERS[i % LOCAL_COVERS.length]!,
+        title: b.title,
+        series: b.series_name,
+        slug: b.slug,
+      }))
+    : FALLBACK);
 
   const count = COVERS.length;
 
@@ -142,9 +162,13 @@ export function FeaturedShowcase({ totalBooks }: FeaturedShowcaseProps) {
             const slot = slotFor(i);
             const visible = Math.abs(slot) <= 2;
             return (
-              <div
+              <Link
                 key={i}
+                href={`/books/${c.slug}`}
                 className="carousel-card"
+                data-cursor-label="Open"
+                aria-label={c.title}
+                tabIndex={visible ? 0 : -1}
                 style={{
                   // Position by slot — pure horizontal translate, NO rotateY.
                   transform: `translate(-50%, -50%) translateX(${slot * 110}%) scale(${
@@ -193,7 +217,7 @@ export function FeaturedShowcase({ totalBooks }: FeaturedShowcaseProps) {
                     </div>
                   )}
                 </div>
-              </div>
+              </Link>
             );
           })}
 

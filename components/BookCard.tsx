@@ -29,7 +29,7 @@ export function BookCard({ book, priority }: BookCardProps) {
           alt={book.cover_alt ?? `${book.title} — book cover`}
           priority={priority}
           tilt
-          className="border border-[rgba(217,204,140,0.18)] transition-all duration-500 group-hover:border-series group-hover:shadow-[0_30px_60px_-20px_rgba(217,204,140,0.4)]"
+          className="transition-all duration-500 group-hover:shadow-[0_30px_60px_-20px_rgba(217,204,140,0.45)]"
         />
         <span
           aria-hidden
@@ -40,21 +40,13 @@ export function BookCard({ book, priority }: BookCardProps) {
             }44 0%, transparent 70%)`,
           }}
         />
-        <span
-          aria-hidden
-          className="pointer-events-none absolute left-3 top-3 z-10 rounded-full border border-[rgba(217,204,140,0.35)] bg-black/60 px-2.5 py-1 backdrop-blur-sm"
-        >
-          <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-accent/80">
-            {waveLabel(book.wave)}
-          </span>
-        </span>
       </div>
 
-      <div className="mt-5 space-y-1.5">
+      <div className="mt-5 space-y-2">
         <div className="flex items-center gap-2">
           <span aria-hidden className="h-px w-6 bg-series/50" />
           <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-accent/70">
-            {book.series_name}
+            {book.series_name} · {waveLabel(book.wave)}
           </p>
         </div>
         <h3 className="font-display text-[1.25rem] leading-[1.15] text-ink transition-colors duration-300 group-hover:text-series">

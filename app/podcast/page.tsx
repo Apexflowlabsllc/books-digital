@@ -3,16 +3,18 @@ import { Mic, Rss, Film } from 'lucide-react';
 import { PageShell } from '@/components/PageShell';
 import { Hero } from '@/components/Hero';
 import { JsonLdSchema } from '@/components/JsonLdSchema';
+import { AudioPlayer } from '@/components/AudioPlayer';
 import { VideoPlayer } from '@/components/VideoPlayer';
 import { getBook, getPageSeo, getPodcastFeed } from '@/lib/api';
 import { buildMetadata, fallbackPageSchema } from '@/lib/seo';
 import { imageProxy } from '@/lib/utils';
 import { empty } from '@/lib/voice';
+import type { BookDetail, PodcastFeed } from '@/lib/types';
 
 export const metadata = buildMetadata({
   title: 'Podcast — Apex Book Publishing',
   description:
-    '13 feeds. One per series, plus a master that streams everything. Subscribe in Apple, Spotify, Amazon, YouTube Music, iHeart, Pandora, Stitcher, Pocket Casts, or Overcast.',
+    '14 feeds. One per series, plus master + apex daily. Subscribe in Apple, Spotify, Amazon, YouTube Music, iHeart, Pandora, Stitcher, Pocket Casts, or Overcast.',
   path: '/podcast',
 });
 
@@ -30,9 +32,25 @@ const DIRECTORIES = [
   'Overcast',
 ];
 
+// Series number → the slug of book #1 in that series. Used to pull the
+// per-series podcast URL so each feed card is actually playable.
+const SERIES_FIRST_BOOK_SLUG: Record<number, string> = {
+  1: 'the-discipline-blueprint',
+  2: 'the-comeback-blueprint',
+  3: 'the-mind-reset-blueprint',
+  4: 'the-success-blueprint',
+  5: 'the-elite-blueprint',
+  6: 'the-unstoppable-blueprint',
+  7: 'the-nervous-system-blueprint',
+  8: 'the-connection-blueprint',
+  9: 'the-power-blueprint',
+  10: 'the-purpose-blueprint',
+  11: 'the-warrior-blueprint',
+  12: 'the-legend-blueprint',
+};
+
 // Backend titles still carry the legacy "Apex Raw Motivation —" prefix.
-// Strip it so the rendered card label reads cleanly until the backend
-// re-titles them.
+// Strip it so the rendered card label reads cleanly.
 function cleanTitle(raw: string): string {
   return raw
     .replace(/^Apex Raw Motivation\s*[—-]\s*/i, '')
@@ -40,18 +58,65 @@ function cleanTitle(raw: string): string {
     .trim();
 }
 
+function feedKind(feed: PodcastFeed): 'master' | 'series' | 'special' {
+  if (feed.slug === 'master') return 'master';
+  if (typeof feed.series === 'number') return 'series';
+  return 'special';
+}
+
+interface FeedCardData {
+  feed: PodcastFeed;
+  kind: 'master' | 'series' | 'special';
+  audioUrl?: string;
+  cover?: string;
+  bookTitle?: string;
+  bookSlug?: string;
+}
+
 export default async function PodcastPage() {
-  const [feedRes, seo, featuredBook] = await Promise.all([
+  // Pull feeds + featured book + every series's book-1 detail in one
+  // Promise.all. The per-series book fetches give us a real audio URL
+  // per tile (each book ships with its own podcast episode).
+  const seriesNumbers = Object.keys(SERIES_FIRST_BOOK_SLUG).map(Number);
+
+  const [feedRes, seo, ...seriesBooks] = await Promise.all([
     getPodcastFeed(50),
     getPageSeo('/podcast'),
-    // Pull book #1 of series #1 so we can surface its podcast video as
-    // the page's featured player. VideoPlayer self-hides if the backend
-    // hasn't uploaded that MP4 yet — page still renders cleanly.
-    getBook('the-discipline-blueprint'),
+    ...seriesNumbers.map((n) => getBook(SERIES_FIRST_BOOK_SLUG[n]!)),
   ]);
+
+  const seriesBookByNumber = new Map<number, BookDetail>();
+  seriesNumbers.forEach((n, idx) => {
+    const b = seriesBooks[idx];
+    if (b) seriesBookByNumber.set(n, b);
+  });
+
   const feeds = feedRes?.feeds ?? [];
-  const master = feeds.find((f) => f.slug === 'master' || typeof f.series !== 'number');
-  const perSeries = feeds.filter((f) => typeof f.series === 'number').sort((a, b) => (a.series ?? 0) - (b.series ?? 0));
+  const featuredBook = seriesBookByNumber.get(1);
+
+  // Build the unified card list. Master + apex_daily first, then series
+  // ordered S01 → S12.
+  const cards: FeedCardData[] = feeds
+    .map((feed) => {
+      const kind = feedKind(feed);
+      if (kind === 'series') {
+        const book = seriesBookByNumber.get(feed.series!);
+        return {
+          feed,
+          kind,
+          audioUrl: book?.podcast_episode_url,
+          cover: book ? imageProxy(book.cover_r2_key) || undefined : undefined,
+          bookTitle: book?.title,
+          bookSlug: book?.slug,
+        };
+      }
+      return { feed, kind };
+    })
+    .sort((a, b) => {
+      const rank = (k: FeedCardData['kind']) => (k === 'master' ? 0 : k === 'special' ? 1 : 2);
+      if (rank(a.kind) !== rank(b.kind)) return rank(a.kind) - rank(b.kind);
+      return (a.feed.series ?? 0) - (b.feed.series ?? 0);
+    });
 
   return (
     <PageShell>
@@ -81,16 +146,10 @@ export default async function PodcastPage() {
               </li>
             ))}
           </ul>
-          <p className="mt-3 text-[11px] text-ink-mute">
-            Paste any feed below into your podcast app of choice — or open a book to play
-            that episode inline.
-          </p>
         </div>
       </section>
 
-      {/* Featured video — pulls book #1 of series #1. VideoPlayer hides
-          itself if the backend's MP4 isn't live yet, so this block
-          disappears cleanly until the videos land in R2. */}
+      {/* Featured video */}
       {featuredBook?.podcast_video_url ? (
         <section className="container-x py-16">
           <div className="mb-6">
@@ -110,111 +169,132 @@ export default async function PodcastPage() {
           />
           <p className="mt-3 text-[11px] text-ink-mute">
             <Film className="mr-1 inline h-3 w-3" aria-hidden />
-            Featuring: {featuredBook.title}. Each book has its own video on its detail
-            page.
+            Featuring: {featuredBook.title}.
           </p>
         </section>
       ) : null}
 
-      {feeds.length === 0 ? (
+      {/* All podcasts — playable + subscribe */}
+      {cards.length === 0 ? (
         <section className="container-x py-16">
           <p className="border border-line bg-bg-subtle p-8 text-sm text-ink-dim">
             {empty.podcastNone}
           </p>
         </section>
       ) : (
-        <>
-          {/* Master feed — the everything-firehose */}
-          {master ? (
-            <section className="container-x py-16">
-              <div className="border border-line bg-bg-subtle p-6 md:p-10">
-                <p className="eyebrow mb-3 text-accent">Master feed</p>
-                <h2 className="font-display text-3xl text-ink md:text-4xl">
-                  {cleanTitle(master.title)}
-                </h2>
-                <p className="mt-4 max-w-2xl text-ink-dim">
-                  Every chapter, every series, in one feed. One subscribe button — Brian
-                  drops new episodes 12 a week. Set it and forget it.
-                </p>
-                <div className="mt-6 flex flex-wrap gap-3">
-                  <a
-                    href={master.feedUrl}
-                    className="cta-primary inline-flex"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Rss className="h-4 w-4" aria-hidden />
-                    <span>Subscribe to the master feed</span>
-                  </a>
-                  <Link href="/books" className="cta-secondary inline-flex">
-                    <span>Or listen per book</span>
-                  </Link>
-                </div>
-              </div>
-            </section>
-          ) : null}
-
-          {/* Per-series feeds */}
-          {perSeries.length > 0 ? (
-            <section className="border-t border-line">
-              <div className="container-x py-16">
-                <div className="mb-8 flex items-baseline justify-between">
-                  <h2 className="font-display text-2xl text-ink md:text-3xl">
-                    One feed per series
-                  </h2>
-                  <span className="eyebrow text-ink-mute">{perSeries.length} feeds</span>
-                </div>
-                <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {perSeries.map((f) => (
-                    <li
-                      key={f.slug}
-                      className="border border-line bg-bg-subtle p-5 transition-colors hover:border-accent/60"
-                    >
-                      <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-accent/80">
-                        S{String(f.series).padStart(2, '0')}
-                      </p>
-                      <p className="mt-2 font-display text-lg text-ink leading-[1.2]">
-                        {cleanTitle(f.title)}
-                      </p>
-                      <a
-                        href={f.feedUrl}
-                        className="mt-4 inline-flex items-center gap-2 text-xs uppercase tracking-widest text-accent hover:text-ink"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <Rss className="h-3.5 w-3.5" aria-hidden />
-                        <span>Subscribe</span>
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </section>
-          ) : null}
-
-          {/* Per-book pitch */}
-          <section className="container-x py-16">
-            <div className="border border-line bg-bg-subtle p-6 md:p-8">
-              <div className="flex items-start gap-4">
-                <Mic className="mt-1 h-6 w-6 shrink-0 text-accent" aria-hidden />
-                <div>
-                  <p className="eyebrow mb-2">Per-episode playback</p>
-                  <p className="font-display text-xl text-ink md:text-2xl">
-                    Want one episode at a time? Open the book.
-                  </p>
-                  <p className="mt-3 max-w-2xl text-sm text-ink-dim">
-                    Every book&rsquo;s detail page has its podcast episode wired inline —
-                    no subscribe required. Pick a fight, hit play.
-                  </p>
-                  <Link href="/books" className="cta-secondary mt-5 inline-flex">
-                    <span>Browse the catalog</span>
-                  </Link>
-                </div>
-              </div>
+        <section className="border-t border-line">
+          <div className="container-x py-16">
+            <div className="mb-8 flex items-baseline justify-between">
+              <h2 className="font-display text-2xl text-ink md:text-3xl">
+                All {cards.length} podcasts
+              </h2>
+              <span className="eyebrow text-ink-mute">Tap play, or subscribe</span>
             </div>
-          </section>
-        </>
+            <ul className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              {cards.map(({ feed, kind, audioUrl, cover, bookTitle, bookSlug }) => (
+                <li
+                  key={feed.slug}
+                  className="border border-line bg-bg-subtle p-5 transition-colors hover:border-accent/60"
+                >
+                  <div className="flex items-start gap-3">
+                    <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-accent/80">
+                      {kind === 'master'
+                        ? 'Master feed · everything'
+                        : kind === 'special'
+                          ? 'Apex daily'
+                          : `S${String(feed.series).padStart(2, '0')}`}
+                    </p>
+                  </div>
+                  <p className="mt-2 font-display text-xl text-ink leading-[1.2]">
+                    {cleanTitle(feed.title)}
+                  </p>
+
+                  {audioUrl ? (
+                    <div className="mt-4">
+                      <AudioPlayer
+                        src={audioUrl}
+                        title={
+                          bookTitle ? `${bookTitle} — podcast` : `${cleanTitle(feed.title)} — sample`
+                        }
+                        variant="full"
+                      />
+                    </div>
+                  ) : kind === 'master' ? (
+                    <p className="mt-4 text-sm text-ink-dim">
+                      Every chapter, every series, in one feed. Subscribe in a podcast app
+                      to get new episodes as Brian drops them — 12 per week.
+                    </p>
+                  ) : kind === 'special' ? (
+                    <p className="mt-4 text-sm text-ink-dim">
+                      The daily firehose — one short kick, every day, from across the
+                      library. Best consumed in a podcast app.
+                    </p>
+                  ) : (
+                    <p className="mt-4 text-sm text-ink-mute">Episode coming online soon.</p>
+                  )}
+
+                  <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs">
+                    <a
+                      href={feed.feedUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 uppercase tracking-widest text-accent hover:text-ink"
+                    >
+                      <Rss className="h-3.5 w-3.5" aria-hidden />
+                      <span>Subscribe via RSS</span>
+                    </a>
+                    {bookSlug ? (
+                      <Link
+                        href={`/books/${bookSlug}`}
+                        className="inline-flex items-center gap-2 uppercase tracking-widest text-ink-dim hover:text-ink"
+                      >
+                        <Mic className="h-3.5 w-3.5" aria-hidden />
+                        <span>Open the book</span>
+                      </Link>
+                    ) : null}
+                  </div>
+
+                  {cover ? (
+                    // Decorative thumb — keep it small + bottom-right so the
+                    // player stays the focus.
+                    <div
+                      aria-hidden
+                      className="pointer-events-none mt-3 flex justify-end opacity-50"
+                    >
+                      <span
+                        className="block h-10 w-10 bg-cover bg-center"
+                        style={{ backgroundImage: `url(${cover})` }}
+                      />
+                    </div>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
       )}
+
+      {/* Per-book pitch */}
+      <section className="container-x py-16">
+        <div className="border border-line bg-bg-subtle p-6 md:p-8">
+          <div className="flex items-start gap-4">
+            <Mic className="mt-1 h-6 w-6 shrink-0 text-accent" aria-hidden />
+            <div>
+              <p className="eyebrow mb-2">Per-episode playback</p>
+              <p className="font-display text-xl text-ink md:text-2xl">
+                Want one episode at a time? Open the book.
+              </p>
+              <p className="mt-3 max-w-2xl text-sm text-ink-dim">
+                Every book&rsquo;s detail page has its podcast episode wired inline — no
+                subscribe required. Pick a fight, hit play.
+              </p>
+              <Link href="/books" className="cta-secondary mt-5 inline-flex">
+                <span>Browse the catalog</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
     </PageShell>
   );
 }

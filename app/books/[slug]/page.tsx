@@ -1,10 +1,11 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { ArrowLeft, ArrowRight, Mic, Headphones } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Mic, Headphones, Film } from 'lucide-react';
 import { PageShell } from '@/components/PageShell';
 import { Cover } from '@/components/Cover';
 import { PriceSelector } from '@/components/PriceSelector';
 import { AudioPlayer } from '@/components/AudioPlayer';
+import { VideoPlayer } from '@/components/VideoPlayer';
 import { BookReviews } from '@/components/BookReviews';
 import { EmailGate } from '@/components/EmailGate';
 import { JsonLdSchema } from '@/components/JsonLdSchema';
@@ -136,6 +137,24 @@ export default async function BookDetailPage({ params }: BookRouteProps) {
               src={book.audiobook.full_url}
               title={`${book.title} — full audiobook`}
               variant="full"
+            />
+          </div>
+        </section>
+      ) : null}
+
+      {/* Podcast video — same episode in MP4. VideoPlayer self-hides if
+          the backend hasn't uploaded the file yet (returns 403/404). */}
+      {book.podcast_video_url ? (
+        <section className="border-b border-line">
+          <div className="container-x grid gap-6 py-10 md:grid-cols-[auto_1fr] md:items-start">
+            <div className="flex items-center gap-3 text-accent">
+              <Film className="h-8 w-8" aria-hidden />
+              <p className="font-display text-2xl text-ink">Watch the podcast</p>
+            </div>
+            <VideoPlayer
+              src={book.podcast_video_url}
+              poster={imageProxy(book.cover_r2_key) || undefined}
+              title={`${book.title} — podcast video`}
             />
           </div>
         </section>

@@ -55,6 +55,10 @@ export interface BookDetail extends BookSummary {
   // Per-book podcast episode (real CDN URL; ~13 unique podcasts cycle across
   // all 636 books while audiobook R2 migration is pending).
   podcast_episode_url?: string;
+  // Video version of the same podcast episode. Same backend route, .mp4
+  // instead of .mp3. Derived in lib/api.ts; the VideoPlayer component
+  // hides itself if the backend hasn't uploaded the MP4 yet.
+  podcast_video_url?: string;
   // Per-format ISBN — needed for SEO Book schema.
   paperback_isbn?: string;
   hardcover_isbn?: string;

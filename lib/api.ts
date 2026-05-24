@@ -233,6 +233,12 @@ function adaptBookDetail(raw: RawBookDetail): BookDetail {
     sample_chapter,
     audiobook,
     podcast_episode_url: raw.podcast?.episodeUrl || undefined,
+    // Video lives at the same path, .mp4 instead of .mp3. The backend
+    // hasn't surfaced a dedicated field yet — the URL swap is the
+    // pre-agreed pattern. VideoPlayer hides itself when the file 403s.
+    podcast_video_url: raw.podcast?.episodeUrl
+      ? raw.podcast.episodeUrl.replace(/\.mp3(\?|$)/, '.mp4$1')
+      : undefined,
     paperback_isbn: raw.paperback?.isbn,
     hardcover_isbn: raw.hardcover?.isbn,
     back_cover: raw.backCover

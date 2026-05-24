@@ -1,10 +1,12 @@
 import Link from 'next/link';
-import { Mic, Rss } from 'lucide-react';
+import { Mic, Rss, Film } from 'lucide-react';
 import { PageShell } from '@/components/PageShell';
 import { Hero } from '@/components/Hero';
 import { JsonLdSchema } from '@/components/JsonLdSchema';
-import { getPageSeo, getPodcastFeed } from '@/lib/api';
+import { VideoPlayer } from '@/components/VideoPlayer';
+import { getBook, getPageSeo, getPodcastFeed } from '@/lib/api';
 import { buildMetadata, fallbackPageSchema } from '@/lib/seo';
+import { imageProxy } from '@/lib/utils';
 import { empty } from '@/lib/voice';
 
 export const metadata = buildMetadata({
@@ -39,7 +41,14 @@ function cleanTitle(raw: string): string {
 }
 
 export default async function PodcastPage() {
-  const [feedRes, seo] = await Promise.all([getPodcastFeed(50), getPageSeo('/podcast')]);
+  const [feedRes, seo, featuredBook] = await Promise.all([
+    getPodcastFeed(50),
+    getPageSeo('/podcast'),
+    // Pull book #1 of series #1 so we can surface its podcast video as
+    // the page's featured player. VideoPlayer self-hides if the backend
+    // hasn't uploaded that MP4 yet — page still renders cleanly.
+    getBook('the-discipline-blueprint'),
+  ]);
   const feeds = feedRes?.feeds ?? [];
   const master = feeds.find((f) => f.slug === 'master' || typeof f.series !== 'number');
   const perSeries = feeds.filter((f) => typeof f.series === 'number').sort((a, b) => (a.series ?? 0) - (b.series ?? 0));
@@ -78,6 +87,34 @@ export default async function PodcastPage() {
           </p>
         </div>
       </section>
+
+      {/* Featured video — pulls book #1 of series #1. VideoPlayer hides
+          itself if the backend's MP4 isn't live yet, so this block
+          disappears cleanly until the videos land in R2. */}
+      {featuredBook?.podcast_video_url ? (
+        <section className="container-x py-16">
+          <div className="mb-6">
+            <p className="eyebrow mb-3 text-accent">Watch the podcast</p>
+            <h2 className="font-display text-3xl text-ink md:text-4xl">
+              Same episode, on video.
+            </h2>
+            <p className="mt-3 max-w-2xl text-sm text-ink-dim md:text-base">
+              Brian and the cohost, recorded. Open the player below or grab a feed and
+              listen in your podcast app.
+            </p>
+          </div>
+          <VideoPlayer
+            src={featuredBook.podcast_video_url}
+            poster={imageProxy(featuredBook.cover_r2_key) || undefined}
+            title={`${featuredBook.title} — podcast video`}
+          />
+          <p className="mt-3 text-[11px] text-ink-mute">
+            <Film className="mr-1 inline h-3 w-3" aria-hidden />
+            Featuring: {featuredBook.title}. Each book has its own video on its detail
+            page.
+          </p>
+        </section>
+      ) : null}
 
       {feeds.length === 0 ? (
         <section className="container-x py-16">

@@ -42,6 +42,22 @@ export interface ReviewExcerpt {
 
 export interface BookDetail extends BookSummary {
   description: string;
+  // Backend's internal book id (e.g. "s01_b01"). Stable across slug
+  // renames — Stripe checkout uses this as the cart-line identity.
+  book_id?: string;
+  // True only when this book's audio/podcast files actually exist in R2.
+  // false means the inline player is borrowing a peer's file via the
+  // backend's cycling fallback; UI must cap that at a 30-sec preview
+  // and surface a "Buy the audiobook" CTA afterward.
+  is_authentic?: boolean;
+  // Direct-sale prices for our Stripe checkout (different from the
+  // retail priceUsd which is what Amazon/IngramSpark list). Defaulted
+  // in the adapter until backend ships the dedicated fields.
+  ebook_direct_price_usd: number;
+  audiobook_direct_price_usd: number;
+  bundle_direct_price_usd: number;
+  // When each format went live on Amazon — informational only for now.
+  published_at?: string;
   sample_chapter: {
     title: string;
     body: string; // ~400 word excerpt from chapter 1

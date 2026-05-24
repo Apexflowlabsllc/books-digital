@@ -2,22 +2,51 @@ import Link from 'next/link';
 import { PageShell } from '@/components/PageShell';
 import { Confetti } from '@/components/Confetti';
 import { buildMetadata } from '@/lib/seo';
+import { backendSafe } from '@/lib/api';
 
 export const metadata = {
   ...buildMetadata({
     title: 'Thanks — you ordered.',
-    description: 'Your order is in. Files land in your inbox; backend handles fulfillment.',
+    description: 'Your order is in. Files land in your inbox within 2 minutes.',
     path: '/thanks',
   }),
   robots: { index: false, follow: false },
 };
 
+// Stripe redirects with ?session_id={CHECKOUT_SESSION_ID}. Keep the
+// legacy ?session= param around in case anything still emits it.
 interface ThanksProps {
-  searchParams: Promise<{ session?: string; product?: string }>;
+  searchParams: Promise<{ session_id?: string; session?: string; product?: string }>;
+}
+
+// Shape the backend will return on GET /api/v1/orders/<sessionId>.
+// Cosmetic only — webhook + Resend already handle delivery before the
+// user lands here. Tolerated as null if the backend route 404s.
+interface OrderResponse {
+  bookTitle?: string;
+  bookSlug?: string;
+  formats?: Array<'ebook' | 'audiobook' | 'bundle' | string>;
+}
+
+function formatList(formats?: string[]): string {
+  if (!formats || formats.length === 0) return 'order';
+  const cleaned = formats.flatMap((f) => (f === 'bundle' ? ['ebook', 'audiobook'] : [f]));
+  if (cleaned.length === 1) return cleaned[0]!;
+  if (cleaned.length === 2) return `${cleaned[0]} + ${cleaned[1]}`;
+  return cleaned.join(', ');
 }
 
 export default async function ThanksPage({ searchParams }: ThanksProps) {
   const sp = await searchParams;
+  const sessionId = sp.session_id ?? sp.session;
+
+  const order = sessionId
+    ? await backendSafe<OrderResponse>(`/api/v1/orders/${sessionId}`, { revalidate: 0 })
+    : null;
+
+  const title = order?.bookTitle;
+  const formats = formatList(order?.formats);
+
   return (
     <PageShell>
       <Confetti />
@@ -26,19 +55,34 @@ export default async function ThanksPage({ searchParams }: ThanksProps) {
         <h1 className="font-display text-5xl text-ink md:text-7xl">
           <span className="metallic-text">Shipped.</span>
         </h1>
-        <p className="mt-6 max-w-xl text-ink-dim">
-          The backend is finalizing your fulfillment now. Receipt + downloads land in your inbox
-          within 5 minutes. If you ordered audiobook or eBook, the files are streamed via the
-          Books Pass library — sign in at apexflowlabs.com to access.
+
+        <p className="mt-6 max-w-2xl text-ink-dim md:text-lg">
+          {title ? (
+            <>
+              Thanks — your <span className="text-ink">{title}</span>{' '}
+              <span className="text-ink">{formats}</span> is on its way to your inbox right
+              now.
+            </>
+          ) : (
+            <>
+              Thanks — your order is on its way to your inbox right now.
+            </>
+          )}{' '}
+          If it&rsquo;s not there in 2 minutes, check spam or hit reply.
         </p>
 
-        {sp.session ? (
-          <p className="mt-4 text-xs text-ink-mute">Stripe session: {sp.session}</p>
+        {sessionId ? (
+          <p className="mt-4 font-mono text-[11px] text-ink-mute">Order ref: {sessionId}</p>
         ) : null}
 
         <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+          {order?.bookSlug ? (
+            <Link href={`/books/${order.bookSlug}`} className="cta-secondary">
+              Back to {title ?? 'the book'}
+            </Link>
+          ) : null}
           <Link href="/books" className="cta-primary">
-            Back to the library
+            Browse more books
           </Link>
           <Link href="/contact" className="cta-secondary">
             Order question? Email support

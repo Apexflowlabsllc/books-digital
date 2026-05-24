@@ -116,6 +116,12 @@ interface RawBookDetail {
   subtitle?: string;
   bookNumber: number;
   description: string;
+  // Backend may or may not return these depending on deploy state.
+  isAuthentic?: boolean;
+  publishedAt?: string | null;
+  ebookDirectPriceUsd?: number;
+  audiobookDirectPriceUsd?: number;
+  bundleDirectPriceUsd?: number;
   series: {
     number: number;
     slug: string;
@@ -149,8 +155,6 @@ interface RawBookDetail {
   keywords?: string[];
   categories?: string[];
   relatedBooks?: Array<{ id: string; type: string; score: number; rationale: string }>;
-  isAuthentic?: boolean;
-  publishedAt?: string;
   generatedAt?: string;
 }
 
@@ -230,6 +234,15 @@ function adaptBookDetail(raw: RawBookDetail): BookDetail {
     audio_status,
     primary_keyword: raw.keywords?.[0],
     description: raw.description || raw.backCover?.body || '',
+    book_id: raw.bookId,
+    is_authentic: raw.isAuthentic,
+    published_at: raw.publishedAt || undefined,
+    // Direct-sale prices. Backend hasn't shipped these yet — fall back
+    // to the Brian-approved defaults from the handoff. Once the backend
+    // adds the *DirectPriceUsd fields these flip over automatically.
+    ebook_direct_price_usd: raw.ebookDirectPriceUsd ?? 5.99,
+    audiobook_direct_price_usd: raw.audiobookDirectPriceUsd ?? 12.99,
+    bundle_direct_price_usd: raw.bundleDirectPriceUsd ?? 16.99,
     sample_chapter,
     audiobook,
     podcast_episode_url: raw.podcast?.episodeUrl || undefined,

@@ -4,17 +4,26 @@ import { ArrowLeft, ArrowRight, Mic, Headphones, Film } from 'lucide-react';
 import { PageShell } from '@/components/PageShell';
 import { Cover } from '@/components/Cover';
 import { PriceSelector } from '@/components/PriceSelector';
-import { AudioPlayer } from '@/components/AudioPlayer';
-import { VideoPlayer } from '@/components/VideoPlayer';
+import { PreviewAudio } from '@/components/PreviewAudio';
+import { PreviewVideo } from '@/components/PreviewVideo';
 import { BookReviews } from '@/components/BookReviews';
 import { EmailGate } from '@/components/EmailGate';
 import { JsonLdSchema } from '@/components/JsonLdSchema';
 import { getBook, getBookSeo } from '@/lib/api';
+import { getAudioPreviewPool, getPodcastPreviewPool } from '@/lib/preview-pool';
 import { buildMetadata, fallbackBookSchema } from '@/lib/seo';
 import { imageProxy, intensityGlyphs, waveLabel } from '@/lib/utils';
 
 interface BookRouteProps {
   params: Promise<{ slug: string }>;
+}
+
+// First paragraph (split on double-newline). Per Brian's doctrine the
+// description must match Amazon/IngramSpark verbatim — but for OG /
+// Twitter cards we trim to the lead paragraph + 200 chars.
+function shortDescription(full: string): string {
+  const lead = full.split(/\n\n+/)[0] ?? full;
+  return lead.length > 200 ? `${lead.slice(0, 197)}…` : lead;
 }
 
 export async function generateMetadata({ params }: BookRouteProps) {
@@ -28,7 +37,7 @@ export async function generateMetadata({ params }: BookRouteProps) {
   }
   return buildMetadata({
     title: `${book.title} — ${book.series_name}`,
-    description: book.description.slice(0, 180),
+    description: shortDescription(book.description),
     path: `/books/${book.slug}`,
     image: imageProxy(book.cover_r2_key) || undefined,
     type: 'book',
@@ -39,9 +48,22 @@ export const revalidate = 3600;
 
 export default async function BookDetailPage({ params }: BookRouteProps) {
   const { slug } = await params;
-  const [book, seo] = await Promise.all([getBook(slug), getBookSeo(slug)]);
+  const [book, seo, audioPool, podcastPool] = await Promise.all([
+    getBook(slug),
+    getBookSeo(slug),
+    getAudioPreviewPool(),
+    getPodcastPreviewPool(),
+  ]);
 
   if (!book) notFound();
+
+  // Authenticity gates whether the player shows full audio or a 30s
+  // preview from a borrowed peer. Per backend handoff: when
+  // is_authentic === true, the file is real and lives in R2 for this
+  // book; when false, the backend's cycling fallback returns a peer's
+  // file — frontend caps that at 30s and prompts purchase.
+  const audioAuthentic = book.is_authentic === true;
+  const podcastAuthentic = book.is_authentic === true;
 
   return (
     <PageShell seriesColor={book.series_color}>
@@ -97,7 +119,7 @@ export default async function BookDetailPage({ params }: BookRouteProps) {
             <span>{book.sample_chapter?.word_count?.toLocaleString() ?? '~38,000'} words · 90 chapters</span>
           </div>
 
-          <p className="mt-6 max-w-prose text-ink">{book.description}</p>
+          <p className="mt-6 max-w-prose text-ink whitespace-pre-line">{book.description}</p>
 
           <div id="buy" className="mt-8 scroll-mt-24">
             <PriceSelector book={book} />
@@ -124,69 +146,73 @@ export default async function BookDetailPage({ params }: BookRouteProps) {
         </div>
       </section>
 
-      {/* Audiobook — Polly Neural narration, paid product. We cap the
-          inline player at a 30-sec preview; the full file is what the
-          customer gets after purchase. The audio source IS the real MP3
-          (no separate preview file from backend yet) — the cap is a
-          browser-side gate, not crypto. Backend will eventually serve a
-          true 30s preview endpoint. */}
-      {book.audio_status === 'live' && book.audiobook?.full_url ? (
-        <section className="border-y border-line bg-bg-subtle">
-          <div className="container-x grid gap-6 py-10 md:grid-cols-[auto_1fr] md:items-start">
-            <div className="flex items-center gap-3 text-series">
-              <Headphones className="h-8 w-8" aria-hidden />
-              <div>
-                <p className="font-display text-2xl text-ink">Listen — 30-sec preview</p>
-                <p className="text-xs text-ink-mute">Audiobook · paid</p>
-              </div>
+      {/* Audiobook — Polly Neural narration. Authentic books play full
+          length; non-authentic borrow a peer's MP3 capped at 30s. */}
+      <section className="border-y border-line bg-bg-subtle">
+        <div className="container-x grid gap-6 py-10 md:grid-cols-[auto_1fr] md:items-start">
+          <div className="flex items-center gap-3 text-series">
+            <Headphones className="h-8 w-8" aria-hidden />
+            <div>
+              <p className="font-display text-2xl text-ink">
+                {audioAuthentic ? 'Listen to the audiobook' : 'Hear a 30-sec preview'}
+              </p>
+              <p className="text-xs text-ink-mute">
+                Audiobook · ${book.audiobook_direct_price_usd.toFixed(2)}
+              </p>
             </div>
-            <AudioPlayer
-              src={book.audiobook.full_url}
-              title={`${book.title} — 30-sec preview`}
-              variant="full"
-              previewMaxSeconds={30}
-              previewCta={{ href: '#buy', label: 'Get the audiobook' }}
-            />
           </div>
-        </section>
-      ) : null}
+          <PreviewAudio
+            kind="audiobook"
+            ownSlug={book.slug}
+            isAuthentic={audioAuthentic}
+            ownAudioUrl={book.audiobook?.full_url}
+            pool={audioPool}
+            buyHref="#buy"
+            buyLabel={`Buy the audiobook — $${book.audiobook_direct_price_usd.toFixed(2)}`}
+            title={`${book.title} — audiobook`}
+          />
+        </div>
+      </section>
 
-      {/* Podcast video — same episode in MP4. VideoPlayer self-hides if
-          the backend hasn't uploaded the file yet (returns 403/404). */}
-      {book.podcast_video_url ? (
-        <section className="border-b border-line">
-          <div className="container-x grid gap-6 py-10 md:grid-cols-[auto_1fr] md:items-start">
-            <div className="flex items-center gap-3 text-accent">
-              <Film className="h-8 w-8" aria-hidden />
-              <p className="font-display text-2xl text-ink">Watch the podcast</p>
-            </div>
-            <VideoPlayer
-              src={book.podcast_video_url}
-              poster={imageProxy(book.cover_r2_key) || undefined}
-              title={`${book.title} — podcast video`}
-            />
+      {/* Podcast video — borrows the same authenticity gate. */}
+      <section className="border-b border-line">
+        <div className="container-x grid gap-6 py-10 md:grid-cols-[auto_1fr] md:items-start">
+          <div className="flex items-center gap-3 text-accent">
+            <Film className="h-8 w-8" aria-hidden />
+            <p className="font-display text-2xl text-ink">Watch the podcast</p>
           </div>
-        </section>
-      ) : null}
+          <PreviewVideo
+            ownSlug={book.slug}
+            isAuthentic={podcastAuthentic}
+            ownVideoUrl={book.podcast_video_url}
+            pool={podcastPool}
+            poster={imageProxy(book.cover_r2_key) || undefined}
+            title={`${book.title} — podcast video`}
+            buyHref="#buy"
+            buyLabel={`Buy the audiobook — $${book.audiobook_direct_price_usd.toFixed(2)}`}
+          />
+        </div>
+      </section>
 
-      {/* Podcast episode — every book ships with a podcast even when the
-          full audiobook is still queued. Works as the audio preview while
-          the R2 migration finishes. */}
-      {book.podcast_episode_url ? (
-        <section className="border-b border-line">
-          <div className="container-x grid gap-6 py-10 md:grid-cols-[auto_1fr] md:items-center">
-            <div className="flex items-center gap-3 text-accent">
-              <Mic className="h-8 w-8" aria-hidden />
-              <p className="font-display text-2xl text-ink">Listen to the podcast</p>
-            </div>
-            <AudioPlayer
-              src={book.podcast_episode_url}
-              title={`${book.title} — podcast episode`}
-              variant="full"
-            />
+      {/* Podcast audio episode. */}
+      <section className="border-b border-line">
+        <div className="container-x grid gap-6 py-10 md:grid-cols-[auto_1fr] md:items-start">
+          <div className="flex items-center gap-3 text-accent">
+            <Mic className="h-8 w-8" aria-hidden />
+            <p className="font-display text-2xl text-ink">Listen to the podcast</p>
           </div>
-        </section>
-      ) : null}
+          <PreviewAudio
+            kind="podcast"
+            ownSlug={book.slug}
+            isAuthentic={podcastAuthentic}
+            ownAudioUrl={book.podcast_episode_url}
+            pool={podcastPool}
+            buyHref="#buy"
+            buyLabel={`Buy the audiobook — $${book.audiobook_direct_price_usd.toFixed(2)}`}
+            title={`${book.title} — podcast episode`}
+          />
+        </div>
+      </section>
 
       {/* Sample chapter excerpt */}
       <section className="container-x py-16">
@@ -217,7 +243,7 @@ export default async function BookDetailPage({ params }: BookRouteProps) {
               <ul className="space-y-2 text-ink-dim">
                 <li>· 35-40k words. 90 chapters. One per day of the 90-day program.</li>
                 <li>· Audiobook narrated via supervised Polly Neural.</li>
-                <li>· Hardcover comes with Printful protective wrap.</li>
+                <li>· Bundle = ebook + audiobook, instant download, one click.</li>
               </ul>
             </div>
           </aside>

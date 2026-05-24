@@ -139,6 +139,18 @@ export interface CatalogResponse {
   total: number;
 }
 
+// What the backend's /api/v1/podcast/feed currently returns: a list of RSS
+// feed URLs (one "master" + one per series). Individual episodes aren't
+// exposed via JSON yet; podcast apps consume the RSS feeds directly, and
+// per-book audio lives on each BookDetail as podcast_episode_url.
+export interface PodcastFeed {
+  slug: string;            // "master" | "s01_discipline" | ...
+  title: string;           // backend title (may still say "Apex Raw Motivation")
+  feedUrl: string;         // RSS XML endpoint
+  series?: number;         // 1-12 for per-series feeds; missing on master
+}
+
 export interface PodcastFeedResponse {
-  episodes: PodcastEpisode[];
+  count: number;
+  feeds: PodcastFeed[];
 }

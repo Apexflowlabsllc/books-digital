@@ -1,29 +1,25 @@
 import { env } from '@/lib/env';
-import { getPodcastFeed } from '@/lib/api';
 import { urlsetXml } from '@/lib/xml';
 
 export const revalidate = 3600;
 
+// Until the backend exposes individual episodes via JSON (currently the
+// /api/v1/podcast/feed endpoint only returns RSS feed URLs), this sitemap
+// just lists the /podcast hub. Per-episode URLs will be added once the
+// backend ships them.
 export async function GET() {
   const siteUrl = env.siteUrl.replace(/\/$/, '');
-  const feed = await getPodcastFeed(500);
-  const list = feed?.episodes ?? [];
   const today = new Date().toISOString().slice(0, 10);
 
-  const entries: Array<{ loc: string; lastmod: string; changefreq: string; priority: number }> = [
-    { loc: `${siteUrl}/podcast`, lastmod: today, changefreq: 'daily', priority: 0.8 },
-    ...list.map((ep) => ({
-      loc: `${siteUrl}/podcast/${ep.slug}`,
-      lastmod: ep.published_at?.slice(0, 10) ?? today,
-      changefreq: 'monthly',
-      priority: 0.6,
-    })),
-  ];
-
-  return new Response(urlsetXml(entries), {
-    headers: {
-      'Content-Type': 'application/xml; charset=utf-8',
-      'Cache-Control': 'public, max-age=3600',
+  return new Response(
+    urlsetXml([
+      { loc: `${siteUrl}/podcast`, lastmod: today, changefreq: 'daily', priority: 0.8 },
+    ]),
+    {
+      headers: {
+        'Content-Type': 'application/xml; charset=utf-8',
+        'Cache-Control': 'public, max-age=3600',
+      },
     },
-  });
+  );
 }

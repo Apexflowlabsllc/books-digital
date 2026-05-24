@@ -99,7 +99,7 @@ export default async function BookDetailPage({ params }: BookRouteProps) {
 
           <p className="mt-6 max-w-prose text-ink">{book.description}</p>
 
-          <div className="mt-8">
+          <div id="buy" className="mt-8 scroll-mt-24">
             <PriceSelector book={book} />
           </div>
 
@@ -124,19 +124,28 @@ export default async function BookDetailPage({ params }: BookRouteProps) {
         </div>
       </section>
 
-      {/* Audiobook — full Polly Neural narration, served via signed R2 redirect.
-          Only renders when audio is live; until then we skip the section. */}
+      {/* Audiobook — Polly Neural narration, paid product. We cap the
+          inline player at a 30-sec preview; the full file is what the
+          customer gets after purchase. The audio source IS the real MP3
+          (no separate preview file from backend yet) — the cap is a
+          browser-side gate, not crypto. Backend will eventually serve a
+          true 30s preview endpoint. */}
       {book.audio_status === 'live' && book.audiobook?.full_url ? (
         <section className="border-y border-line bg-bg-subtle">
-          <div className="container-x grid gap-6 py-10 md:grid-cols-[auto_1fr] md:items-center">
+          <div className="container-x grid gap-6 py-10 md:grid-cols-[auto_1fr] md:items-start">
             <div className="flex items-center gap-3 text-series">
               <Headphones className="h-8 w-8" aria-hidden />
-              <p className="font-display text-2xl text-ink">Listen to the audiobook</p>
+              <div>
+                <p className="font-display text-2xl text-ink">Listen — 30-sec preview</p>
+                <p className="text-xs text-ink-mute">Audiobook · paid</p>
+              </div>
             </div>
             <AudioPlayer
               src={book.audiobook.full_url}
-              title={`${book.title} — full audiobook`}
+              title={`${book.title} — 30-sec preview`}
               variant="full"
+              previewMaxSeconds={30}
+              previewCta={{ href: '#buy', label: 'Get the audiobook' }}
             />
           </div>
         </section>

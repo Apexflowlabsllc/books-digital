@@ -5,6 +5,11 @@ import { useEffect, useState } from 'react';
 import { Gift, Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { EmailCaptureModal } from './EmailCaptureModal';
+import { NavUserMenu } from './auth/NavUserMenu';
+
+interface NavProps {
+  userEmail?: string | null;
+}
 
 const LINKS = [
   { href: '/books', label: 'Books' },
@@ -16,7 +21,7 @@ const LINKS = [
   { href: '/bundles', label: 'Bundles' },
 ];
 
-export function Nav() {
+export function Nav({ userEmail }: NavProps = {}) {
   const [modalOpen, setModalOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -92,9 +97,20 @@ export function Nav() {
               <Gift className="h-3.5 w-3.5" aria-hidden />
               <span>15% off</span>
             </button>
-            <Link href="/books" className="cta-secondary hidden md:inline-flex">
-              <span>Browse</span>
-            </Link>
+
+            {userEmail ? (
+              <div className="hidden md:block">
+                <NavUserMenu email={userEmail} />
+              </div>
+            ) : (
+              <Link
+                href="/sign-in"
+                className="cta-secondary hidden md:inline-flex"
+                data-cursor-label="Open"
+              >
+                <span>Sign in</span>
+              </Link>
+            )}
 
             {/* Hamburger — mobile only */}
             <button
@@ -183,25 +199,40 @@ export function Nav() {
           </nav>
 
           <div className="flex flex-col gap-3 border-t border-[rgba(217,204,140,0.2)] px-6 py-6">
+            {userEmail ? (
+              <>
+                <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-accent/70">
+                  Signed in · {userEmail}
+                </p>
+                <Link
+                  href="/account"
+                  onClick={() => setMenuOpen(false)}
+                  className="cta-primary w-full justify-center"
+                >
+                  <span>Your account</span>
+                </Link>
+              </>
+            ) : (
+              <Link
+                href="/sign-in"
+                onClick={() => setMenuOpen(false)}
+                className="cta-primary w-full justify-center"
+              >
+                <span>Sign in</span>
+              </Link>
+            )}
             <button
               type="button"
               onClick={() => {
                 setMenuOpen(false);
                 setModalOpen(true);
               }}
-              className="cta-primary w-full justify-center"
+              className="cta-secondary w-full justify-center"
               data-cursor-label="Open"
             >
               <Gift className="h-3.5 w-3.5" aria-hidden />
               <span>15% off your first order</span>
             </button>
-            <Link
-              href="/books"
-              onClick={() => setMenuOpen(false)}
-              className="cta-secondary w-full justify-center"
-            >
-              <span>Browse the 12 series</span>
-            </Link>
           </div>
         </aside>
       </div>

@@ -126,7 +126,7 @@ export default async function BookDetailPage({ params }: BookRouteProps) {
         </div>
       </section>
 
-      {/* Audio sample */}
+      {/* Audiobook sample — gated on real mp3 availability */}
       <section className="border-y border-line bg-bg-subtle">
         <div className="container-x grid gap-6 py-10 md:grid-cols-[auto_1fr] md:items-center">
           <div className="flex items-center gap-3 text-series">
@@ -148,6 +148,26 @@ export default async function BookDetailPage({ params }: BookRouteProps) {
           )}
         </div>
       </section>
+
+      {/* Podcast episode — every book ships with a podcast even when the
+          full audiobook is still queued. Works as the audio preview while
+          the R2 migration finishes. */}
+      {book.podcast_episode_url ? (
+        <section className="border-b border-line">
+          <div className="container-x grid gap-6 py-10 md:grid-cols-[auto_1fr] md:items-center">
+            <div className="flex items-center gap-3 text-accent">
+              <Mic className="h-8 w-8" aria-hidden />
+              <p className="font-display text-2xl text-ink">Listen to the podcast</p>
+            </div>
+            <AudioPlayer
+              src={book.podcast_episode_url}
+              title={`${book.title} — podcast episode`}
+              description="Apex Raw Motivation · the audio companion"
+              variant="full"
+            />
+          </div>
+        </section>
+      ) : null}
 
       {/* Sample chapter excerpt */}
       <section className="container-x py-16">

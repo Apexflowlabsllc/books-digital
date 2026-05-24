@@ -52,6 +52,22 @@ export interface BookDetail extends BookSummary {
     full_url?: string; // gated audiobook stream
     duration_seconds?: number;
   };
+  // Per-book podcast episode (real CDN URL; ~13 unique podcasts cycle across
+  // all 636 books while audiobook R2 migration is pending).
+  podcast_episode_url?: string;
+  // Per-format ISBN — needed for SEO Book schema.
+  paperback_isbn?: string;
+  hardcover_isbn?: string;
+  // Marketing back-cover content from the backend.
+  back_cover?: {
+    headline: string;
+    subhead: string;
+    body: string;
+    bullets: Array<{ title: string; body: string }>;
+    callout: string[];
+  };
+  keywords?: string[];
+  categories?: string[];
   reviews: ReviewExcerpt[];
   review_summary?: { count: number; averageRating: number };
   previous_book_slug?: string;

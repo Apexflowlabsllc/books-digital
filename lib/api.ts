@@ -298,18 +298,30 @@ export async function getSeriesList(): Promise<{ series: SeriesSummary[] } | nul
 }
 
 export async function getSeries(slug: string): Promise<SeriesDetail | null> {
-  const [rawSeries, rawCatalog] = await Promise.all([
-    backendSafe<RawSeriesSummary>(`/api/v1/series/${slug}`, {
+  // Try the slug as-given. If the backend doesn't know it AND the slug is
+  // missing the `-blueprint` suffix, retry with the suffix appended —
+  // this rescues stale links like /series/unstoppable that pre-date the
+  // canonical /series/unstoppable-blueprint slug schema.
+  const candidates = slug.endsWith('-blueprint') ? [slug] : [slug, `${slug}-blueprint`];
+  let rawSeries: RawSeriesSummary | null = null;
+  let resolvedSlug = slug;
+  for (const candidate of candidates) {
+    rawSeries = await backendSafe<RawSeriesSummary>(`/api/v1/series/${candidate}`, {
       revalidate: 3600,
-      tags: ['series', `series:${slug}`],
-    }),
-    // Series detail needs its books — pull via catalog filter. Catalog books
-    // are already BookSummary[], so they pass straight through.
-    backendSafe<RawCatalogResponse>(`/api/v1/books/catalog?series=${slug}&limit=200`, {
-      revalidate: 300,
-    }),
-  ]);
+      tags: ['series', `series:${candidate}`],
+    });
+    if (rawSeries) {
+      resolvedSlug = candidate;
+      break;
+    }
+  }
   if (!rawSeries) return null;
+
+  const rawCatalog = await backendSafe<RawCatalogResponse>(
+    `/api/v1/books/catalog?series=${resolvedSlug}&limit=200`,
+    { revalidate: 300 },
+  );
+
   return {
     ...adaptSeriesSummary(rawSeries),
     long_desc: rawSeries.promise,

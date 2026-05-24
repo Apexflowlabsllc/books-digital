@@ -135,7 +135,6 @@ export default async function BookDetailPage({ params }: BookRouteProps) {
             <AudioPlayer
               src={book.audiobook.full_url}
               title={`${book.title} — full audiobook`}
-              description="Polly Neural narration · supervised by Brian"
               variant="full"
             />
           </div>
@@ -155,7 +154,6 @@ export default async function BookDetailPage({ params }: BookRouteProps) {
             <AudioPlayer
               src={book.podcast_episode_url}
               title={`${book.title} — podcast episode`}
-              description="Apex Raw Motivation · the audio companion"
               variant="full"
             />
           </div>

@@ -40,29 +40,29 @@ const ORIGINS: Record<string, { x: number; y: number; rot: number }> = {
 // a different position/size on mobile. Falls back to the desktop x/y/size if
 // not set. So you only need to override the cards you want to move.
 //
-// Example: { src: '/b1.png', x: 12, y: 40, size: 100, mX: 18, mY: 26, mSize: 70, ... }
+// Example: { src: '/b1.webp', x: 12, y: 40, size: 100, mX: 18, mY: 26, mSize: 70, ... }
 //   → desktop sits at (12%, 40%) size 100vh, mobile sits at (18%, 26%) size 70vh
 //
 // Threshold: mobile = viewport ≤ 640px. Tablet uses the desktop x/y but the
 // --foundation-scale CSS var (in <style jsx>) still shrinks the size.
 const DECK = [
   // Batch 0 — first 4 books fly in on first scroll
-  { src: '/b1.png',  x: 12, y: 40, size: 100, rot: 93,  from: 'tl', batch: 0, title: 'The Discipline Blueprint',  titlePos: 'below' as const, mX: 8,  mY: 22, mSize: 40 },
-  { src: '/b2.png',  x: 80, y: 58, size: 90,  rot:  0,  from: 'tr', batch: 0, title: 'The Comeback Blueprint',    titlePos: 'above' as const, mX: 78, mY: 18, mSize: 30 },
-  { src: '/b3.png',  x: 38, y: 22, size:  40, rot:  0,  from: 't',  batch: 0, title: 'The Mind Reset Blueprint',  titlePos: 'below' as const, mX: 70, mY: 85, mSize: 30 },
-  { src: '/b4.png',  x: 10, y: 82, size:  60, rot:  0,  from: 'l',  batch: 0, title: 'The Success Blueprint',     titlePos: 'below' as const, mX: 16, mY: 82, mSize: 35 },
+  { src: '/b1.webp',  x: 12, y: 40, size: 100, rot: 93,  from: 'tl', batch: 0, title: 'The Discipline Blueprint',  titlePos: 'below' as const, mX: 8,  mY: 22, mSize: 40 },
+  { src: '/b2.webp',  x: 80, y: 58, size: 90,  rot:  0,  from: 'tr', batch: 0, title: 'The Comeback Blueprint',    titlePos: 'above' as const, mX: 78, mY: 18, mSize: 30 },
+  { src: '/b3.webp',  x: 38, y: 22, size:  40, rot:  0,  from: 't',  batch: 0, title: 'The Mind Reset Blueprint',  titlePos: 'below' as const, mX: 70, mY: 85, mSize: 30 },
+  { src: '/b4.webp',  x: 10, y: 82, size:  60, rot:  0,  from: 'l',  batch: 0, title: 'The Success Blueprint',     titlePos: 'below' as const, mX: 16, mY: 82, mSize: 35 },
 
   // Batch 1 — next 4 on second scroll
-  { src: '/b5.png',  x: 22, y: 42, size:  80, rot:  0,  from: 't',  batch: 1, title: 'The Elite Blueprint',       titlePos: 'below' as const, mX: 14, mY: 24, mSize: 40 },
-  { src: '/b6.png',  x: 86, y: 68, size:  40, rot: 340, from: 'r',  batch: 1, title: 'The Unstoppable Blueprint', titlePos: 'above' as const, mX: 80, mY: 72, mSize: 32 },
-  { src: '/b7.png',  x: 30, y: 80, size:  40, rot:   5, from: 'bl', batch: 1, title: 'The Nervous System Blueprint', titlePos: 'above' as const, mX: 18, mY: 80, mSize: 34 },
-  { src: '/b8.png',  x: 78, y: 36, size:  56, rot:  -4, from: 'tr', batch: 1, title: 'The Connection Blueprint',  titlePos: 'below' as const, mX: 76, mY: 28, mSize: 30 },
+  { src: '/b5.webp',  x: 22, y: 42, size:  80, rot:  0,  from: 't',  batch: 1, title: 'The Elite Blueprint',       titlePos: 'below' as const, mX: 14, mY: 24, mSize: 40 },
+  { src: '/b6.webp',  x: 86, y: 68, size:  40, rot: 340, from: 'r',  batch: 1, title: 'The Unstoppable Blueprint', titlePos: 'above' as const, mX: 80, mY: 72, mSize: 32 },
+  { src: '/b7.webp',  x: 30, y: 80, size:  40, rot:   5, from: 'bl', batch: 1, title: 'The Nervous System Blueprint', titlePos: 'above' as const, mX: 18, mY: 80, mSize: 34 },
+  { src: '/b8.webp',  x: 78, y: 36, size:  56, rot:  -4, from: 'tr', batch: 1, title: 'The Connection Blueprint',  titlePos: 'below' as const, mX: 76, mY: 28, mSize: 30 },
 
   // Batch 2 — final 4 on third scroll
-  { src: '/b9.png',  x: 14, y: 34, size:  62, rot:  -3, from: 'tl', batch: 2, title: 'The Power Blueprint',       titlePos: 'below' as const, mX: 12, mY: 22, mSize: 35 },
-  { src: '/b10.png', x: 84, y: 78, size:  48, rot:   3, from: 'br', batch: 2, title: 'The Purpose Blueprint',     titlePos: 'above' as const, mX: 80, mY: 78, mSize: 38 },
-  { src: '/b11.png', x: 22, y: 80, size:  68, rot:   0, from: 'b',  batch: 2, title: 'The Warrior Blueprint',     titlePos: 'above' as const, mX: 18, mY: 78, mSize: 38 },
-  { src: '/b12.png', x: 84, y: 26, size:  50, rot:   0, from: 't',  batch: 2, title: 'The Legend Blueprint',      titlePos: 'below' as const, mX: 78, mY: 26, mSize: 38 },
+  { src: '/b9.webp',  x: 14, y: 34, size:  62, rot:  -3, from: 'tl', batch: 2, title: 'The Power Blueprint',       titlePos: 'below' as const, mX: 12, mY: 22, mSize: 35 },
+  { src: '/b10.webp', x: 84, y: 78, size:  48, rot:   3, from: 'br', batch: 2, title: 'The Purpose Blueprint',     titlePos: 'above' as const, mX: 80, mY: 78, mSize: 38 },
+  { src: '/b11.webp', x: 22, y: 80, size:  68, rot:   0, from: 'b',  batch: 2, title: 'The Warrior Blueprint',     titlePos: 'above' as const, mX: 18, mY: 78, mSize: 38 },
+  { src: '/b12.webp', x: 84, y: 26, size:  50, rot:   0, from: 't',  batch: 2, title: 'The Legend Blueprint',      titlePos: 'below' as const, mX: 78, mY: 26, mSize: 38 },
 ];
 
 export function FoundationSection() {

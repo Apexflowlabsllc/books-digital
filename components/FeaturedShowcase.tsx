@@ -8,12 +8,12 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ArrowLeft, ArrowRight, ArrowUpRight } from 'lucide-react';
 import type { BookSummary } from '@/lib/types';
 
-import b1 from '../public/b1.png';
-import b2 from '../public/b2.png';
-import b3 from '../public/b3.png';
-import b4 from '../public/b4.png';
-import b5 from '../public/b5.png';
-import b6 from '../public/b6.png';
+import b1 from '../public/b1.webp';
+import b2 from '../public/b2.webp';
+import b3 from '../public/b3.webp';
+import b4 from '../public/b4.webp';
+import b5 from '../public/b5.webp';
+import b6 from '../public/b6.webp';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);

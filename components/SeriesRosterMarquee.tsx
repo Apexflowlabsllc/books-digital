@@ -4,18 +4,18 @@ import Link from 'next/link';
 import Image, { type StaticImageData } from 'next/image';
 import type { SeriesSummary } from '@/lib/types';
 
-import b1 from '../public/b1.png';
-import b2 from '../public/b2.png';
-import b3 from '../public/b3.png';
-import b4 from '../public/b4.png';
-import b5 from '../public/b5.png';
-import b6 from '../public/b6.png';
-import b7 from '../public/b7.png';
-import b8 from '../public/b8.png';
-import b9 from '../public/b9.png';
-import b10 from '../public/b10.png';
-import b11 from '../public/b11.png';
-import b12 from '../public/b12.png';
+import b1 from '../public/b1.webp';
+import b2 from '../public/b2.webp';
+import b3 from '../public/b3.webp';
+import b4 from '../public/b4.webp';
+import b5 from '../public/b5.webp';
+import b6 from '../public/b6.webp';
+import b7 from '../public/b7.webp';
+import b8 from '../public/b8.webp';
+import b9 from '../public/b9.webp';
+import b10 from '../public/b10.webp';
+import b11 from '../public/b11.webp';
+import b12 from '../public/b12.webp';
 
 type SeriesTile = {
   num: string;

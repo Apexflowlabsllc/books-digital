@@ -4,15 +4,15 @@ import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, X, Send, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { env } from '@/lib/env';
 
 type Role = 'user' | 'assistant';
 type Msg = { id: string; role: Role; body: string };
 
-// Floating "Books Concierge" chatbot. Posts to backend
-// /api/v1/concierge/books — the backend Pinecone search + Claude API call
-// happens server-side, frontend just streams the reply. Falls back to a
-// voice-correct placeholder when the endpoint isn't yet live.
+// Floating "Books Concierge" chatbot. Posts to our own /api/concierge
+// route which calls OpenAI (gpt-4o-mini) with the full Apex library +
+// Brian's voice baked into the system prompt. Server-side only —
+// OPENAI_API_KEY never reaches the browser. Falls back to voice-correct
+// copy if the key is missing or the model errors.
 const SUGGESTED = [
   'Where should I start?',
   'I run a small business — which series?',
@@ -56,7 +56,9 @@ export function BooksConcierge() {
 
     (async () => {
       try {
-        const res = await fetch(`${env.backendUrl}/api/v1/concierge/books`, {
+        // Local Next.js API route — calls OpenAI server-side so the
+        // key never ships to the browser.
+        const res = await fetch('/api/concierge', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({

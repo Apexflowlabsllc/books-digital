@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { Loader2, Download, Headphones, Layers, BookOpen, BookMarked } from 'lucide-react';
+import { Loader2, Download, Headphones, Layers, BookOpen, BookMarked, Sparkles } from 'lucide-react';
 import type { BookDetail } from '@/lib/types';
 import { env } from '@/lib/env';
+import { LAUNCH, launchPrice } from '@/lib/launch';
 
 type DirectFormat = 'ebook' | 'audiobook' | 'bundle' | 'paperback' | 'hardcover';
 
@@ -28,6 +29,7 @@ function formatPrice(usd: number): string {
 }
 
 function BuyButton({ format, label, helper, priceUsd, icon, highlight, onBuy, busy }: BuyButtonProps) {
+  const discounted = LAUNCH.active ? launchPrice(priceUsd) : null;
   return (
     <button
       type="button"
@@ -51,9 +53,20 @@ function BuyButton({ format, label, helper, priceUsd, icon, highlight, onBuy, bu
         </div>
       </div>
       <div className="flex shrink-0 items-center gap-3">
-        <span className={'font-display text-xl ' + (highlight ? 'text-accent' : 'text-ink')}>
-          {formatPrice(priceUsd)}
-        </span>
+        {discounted !== null ? (
+          <>
+            <span className="font-mono text-[12px] text-ink-mute line-through">
+              {formatPrice(priceUsd)}
+            </span>
+            <span className={'font-display text-xl ' + (highlight ? 'text-accent' : 'text-ink')}>
+              {formatPrice(discounted)}
+            </span>
+          </>
+        ) : (
+          <span className={'font-display text-xl ' + (highlight ? 'text-accent' : 'text-ink')}>
+            {formatPrice(priceUsd)}
+          </span>
+        )}
         {busy ? <Loader2 className="h-4 w-4 animate-spin text-ink-mute" aria-hidden /> : null}
       </div>
     </button>
@@ -113,6 +126,29 @@ export function PriceSelector({ book }: PriceSelectorProps) {
 
   return (
     <div className="space-y-3">
+      {LAUNCH.active ? (
+        <div
+          className="flex items-center justify-between gap-3 border border-accent/50 bg-bg-raised px-4 py-3"
+          style={{
+            boxShadow: '0 0 24px -8px rgba(217,204,140,0.35)',
+          }}
+        >
+          <div className="flex items-center gap-3">
+            <Sparkles className="h-4 w-4 shrink-0 text-accent" aria-hidden />
+            <div>
+              <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent">
+                Launch week · {LAUNCH.percent}% off
+              </p>
+              <p className="text-[12px] text-ink-dim">
+                Use code{' '}
+                <span className="font-mono font-bold text-accent">{LAUNCH.code}</span> at
+                checkout. All 5 formats.
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       <BuyButton
         format="ebook"
         label="Buy ebook"

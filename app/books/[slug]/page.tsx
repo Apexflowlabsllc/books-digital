@@ -15,6 +15,7 @@ import { getAudioPreviewPool, getPodcastPreviewPool } from '@/lib/preview-pool';
 import { buildMetadata, fallbackBookSchema, fallbackClusterSchema } from '@/lib/seo';
 import { SHOW_PODCAST_VIDEO } from '@/lib/flags';
 import { getClusterBySlug, isClusterSlug } from '@/lib/clusters';
+import { LAUNCH } from '@/lib/launch';
 import { imageProxy, intensityGlyphs, waveLabel } from '@/lib/utils';
 
 interface BookRouteProps {
@@ -128,6 +129,12 @@ export default async function BookDetailPage({ params }: BookRouteProps) {
         </div>
 
         <div>
+          {LAUNCH.active ? (
+            <div className="mb-4 inline-flex items-center gap-2 border border-accent/60 bg-bg-subtle px-3 py-1 font-mono text-[10px] uppercase tracking-[0.28em] text-accent">
+              <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden />
+              <span>Launch week · {LAUNCH.percent}% off · code {LAUNCH.code}</span>
+            </div>
+          ) : null}
           <p className="eyebrow mb-4 text-series">
             {book.series_name} · Book {book.book_number} · {waveLabel(book.wave)}
           </p>

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { BookSummary } from '@/lib/types';
 import { Cover } from './Cover';
 import { intensityGlyphs, priceDisplay, sortFormats, waveLabel } from '@/lib/utils';
+import { LAUNCH } from '@/lib/launch';
 
 interface BookCardProps {
   book: BookSummary;
@@ -40,6 +41,17 @@ export function BookCard({ book, priority }: BookCardProps) {
             }44 0%, transparent 70%)`,
           }}
         />
+        {LAUNCH.active ? (
+          <span
+            aria-label={`${LAUNCH.percent}% off with code ${LAUNCH.code}`}
+            className="pointer-events-none absolute right-2 top-2 z-10 rotate-3 border border-accent bg-bg/90 px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-accent backdrop-blur-sm"
+            style={{
+              boxShadow: '0 6px 18px -6px rgba(217,204,140,0.55)',
+            }}
+          >
+            {LAUNCH.badgeLabel}
+          </span>
+        ) : null}
       </div>
 
       <div className="mt-5 space-y-2">

@@ -9,7 +9,9 @@ import { Magnetic } from '@/components/Magnetic';
 import { LeadCapture } from '@/components/LeadCapture';
 import { FoundationSection } from '@/components/FoundationSection';
 import { FeaturedShowcase } from '@/components/FeaturedShowcase';
+import { LaunchOffer } from '@/components/LaunchOffer';
 import { SeriesRosterMarquee } from '@/components/SeriesRosterMarquee';
+import { LAUNCH } from '@/lib/launch';
 import { TrustBar } from '@/components/TrustBar';
 import { AnimatedReviewsRail } from '@/components/AnimatedReviewsRail';
 import { WholePitch } from '@/components/WholePitch';
@@ -111,8 +113,13 @@ export default async function HomePage() {
       {/* The Foundation — cinematic chrome-text section */}
       <FoundationSection />
 
-      {/* Featured — animated parallax showcase */}
-      {featured.length === 0 ? (
+      {/* Launch-week offer — replaces the Featured parallax during the
+          promo window. When LAUNCH.active flips to false in
+          lib/launch.ts, falls back to the Featured carousel
+          automatically. */}
+      {LAUNCH.active ? (
+        <LaunchOffer totalBooks={totalBooks} />
+      ) : featured.length === 0 ? (
         <section id="featured" className="relative z-10 px-6 py-12 sm:py-28 lg:py-32">
           <div className="mx-auto w-full max-w-7xl">
             <Reveal>

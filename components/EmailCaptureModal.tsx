@@ -68,12 +68,16 @@ export function EmailCaptureModal({
     setError(null);
     startTransition(async () => {
       try {
+        // Modal is brand-level (15% off discount, not tied to a specific
+        // book) — default to s01_b01 so the backend has a bookId for the
+        // free-chapter delivery. Peer fallback handles missing manuscripts.
         const res = await fetch(
-          `${env.backendUrl}/api/v1/lead-magnets/free-chapter`,
+          `${env.backendUrl}/api/v1/books/free-chapter`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
+              bookId: 's01_b01',
               email,
               bookSlug,
               utmSource: source,
@@ -81,7 +85,11 @@ export function EmailCaptureModal({
             }),
           },
         );
-        if (!res.ok) throw new Error(`lead-magnet ${res.status}`);
+        if (!res.ok) throw new Error(`free-chapter ${res.status}`);
+        const data = (await res.json()) as { ok?: boolean; message_id?: string };
+        if (!data.ok || !data.message_id) {
+          throw new Error('Email queued without a delivery id.');
+        }
         setDone(true);
         try {
           localStorage.setItem(STORAGE_KEY, '1');

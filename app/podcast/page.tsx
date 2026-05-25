@@ -7,6 +7,7 @@ import { AudioPlayer } from '@/components/AudioPlayer';
 import { VideoPlayer } from '@/components/VideoPlayer';
 import { getBook, getPageSeo, getPodcastFeed } from '@/lib/api';
 import { buildMetadata, fallbackPageSchema } from '@/lib/seo';
+import { SHOW_PODCAST_VIDEO } from '@/lib/flags';
 import { imageProxy } from '@/lib/utils';
 import { empty } from '@/lib/voice';
 import type { BookDetail, PodcastFeed } from '@/lib/types';
@@ -149,8 +150,8 @@ export default async function PodcastPage() {
         </div>
       </section>
 
-      {/* Featured video */}
-      {featuredBook?.podcast_video_url ? (
+      {/* Featured video — gated by SHOW_PODCAST_VIDEO flag. */}
+      {SHOW_PODCAST_VIDEO && featuredBook?.podcast_video_url ? (
         <section className="container-x py-16">
           <div className="mb-6">
             <p className="eyebrow mb-3 text-accent">Watch the podcast</p>

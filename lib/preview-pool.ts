@@ -42,13 +42,19 @@ function deriveBookId(seriesSlug: string, bookNumber: number): string | null {
  * server-side via the same revalidate window as getCatalog (5 min).
  * Returns [] on backend hiccup — caller treats empty pool as "no
  * preview available" and renders accordingly.
+ *
+ * Prefers the explicit `audioAvailable` boolean when backend ships it.
+ * Falls back to `audio_status === 'live'` as a close proxy until then.
+ * Pool grew from 16 → 22 books in the 2026-05-25 backfill (S1 + S2).
  */
 export async function getAudioPreviewPool(): Promise<PreviewPoolItem[]> {
   const res = await getCatalog({ limit: 636 });
   if (!res) return [];
   const pool: PreviewPoolItem[] = [];
   for (const b of res.books) {
-    if (b.audio_status !== 'live') continue;
+    const explicit = (b as unknown as { audioAvailable?: boolean }).audioAvailable;
+    const isAvailable = typeof explicit === 'boolean' ? explicit : b.audio_status === 'live';
+    if (!isAvailable) continue;
     const bookId = deriveBookId(b.series_slug, b.book_number);
     if (!bookId) continue;
     pool.push({ bookId, slug: b.slug, title: b.title });
@@ -56,14 +62,28 @@ export async function getAudioPreviewPool(): Promise<PreviewPoolItem[]> {
   return pool;
 }
 
-/* Backend signal for podcast availability isn't exposed in the catalog
- * yet (only the audio_status field is). Per the handoff, the podcast
- * pool is "S1 b1-8 + S2 b1-5" today; it's a strict subset of the audio
- * pool. Until backend ships podcastAvailable, treat any audio-live book
- * as a viable podcast peer too — close enough and degrades gracefully.
+/* Podcast pool. Prefers an explicit `podcastAvailable` boolean from the
+ * catalog when backend ships it; otherwise falls back to the audio pool
+ * (close approximation — podcast availability is a strict subset of
+ * audio availability per Brian's handoff).
  */
 export async function getPodcastPreviewPool(): Promise<PreviewPoolItem[]> {
-  return getAudioPreviewPool();
+  const res = await getCatalog({ limit: 636 });
+  if (!res) return [];
+  // If the catalog doesn't carry podcastAvailable, reuse the audio pool.
+  const hasPodcastFlag = res.books.some(
+    (b) => typeof (b as unknown as { podcastAvailable?: boolean }).podcastAvailable === 'boolean',
+  );
+  if (!hasPodcastFlag) return getAudioPreviewPool();
+
+  const pool: PreviewPoolItem[] = [];
+  for (const b of res.books) {
+    if (!(b as unknown as { podcastAvailable?: boolean }).podcastAvailable) continue;
+    const bookId = deriveBookId(b.series_slug, b.book_number);
+    if (!bookId) continue;
+    pool.push({ bookId, slug: b.slug, title: b.title });
+  }
+  return pool;
 }
 
 /* Construct the preview MP3 URL for a pool item. Same backend route as

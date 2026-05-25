@@ -12,6 +12,7 @@ import { JsonLdSchema } from '@/components/JsonLdSchema';
 import { getBook, getBookSeo } from '@/lib/api';
 import { getAudioPreviewPool, getPodcastPreviewPool } from '@/lib/preview-pool';
 import { buildMetadata, fallbackBookSchema } from '@/lib/seo';
+import { SHOW_PODCAST_VIDEO } from '@/lib/flags';
 import { imageProxy, intensityGlyphs, waveLabel } from '@/lib/utils';
 
 interface BookRouteProps {
@@ -174,25 +175,29 @@ export default async function BookDetailPage({ params }: BookRouteProps) {
         </div>
       </section>
 
-      {/* Podcast video — borrows the same authenticity gate. */}
-      <section className="border-b border-line">
-        <div className="container-x grid gap-6 py-10 md:grid-cols-[auto_1fr] md:items-start">
-          <div className="flex items-center gap-3 text-accent">
-            <Film className="h-8 w-8" aria-hidden />
-            <p className="font-display text-2xl text-ink">Watch the podcast</p>
+      {/* Podcast video — feature-flagged off per Brian's 2026-05-25
+          directive (video generation paused). Code stays wired so we can
+          flip it back on with one line in lib/flags.ts. */}
+      {SHOW_PODCAST_VIDEO ? (
+        <section className="border-b border-line">
+          <div className="container-x grid gap-6 py-10 md:grid-cols-[auto_1fr] md:items-start">
+            <div className="flex items-center gap-3 text-accent">
+              <Film className="h-8 w-8" aria-hidden />
+              <p className="font-display text-2xl text-ink">Watch the podcast</p>
+            </div>
+            <PreviewVideo
+              ownSlug={book.slug}
+              isAuthentic={podcastAuthentic}
+              ownVideoUrl={book.podcast_video_url}
+              pool={podcastPool}
+              poster={imageProxy(book.cover_r2_key) || undefined}
+              title={`${book.title} — podcast video`}
+              buyHref="#buy"
+              buyLabel={`Buy the audiobook — $${book.audiobook_direct_price_usd.toFixed(2)}`}
+            />
           </div>
-          <PreviewVideo
-            ownSlug={book.slug}
-            isAuthentic={podcastAuthentic}
-            ownVideoUrl={book.podcast_video_url}
-            pool={podcastPool}
-            poster={imageProxy(book.cover_r2_key) || undefined}
-            title={`${book.title} — podcast video`}
-            buyHref="#buy"
-            buyLabel={`Buy the audiobook — $${book.audiobook_direct_price_usd.toFixed(2)}`}
-          />
-        </div>
-      </section>
+        </section>
+      ) : null}
 
       {/* Podcast audio episode. */}
       <section className="border-b border-line">
@@ -236,7 +241,12 @@ export default async function BookDetailPage({ params }: BookRouteProps) {
           </article>
 
           <aside className="space-y-6">
-            <EmailGate bookSlug={book.slug} bookTitle={book.title} utmSource="book-detail-aside" />
+            <EmailGate
+              bookId={book.book_id}
+              bookSlug={book.slug}
+              bookTitle={book.title}
+              utmSource="book-detail-aside"
+            />
 
             <div className="border border-line bg-bg-subtle p-5 text-sm">
               <p className="eyebrow mb-2">FYI</p>

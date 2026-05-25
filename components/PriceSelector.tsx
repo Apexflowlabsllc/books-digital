@@ -1,11 +1,11 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { Loader2, Download, Headphones, Layers } from 'lucide-react';
+import { Loader2, Download, Headphones, Layers, BookOpen, BookMarked } from 'lucide-react';
 import type { BookDetail } from '@/lib/types';
 import { env } from '@/lib/env';
 
-type DirectFormat = 'ebook' | 'audiobook' | 'bundle';
+type DirectFormat = 'ebook' | 'audiobook' | 'bundle' | 'paperback' | 'hardcover';
 
 interface PriceSelectorProps {
   book: BookDetail;
@@ -60,11 +60,14 @@ function BuyButton({ format, label, helper, priceUsd, icon, highlight, onBuy, bu
   );
 }
 
-/* Three-button direct-sale stack: ebook / audiobook / bundle. POSTs to
- * /api/v1/books/checkout — backend creates a Stripe session and
- * returns { url } that we redirect to. The route 404s until backend
- * lands the Stripe Products; this component degrades to a soft error
- * toast in that window.
+/* Five-button direct-sale stack: ebook / audiobook / bundle, separator,
+ * paperback / hardcover. POSTs to /api/v1/books/checkout with
+ * { bookId, format } — backend returns { checkout_url } and we redirect.
+ * Physical formats trigger Stripe's address collection automatically;
+ * backend reads the address, posts a Lulu print job, and emails tracking.
+ *
+ * Returns 404/405 produce a soft toast — UI doesn't crash if the route
+ * isn't deployed yet on a given environment.
  */
 export function PriceSelector({ book }: PriceSelectorProps) {
   const [isPending, startTransition] = useTransition();
@@ -85,13 +88,15 @@ export function PriceSelector({ book }: PriceSelectorProps) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ bookId: bookIdentity, format }),
         });
-        if (res.status === 404) {
+        if (res.status === 404 || res.status === 405) {
           throw new Error('Checkout route not deployed yet — backend will signal when live.');
         }
         if (!res.ok) throw new Error(`checkout ${res.status}`);
-        const data = (await res.json()) as { url?: string };
-        if (data.url) {
-          window.location.href = data.url;
+        const data = (await res.json()) as { checkout_url?: string; url?: string };
+        // Backend returns checkout_url; accept legacy `url` too.
+        const target = data.checkout_url ?? data.url;
+        if (target) {
+          window.location.href = target;
         } else {
           throw new Error('No checkout URL returned');
         }
@@ -137,6 +142,34 @@ export function PriceSelector({ book }: PriceSelectorProps) {
         busy={isPending && pendingFormat === 'bundle'}
       />
 
+      {/* Digital / physical divider */}
+      <div className="flex items-center gap-3 pt-2">
+        <span aria-hidden className="h-px flex-1 bg-line" />
+        <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-ink-mute">
+          Or hold it in your hands
+        </span>
+        <span aria-hidden className="h-px flex-1 bg-line" />
+      </div>
+
+      <BuyButton
+        format="paperback"
+        label="Buy paperback"
+        helper="Signed by Brian · shipping included · 5-7 days"
+        priceUsd={book.paperback_direct_price_usd}
+        icon={<BookOpen className="h-5 w-5" />}
+        onBuy={handleBuy}
+        busy={isPending && pendingFormat === 'paperback'}
+      />
+      <BuyButton
+        format="hardcover"
+        label="Buy hardcover"
+        helper="Signed by Brian · shipping included · 5-7 days"
+        priceUsd={book.hardcover_direct_price_usd}
+        icon={<BookMarked className="h-5 w-5" />}
+        onBuy={handleBuy}
+        busy={isPending && pendingFormat === 'hardcover'}
+      />
+
       {error ? (
         <p role="alert" className="text-xs text-accent">
           {error}
@@ -144,8 +177,8 @@ export function PriceSelector({ book }: PriceSelectorProps) {
       ) : null}
 
       <p className="pt-3 text-[12px] text-ink-mute">
-        Print editions available on Amazon, Barnes &amp; Noble, and your local indie
-        bookstore — search &ldquo;Apex Raw Motivation.&rdquo;
+        Physical books printed and shipped by Lulu xPress. Stripe handles payment +
+        receipt. Signed by Brian before they ship.
       </p>
     </div>
   );

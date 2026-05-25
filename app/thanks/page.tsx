@@ -22,10 +22,18 @@ interface ThanksProps {
 // Shape the backend will return on GET /api/v1/orders/<sessionId>.
 // Cosmetic only — webhook + Resend already handle delivery before the
 // user lands here. Tolerated as null if the backend route 404s.
+// Physical orders also include shipping data so we can render
+// "ships to <name> in <city>".
 interface OrderResponse {
   bookTitle?: string;
   bookSlug?: string;
-  formats?: Array<'ebook' | 'audiobook' | 'bundle' | string>;
+  formats?: Array<'ebook' | 'audiobook' | 'bundle' | 'paperback' | 'hardcover' | string>;
+  shipping?: {
+    name?: string;
+    city?: string;
+    country?: string;
+    tracking_status?: string;
+  };
 }
 
 function formatList(formats?: string[]): string {
@@ -34,6 +42,10 @@ function formatList(formats?: string[]): string {
   if (cleaned.length === 1) return cleaned[0]!;
   if (cleaned.length === 2) return `${cleaned[0]} + ${cleaned[1]}`;
   return cleaned.join(', ');
+}
+
+function isPhysical(formats?: string[]): boolean {
+  return !!formats?.some((f) => f === 'paperback' || f === 'hardcover');
 }
 
 export default async function ThanksPage({ searchParams }: ThanksProps) {
@@ -46,6 +58,8 @@ export default async function ThanksPage({ searchParams }: ThanksProps) {
 
   const title = order?.bookTitle;
   const formats = formatList(order?.formats);
+  const physical = isPhysical(order?.formats);
+  const ship = order?.shipping;
 
   return (
     <PageShell>
@@ -70,6 +84,28 @@ export default async function ThanksPage({ searchParams }: ThanksProps) {
           )}{' '}
           If it&rsquo;s not there in 2 minutes, check spam or hit reply.
         </p>
+
+        {physical ? (
+          <div className="mt-6 border border-line bg-bg-subtle p-5 text-sm md:text-base">
+            <p className="eyebrow mb-2 text-accent">Shipping</p>
+            <p className="text-ink">
+              {ship?.name && ship?.city ? (
+                <>
+                  Ships to <span className="text-ink">{ship.name}</span> in{' '}
+                  <span className="text-ink">{ship.city}</span>
+                  {ship.country ? `, ${ship.country}` : ''}.
+                </>
+              ) : (
+                <>Your signed copy is going to print.</>
+              )}{' '}
+              Brian signs each one before it goes out — printed and shipped by Lulu xPress.
+              Tracking lands in your inbox once it ships (usually 5-7 days).
+            </p>
+            {ship?.tracking_status ? (
+              <p className="mt-2 text-ink-dim">Status: {ship.tracking_status}</p>
+            ) : null}
+          </div>
+        ) : null}
 
         {sessionId ? (
           <p className="mt-4 font-mono text-[11px] text-ink-mute">Order ref: {sessionId}</p>

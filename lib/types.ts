@@ -53,9 +53,12 @@ export interface BookDetail extends BookSummary {
   // Direct-sale prices for our Stripe checkout (different from the
   // retail priceUsd which is what Amazon/IngramSpark list). Defaulted
   // in the adapter until backend ships the dedicated fields.
+  // Print prices are all-in (shipping included for v1).
   ebook_direct_price_usd: number;
   audiobook_direct_price_usd: number;
   bundle_direct_price_usd: number;
+  paperback_direct_price_usd: number;
+  hardcover_direct_price_usd: number;
   // When each format went live on Amazon — informational only for now.
   published_at?: string;
   sample_chapter: {

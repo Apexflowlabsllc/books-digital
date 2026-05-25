@@ -3,16 +3,26 @@
 import { useState, useTransition } from 'react';
 import { Loader2, Mail } from 'lucide-react';
 import { tone } from '@/lib/voice';
+import { env } from '@/lib/env';
 
 interface EmailGateProps {
+  // Backend keys on bookId (s01_b01). When unavailable, the route falls
+  // back to a random peer book's chapter (and labels it as such in the
+  // email body) so a missing manuscript never blocks the capture.
+  bookId?: string;
   bookSlug: string;
   bookTitle: string;
   utmSource?: string;
 }
 
-// Posts to backend /api/v1/lead-magnets/free-chapter. Backend handles Klaviyo
-// subscription + sends chapter 1 PDF. Never store the email here.
-export function EmailGate({ bookSlug, bookTitle, utmSource }: EmailGateProps) {
+/* POSTs to /api/v1/books/free-chapter. Backend renders chapter 1 as
+ * styled HTML and sends via Resend. We only paint "Sent." after the
+ * response confirms both ok=true AND a Resend message_id — that's the
+ * proof the email actually queued. Previous endpoint returned 200 even
+ * when delivery failed; a customer complained, so the new contract is:
+ * no message_id = no success state.
+ */
+export function EmailGate({ bookId, bookSlug, bookTitle, utmSource }: EmailGateProps) {
   const [email, setEmail] = useState('');
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,16 +37,25 @@ export function EmailGate({ bookSlug, bookTitle, utmSource }: EmailGateProps) {
     setError(null);
     startTransition(async () => {
       try {
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/lead-magnets/free-chapter`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, bookSlug, utmSource: utmSource ?? 'organic' }),
-          },
-        );
+        // Fall back to the canonical s01_b01 when bookId isn't passed —
+        // backend's peer fallback will route to whichever manuscript is
+        // closest if that one's missing.
+        const id = bookId ?? 's01_b01';
+        const res = await fetch(`${env.backendUrl}/api/v1/books/free-chapter`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ bookId: id, email, bookSlug, utmSource: utmSource ?? 'organic' }),
+        });
         if (!res.ok) throw new Error(`free-chapter ${res.status}`);
-        setDone(true);
+        const data = (await res.json()) as {
+          ok?: boolean;
+          message_id?: string;
+        };
+        if (data.ok && data.message_id) {
+          setDone(true);
+        } else {
+          throw new Error('Email queued without a delivery id.');
+        }
       } catch (err) {
         setError('Email service is briefly down. Try again in 60 seconds.');
         console.error(err);
@@ -49,8 +68,9 @@ export function EmailGate({ bookSlug, bookTitle, utmSource }: EmailGateProps) {
       <div className="border border-accent bg-bg-subtle p-6 text-sm">
         <p className="font-display text-2xl text-accent">Sent.</p>
         <p className="mt-2 text-ink-dim">
-          Check inbox + promo tab. Chapter one of <span className="text-ink">{bookTitle}</span>{' '}
-          arrives in under 90 seconds.
+          Check inbox + promo tab in the next 60 seconds. Chapter one of{' '}
+          <span className="text-ink">{bookTitle}</span> is on its way. If you don&rsquo;t
+          see it, hit reply on any of our emails — Brian reads them.
         </p>
       </div>
     );

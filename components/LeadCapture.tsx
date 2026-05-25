@@ -40,12 +40,16 @@ export function LeadCapture({
     setError(null);
     startTransition(async () => {
       try {
+        // Default to s01_b01 — this capture isn't tied to a specific
+        // book detail page so we use the canonical first book; the
+        // backend's peer fallback covers missing manuscripts.
         const res = await fetch(
-          `${env.backendUrl}/api/v1/lead-magnets/free-chapter`,
+          `${env.backendUrl}/api/v1/books/free-chapter`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
+              bookId: 's01_b01',
               email,
               bookSlug,
               utmSource: sourcePage,
@@ -53,7 +57,11 @@ export function LeadCapture({
             }),
           },
         );
-        if (!res.ok) throw new Error(`lead-magnet ${res.status}`);
+        if (!res.ok) throw new Error(`free-chapter ${res.status}`);
+        const data = (await res.json()) as { ok?: boolean; message_id?: string };
+        if (!data.ok || !data.message_id) {
+          throw new Error('Email queued without a delivery id.');
+        }
         setDone(true);
       } catch (err) {
         setError('Email service is briefly down. Try again in 60 seconds.');

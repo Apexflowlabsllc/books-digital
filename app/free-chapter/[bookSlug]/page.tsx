@@ -68,7 +68,12 @@ export default async function FreeChapterPage({ params, searchParams }: FreeChap
           </p>
 
           <div className="mt-8">
-            <EmailGate bookSlug={book.slug} bookTitle={book.title} utmSource={utmSource} />
+            <EmailGate
+              bookId={book.book_id}
+              bookSlug={book.slug}
+              bookTitle={book.title}
+              utmSource={utmSource}
+            />
           </div>
 
           <div className="mt-10 grid gap-3 sm:grid-cols-2">

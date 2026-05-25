@@ -212,15 +212,10 @@ export function PriceSelector({ book }: PriceSelectorProps) {
         </p>
       ) : null}
 
-      <p className="pt-3 text-[12px] text-ink-mute">
-        Physical books printed and shipped by Lulu xPress. Stripe handles payment +
-        receipt. Signed by Brian before they ship.
-      </p>
-
       {/* Informational only — no link out. Brian's "no Amazon button"
           doctrine: print exists on retailers, we tell people where to
           look, but we never click them off our store. */}
-      <p className="text-[12px] text-ink-mute">
+      <p className="pt-3 text-[12px] text-ink-mute">
         Print editions also available on Amazon, Barnes &amp; Noble, and your local
         indie bookstore — search &ldquo;Apex Publishing House&rdquo; anywhere.
       </p>

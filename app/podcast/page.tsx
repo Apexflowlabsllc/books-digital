@@ -5,12 +5,35 @@ import { Hero } from '@/components/Hero';
 import { JsonLdSchema } from '@/components/JsonLdSchema';
 import { AudioPlayer } from '@/components/AudioPlayer';
 import { VideoPlayer } from '@/components/VideoPlayer';
-import { getBook, getPageSeo, getPodcastFeed } from '@/lib/api';
+import { getBook, getCatalog, getPageSeo, getPodcastFeed } from '@/lib/api';
+import { podcastVideoPreviewUrl } from '@/lib/preview-pool';
 import { buildMetadata, fallbackPageSchema } from '@/lib/seo';
-import { SHOW_PODCAST_VIDEO } from '@/lib/flags';
+import { SHOW_PODCAST_VIDEO_ON_PODCAST_PAGE } from '@/lib/flags';
 import { imageProxy } from '@/lib/utils';
 import { empty } from '@/lib/voice';
-import type { BookDetail, PodcastFeed } from '@/lib/types';
+import type { BookDetail, BookSummary, PodcastFeed } from '@/lib/types';
+
+// Derive backend bookId (s01_b01 style) from the slug+number pair —
+// catalog summary doesn't yet expose bookId, so we synthesize it.
+const SERIES_NUM: Record<string, number> = {
+  'discipline-blueprint': 1,
+  'comeback-blueprint': 2,
+  'mind-reset-blueprint': 3,
+  'success-blueprint': 4,
+  'elite-blueprint': 5,
+  'unstoppable-blueprint': 6,
+  'nervous-system-blueprint': 7,
+  'connection-blueprint': 8,
+  'power-blueprint': 9,
+  'purpose-blueprint': 10,
+  'warrior-blueprint': 11,
+  'legend-blueprint': 12,
+};
+function bookIdFor(b: BookSummary): string | null {
+  const s = SERIES_NUM[b.series_slug];
+  if (!s) return null;
+  return `s${String(s).padStart(2, '0')}_b${String(b.book_number).padStart(2, '0')}`;
+}
 
 export const metadata = buildMetadata({
   title: 'Podcast — Apex Publishing House',
@@ -75,14 +98,17 @@ interface FeedCardData {
 }
 
 export default async function PodcastPage() {
-  // Pull feeds + featured book + every series's book-1 detail in one
-  // Promise.all. The per-series book fetches give us a real audio URL
-  // per tile (each book ships with its own podcast episode).
+  // Pull feeds + per-series first-book detail + the full S1 and S2
+  // catalog (those 20 books are the ones with real podcast video per
+  // Brian's 2026-05-25 handoff). The S1/S2 lists drive the video
+  // grid; the per-series book details drive the audio cards below.
   const seriesNumbers = Object.keys(SERIES_FIRST_BOOK_SLUG).map(Number);
 
-  const [feedRes, seo, ...seriesBooks] = await Promise.all([
+  const [feedRes, seo, s1Catalog, s2Catalog, ...seriesBooks] = await Promise.all([
     getPodcastFeed(50),
     getPageSeo('/podcast'),
+    getCatalog({ series: 'discipline-blueprint', limit: 10 }),
+    getCatalog({ series: 'comeback-blueprint', limit: 10 }),
     ...seriesNumbers.map((n) => getBook(SERIES_FIRST_BOOK_SLUG[n]!)),
   ]);
 
@@ -93,7 +119,21 @@ export default async function PodcastPage() {
   });
 
   const feeds = feedRes?.feeds ?? [];
-  const featuredBook = seriesBookByNumber.get(1);
+
+  // Build the 20-card video lineup: S1 books 1-10 then S2 books 1-10.
+  // Each VideoPlayer self-hides if the backend hasn't uploaded that
+  // MP4 — so the visible count auto-matches what's actually live.
+  const videoBooks: Array<{ slug: string; title: string; bookId: string; cover: string | null }> = [];
+  for (const b of [...(s1Catalog?.books ?? []), ...(s2Catalog?.books ?? [])]) {
+    const bookId = bookIdFor(b);
+    if (!bookId) continue;
+    videoBooks.push({
+      slug: b.slug,
+      title: b.title,
+      bookId,
+      cover: imageProxy(b.cover_r2_key) || null,
+    });
+  }
 
   // Build the unified card list. Master + apex_daily first, then series
   // ordered S01 → S12.
@@ -150,28 +190,50 @@ export default async function PodcastPage() {
         </div>
       </section>
 
-      {/* Featured video — gated by SHOW_PODCAST_VIDEO flag. */}
-      {SHOW_PODCAST_VIDEO && featuredBook?.podcast_video_url ? (
+      {/* Video lineup — every book in S1 and S2 (Brian's 2026-05-25
+          handoff: 20 books have real podcast video). Each player
+          self-hides via onError when the backend hasn't uploaded its
+          MP4 yet, so the visible grid auto-matches the live set. */}
+      {SHOW_PODCAST_VIDEO_ON_PODCAST_PAGE && videoBooks.length > 0 ? (
         <section className="container-x py-16">
-          <div className="mb-6">
+          <div className="mb-8">
             <p className="eyebrow mb-3 text-accent">Watch the podcast</p>
             <h2 className="font-display text-3xl text-ink md:text-4xl">
               Same episode, on video.
             </h2>
             <p className="mt-3 max-w-2xl text-sm text-ink-dim md:text-base">
-              Brian and the cohost, recorded. Open the player below or grab a feed and
-              listen in your podcast app.
+              Brian and the cohost, recorded. Browse the lineup below or grab a feed
+              further down to listen on the go.
             </p>
           </div>
-          <VideoPlayer
-            src={featuredBook.podcast_video_url}
-            poster={imageProxy(featuredBook.cover_r2_key) || undefined}
-            title={`${featuredBook.title} — podcast video`}
-          />
-          <p className="mt-3 text-[11px] text-ink-mute">
-            <Film className="mr-1 inline h-3 w-3" aria-hidden />
-            Featuring: {featuredBook.title}.
-          </p>
+          <ul className="grid grid-cols-1 gap-8 md:grid-cols-2">
+            {videoBooks.map((b) => (
+              <li key={b.bookId} className="space-y-3">
+                <VideoPlayer
+                  src={podcastVideoPreviewUrl(b.bookId)}
+                  poster={b.cover ?? undefined}
+                  title={`${b.title} — podcast video`}
+                />
+                <div className="flex items-baseline justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent/70">
+                      <Film className="mr-1 inline h-3 w-3" aria-hidden />
+                      {b.bookId.toUpperCase().replace('_', ' · ')}
+                    </p>
+                    <p className="mt-1 truncate font-display text-base text-ink">
+                      {b.title}
+                    </p>
+                  </div>
+                  <Link
+                    href={`/books/${b.slug}`}
+                    className="shrink-0 text-[11px] uppercase tracking-widest text-accent hover:text-ink"
+                  >
+                    Open →
+                  </Link>
+                </div>
+              </li>
+            ))}
+          </ul>
         </section>
       ) : null}
 
@@ -187,7 +249,7 @@ export default async function PodcastPage() {
           <div className="container-x py-16">
             <div className="mb-8 flex items-baseline justify-between">
               <h2 className="font-display text-2xl text-ink md:text-3xl">
-                All {cards.length} podcasts
+                Listen to the podcast
               </h2>
               <span className="eyebrow text-ink-mute">Tap play, or subscribe</span>
             </div>

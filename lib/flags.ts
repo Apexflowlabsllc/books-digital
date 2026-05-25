@@ -2,11 +2,14 @@
  * dependency — these are decisions, not configuration.
  */
 
-// Podcast video: ON for the 20 books that have it (S1 + S2). Books
-// without a real MP4 self-hide via VideoPlayer's onError handler — the
-// 403/404 they get from the backend trips the listener, which unmounts
-// the player. No flicker, no broken UI on books without video.
-// Brian paused video generation 2026-05-25 so the pool won't grow
-// beyond 20 until he reverses; flip to false if we ever need to hide
-// it site-wide again.
-export const SHOW_PODCAST_VIDEO = true;
+// Per-surface podcast-video flags. Brian wants video off on the book
+// detail page (cleaner buy flow) but on for the dedicated /podcast
+// page where the whole grid is visible. Books without a real MP4
+// self-hide via VideoPlayer's onError handler — the 403/404 trips
+// the listener and the player unmounts.
+export const SHOW_PODCAST_VIDEO_ON_BOOK = false;
+export const SHOW_PODCAST_VIDEO_ON_PODCAST_PAGE = true;
+
+// Legacy export kept for safety in case any imports remain — points
+// at the more permissive flag so behavior matches /podcast page.
+export const SHOW_PODCAST_VIDEO = SHOW_PODCAST_VIDEO_ON_PODCAST_PAGE;

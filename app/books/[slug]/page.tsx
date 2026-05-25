@@ -13,7 +13,7 @@ import { ClusterHub } from '@/components/ClusterHub';
 import { getBook, getBookSeo, getCluster } from '@/lib/api';
 import { getAudioPreviewPool, getPodcastPreviewPool } from '@/lib/preview-pool';
 import { buildMetadata, fallbackBookSchema, fallbackClusterSchema } from '@/lib/seo';
-import { SHOW_PODCAST_VIDEO } from '@/lib/flags';
+import { SHOW_PODCAST_VIDEO_ON_BOOK } from '@/lib/flags';
 import { getClusterBySlug, isClusterSlug } from '@/lib/clusters';
 import { LAUNCH } from '@/lib/launch';
 import { imageProxy, intensityGlyphs, waveLabel } from '@/lib/utils';
@@ -211,7 +211,7 @@ export default async function BookDetailPage({ params }: BookRouteProps) {
       {/* Podcast video — feature-flagged off per Brian's 2026-05-25
           directive (video generation paused). Code stays wired so we can
           flip it back on with one line in lib/flags.ts. */}
-      {SHOW_PODCAST_VIDEO ? (
+      {SHOW_PODCAST_VIDEO_ON_BOOK ? (
         <section className="border-b border-line">
           <div className="container-x grid gap-6 py-10 md:grid-cols-[auto_1fr] md:items-start">
             <div className="flex items-center gap-3 text-accent">

@@ -99,7 +99,18 @@ export function PriceSelector({ book }: PriceSelectorProps) {
           method: 'POST',
           credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bookId: bookIdentity, format }),
+          body: JSON.stringify({
+            bookId: bookIdentity,
+            format,
+            // Pre-applies the launch promo so the customer lands on
+            // Stripe Checkout with the discount already attached —
+            // no copy/paste, no remembering. Backend looks the code
+            // up against the Stripe Promotion Code and includes it
+            // in session.discounts. If backend ignores this param
+            // the session still works (manual code entry still
+            // available since allow_promotion_codes is true).
+            ...(LAUNCH.active ? { promotionCode: LAUNCH.code } : {}),
+          }),
         });
         if (res.status === 404 || res.status === 405) {
           throw new Error('Checkout route not deployed yet — backend will signal when live.');

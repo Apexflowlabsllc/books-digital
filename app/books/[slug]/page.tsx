@@ -188,7 +188,7 @@ export default async function BookDetailPage({ params }: BookRouteProps) {
             <Headphones className="h-8 w-8" aria-hidden />
             <div>
               <p className="font-display text-2xl text-ink">
-                {audioAuthentic ? 'Listen to the audiobook' : 'Hear a 30-sec preview'}
+                Hear a 30-sec preview
               </p>
               <p className="text-xs text-ink-mute">
                 Audiobook · ${book.audiobook_direct_price_usd.toFixed(2)}
@@ -201,6 +201,7 @@ export default async function BookDetailPage({ params }: BookRouteProps) {
             isAuthentic={audioAuthentic}
             ownAudioUrl={book.audiobook?.full_url}
             pool={audioPool}
+            alwaysCap
             buyHref="#buy"
             buyLabel={`Buy the audiobook — $${book.audiobook_direct_price_usd.toFixed(2)}`}
             title={`${book.title} — audiobook`}

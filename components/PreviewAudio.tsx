@@ -14,17 +14,22 @@ interface PreviewAudioProps {
   buyLabel: string; // e.g. "Buy the audiobook — $12.99"
   // The book's own slug — used to exclude itself from peer rotation.
   ownSlug: string;
-  // When the book IS authentic, we play its own audio at full length.
-  // When false, we pick a random peer from the pool and cap at 30s.
+  // True when this book has its own real audio in R2. Drives whether
+  // we play THIS book's file or borrow a peer's.
   isAuthentic: boolean;
-  // Own audio URL — used only when isAuthentic. Authentic books skip
-  // the pool entirely.
+  // Own audio URL — used when isAuthentic (regardless of alwaysCap).
   ownAudioUrl?: string;
   // The pool to draw from when not authentic. Empty pool = no preview.
   pool: PreviewPoolItem[];
   // 'audiobook' → /audiobook.mp3 URL; 'podcast' → /podcast/episode.mp3.
   // Tells the peer-URL builder which path to use.
   kind: 'audiobook' | 'podcast';
+  // Force the 30-sec preview cap + badge + Buy CTA even when the book
+  // is authentic. Used for the audiobook section (paid product —
+  // never give the full file away). Default false → authentic books
+  // play full audio (used for the podcast section, which is the free
+  // marketing companion).
+  alwaysCap?: boolean;
   title: string;
   description?: string;
 }
@@ -37,11 +42,12 @@ export function PreviewAudio({
   ownAudioUrl,
   pool,
   kind,
+  alwaysCap = false,
   title,
   description,
 }: PreviewAudioProps) {
-  // Pick a peer ONCE per mount. useMemo with [] deps would do it; but
-  // we want it stable across renders, so cache in state.
+  // Pick a peer ONCE per mount. Only needed when we don't have own
+  // audio (i.e. non-authentic books).
   const [peer] = useState<PreviewPoolItem | null>(() =>
     isAuthentic ? null : pickPeer(pool, kind === 'audiobook' ? 'audio' : 'podcast', ownSlug),
   );
@@ -65,12 +71,16 @@ export function PreviewAudio({
     );
   }
 
-  if (isAuthentic) {
-    // Authentic: full audio, no cap, no badge.
+  // Free + uncapped path: authentic book AND caller didn't force a cap.
+  // The podcast section uses this since the podcast is the free promo.
+  if (isAuthentic && !alwaysCap) {
     return <AudioPlayer src={src} title={title} description={description} variant="full" />;
   }
 
-  // Non-authentic: 30-sec cap, preview badge, Buy CTA on cap.
+  // Capped path: 30-sec preview with badge + Buy CTA. Source is
+  // either the book's own file (authentic + alwaysCap) or a peer's
+  // (non-authentic).
+  const usingPeer = !isAuthentic && peer;
   return (
     <div className="space-y-2">
       <div className="inline-flex items-center gap-2 border border-accent/40 bg-bg-subtle px-3 py-1 text-[11px] uppercase tracking-widest text-accent">
@@ -85,10 +95,16 @@ export function PreviewAudio({
         previewMaxSeconds={30}
         previewCta={{ href: buyHref, label: buyLabel }}
       />
-      <p className="text-[11px] text-ink-mute">
-        Sampling from <span className="text-ink-dim">{peer?.title}</span>. Buy this
-        book&rsquo;s audiobook to hear it in full.
-      </p>
+      {usingPeer ? (
+        <p className="text-[11px] text-ink-mute">
+          Sampling from <span className="text-ink-dim">{peer?.title}</span>. Buy this
+          book&rsquo;s audiobook to hear it in full.
+        </p>
+      ) : (
+        <p className="text-[11px] text-ink-mute">
+          First 30 seconds. Buy the audiobook to hear it in full.
+        </p>
+      )}
     </div>
   );
 }

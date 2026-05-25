@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react';
 import { Loader2, Mail } from 'lucide-react';
 import { tone } from '@/lib/voice';
-import { env } from '@/lib/env';
+import { sendFreeChapter } from '@/lib/free-chapter';
 
 interface EmailGateProps {
   // Backend keys on bookId (s01_b01). When unavailable, the route falls
@@ -36,29 +36,14 @@ export function EmailGate({ bookId, bookSlug, bookTitle, utmSource }: EmailGateP
     }
     setError(null);
     startTransition(async () => {
-      try {
-        // Fall back to the canonical s01_b01 when bookId isn't passed —
-        // backend's peer fallback will route to whichever manuscript is
-        // closest if that one's missing.
-        const id = bookId ?? 's01_b01';
-        const res = await fetch(`${env.backendUrl}/api/v1/books/free-chapter`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ bookId: id, email, bookSlug, utmSource: utmSource ?? 'organic' }),
-        });
-        if (!res.ok) throw new Error(`free-chapter ${res.status}`);
-        const data = (await res.json()) as {
-          ok?: boolean;
-          message_id?: string;
-        };
-        if (data.ok && data.message_id) {
-          setDone(true);
-        } else {
-          throw new Error('Email queued without a delivery id.');
-        }
-      } catch (err) {
+      const result = await sendFreeChapter({ bookId, bookSlug, email, utmSource });
+      if (result.ok) {
+        setDone(true);
+      } else {
         setError('Email service is briefly down. Try again in 60 seconds.');
-        console.error(err);
+        if (process.env.NODE_ENV !== 'production') {
+          console.warn('[EmailGate] sendFreeChapter failed:', result.error);
+        }
       }
     });
   }

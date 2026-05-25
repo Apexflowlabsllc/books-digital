@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useTransition } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Loader2, Mail, Sparkles } from 'lucide-react';
 import { createPortal } from 'react-dom';
-import { env } from '@/lib/env';
+import { sendFreeChapter } from '@/lib/free-chapter';
 
 interface EmailCaptureModalProps {
   open: boolean;
@@ -67,38 +67,24 @@ export function EmailCaptureModal({
     }
     setError(null);
     startTransition(async () => {
-      try {
-        // Modal is brand-level (15% off discount, not tied to a specific
-        // book) — default to s01_b01 so the backend has a bookId for the
-        // free-chapter delivery. Peer fallback handles missing manuscripts.
-        const res = await fetch(
-          `${env.backendUrl}/api/v1/books/free-chapter`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              bookId: 's01_b01',
-              email,
-              bookSlug,
-              utmSource: source,
-              discount: code,
-            }),
-          },
-        );
-        if (!res.ok) throw new Error(`free-chapter ${res.status}`);
-        const data = (await res.json()) as { ok?: boolean; message_id?: string };
-        if (!data.ok || !data.message_id) {
-          throw new Error('Email queued without a delivery id.');
-        }
+      const result = await sendFreeChapter({
+        bookSlug,
+        email,
+        utmSource: source,
+        discount: code,
+      });
+      if (result.ok) {
         setDone(true);
         try {
           localStorage.setItem(STORAGE_KEY, '1');
         } catch {
           /* swallow — private mode */
         }
-      } catch (err) {
+      } else {
         setError('Email service is briefly down. Try again in 60 seconds.');
-        console.error(err);
+        if (process.env.NODE_ENV !== 'production') {
+          console.warn('[EmailCaptureModal] sendFreeChapter failed:', result.error);
+        }
       }
     });
   }

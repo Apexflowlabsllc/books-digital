@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { Loader2 } from 'lucide-react';
-import { env } from '@/lib/env';
+import { sendFreeChapter } from '@/lib/free-chapter';
 
 interface LeadCaptureProps {
   sourcePage?: string;
@@ -39,33 +39,19 @@ export function LeadCapture({
     }
     setError(null);
     startTransition(async () => {
-      try {
-        // Default to s01_b01 — this capture isn't tied to a specific
-        // book detail page so we use the canonical first book; the
-        // backend's peer fallback covers missing manuscripts.
-        const res = await fetch(
-          `${env.backendUrl}/api/v1/books/free-chapter`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              bookId: 's01_b01',
-              email,
-              bookSlug,
-              utmSource: sourcePage,
-              optInAsset,
-            }),
-          },
-        );
-        if (!res.ok) throw new Error(`free-chapter ${res.status}`);
-        const data = (await res.json()) as { ok?: boolean; message_id?: string };
-        if (!data.ok || !data.message_id) {
-          throw new Error('Email queued without a delivery id.');
-        }
+      const result = await sendFreeChapter({
+        bookSlug,
+        email,
+        utmSource: sourcePage,
+        optInAsset,
+      });
+      if (result.ok) {
         setDone(true);
-      } catch (err) {
+      } else {
         setError('Email service is briefly down. Try again in 60 seconds.');
-        console.error(err);
+        if (process.env.NODE_ENV !== 'production') {
+          console.warn('[LeadCapture] sendFreeChapter failed:', result.error);
+        }
       }
     });
   }

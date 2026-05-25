@@ -1,5 +1,6 @@
 import { env } from '@/lib/env';
 import { urlsetXml } from '@/lib/xml';
+import { CLUSTERS } from '@/lib/clusters';
 
 export const revalidate = 3600;
 
@@ -18,11 +19,20 @@ const STATIC_PATHS: Array<{ path: string; priority: number; changefreq: string }
   { path: '/press', priority: 0.5, changefreq: 'monthly' },
 ];
 
+// Topic cluster hubs — high-intent SEO landing pages. Each carries an
+// H1-with-keyword + curated book grid + CollectionPage schema. Worth
+// indexing aggressively.
+const CLUSTER_PATHS = CLUSTERS.map((c) => ({
+  path: `/books/${c.slug}`,
+  priority: 0.85,
+  changefreq: 'weekly',
+}));
+
 export function GET() {
   const siteUrl = env.siteUrl.replace(/\/$/, '');
   const today = new Date().toISOString().slice(0, 10);
 
-  const entries = STATIC_PATHS.map((s) => ({
+  const entries = [...STATIC_PATHS, ...CLUSTER_PATHS].map((s) => ({
     loc: `${siteUrl}${s.path}`,
     lastmod: today,
     priority: s.priority,

@@ -60,7 +60,7 @@ export function Nav({ userEmail }: NavProps = {}) {
               ▲
             </span>
             <span className="font-display text-[0.95rem] sm:text-[1.05rem] italic font-light text-cream tracking-tight">
-              Apex Book Publishing
+              Apex Publishing House
             </span>
           </Link>
 

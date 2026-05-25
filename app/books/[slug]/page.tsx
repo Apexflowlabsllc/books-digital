@@ -9,10 +9,12 @@ import { PreviewVideo } from '@/components/PreviewVideo';
 import { BookReviews } from '@/components/BookReviews';
 import { EmailGate } from '@/components/EmailGate';
 import { JsonLdSchema } from '@/components/JsonLdSchema';
-import { getBook, getBookSeo } from '@/lib/api';
+import { ClusterHub } from '@/components/ClusterHub';
+import { getBook, getBookSeo, getCluster } from '@/lib/api';
 import { getAudioPreviewPool, getPodcastPreviewPool } from '@/lib/preview-pool';
-import { buildMetadata, fallbackBookSchema } from '@/lib/seo';
+import { buildMetadata, fallbackBookSchema, fallbackClusterSchema } from '@/lib/seo';
 import { SHOW_PODCAST_VIDEO } from '@/lib/flags';
+import { getClusterBySlug, isClusterSlug } from '@/lib/clusters';
 import { imageProxy, intensityGlyphs, waveLabel } from '@/lib/utils';
 
 interface BookRouteProps {
@@ -29,6 +31,16 @@ function shortDescription(full: string): string {
 
 export async function generateMetadata({ params }: BookRouteProps) {
   const { slug } = await params;
+  // Cluster hubs share /books/<slug> with book detail pages; cluster
+  // slugs (discipline, comeback, mindset, ...) win first.
+  const cluster = getClusterBySlug(slug);
+  if (cluster) {
+    return buildMetadata({
+      title: `${cluster.name} — Apex Publishing House`,
+      description: cluster.description,
+      path: `/books/${cluster.slug}`,
+    });
+  }
   const book = await getBook(slug);
   if (!book) {
     return buildMetadata({
@@ -49,6 +61,20 @@ export const revalidate = 3600;
 
 export default async function BookDetailPage({ params }: BookRouteProps) {
   const { slug } = await params;
+
+  // Cluster hub branch — runs before the book fetch so we don't spend
+  // a backend call on URLs that are SEO landing pages, not books.
+  if (isClusterSlug(slug)) {
+    const cluster = getClusterBySlug(slug)!;
+    const { books } = await getCluster(cluster.slug, cluster.fallbackSeriesSlugs);
+    return (
+      <PageShell>
+        <JsonLdSchema bundle={null} fallback={fallbackClusterSchema(cluster, books)} />
+        <ClusterHub cluster={cluster} books={books} />
+      </PageShell>
+    );
+  }
+
   const [book, seo, audioPool, podcastPool] = await Promise.all([
     getBook(slug),
     getBookSeo(slug),

@@ -357,6 +357,47 @@ export async function getSeries(slug: string): Promise<SeriesDetail | null> {
   };
 }
 
+/* Topic cluster fetcher. Backend exposes /api/v1/books/clusters/<slug>
+ * returning { cluster, books: BookSummary[] }. When the endpoint isn't
+ * deployed yet, fall back to filtering the catalog by the cluster's
+ * declared fallbackSeriesSlugs so the hub never renders empty.
+ */
+interface RawClusterResponse {
+  cluster?: { slug: string; name: string; description?: string };
+  books?: BookSummary[];
+}
+
+export async function getCluster(
+  slug: string,
+  fallbackSeriesSlugs: string[],
+): Promise<{ books: BookSummary[] }> {
+  const raw = await backendSafe<RawClusterResponse>(`/api/v1/books/clusters/${slug}`, {
+    revalidate: 600,
+    tags: ['cluster', `cluster:${slug}`],
+  });
+  if (raw?.books && raw.books.length > 0) {
+    return { books: raw.books };
+  }
+  // Fallback: pull catalog filtered by series and concatenate.
+  const lists = await Promise.all(
+    fallbackSeriesSlugs.map((s) =>
+      backendSafe<RawCatalogResponse>(`/api/v1/books/catalog?series=${s}&limit=200`, {
+        revalidate: 600,
+      }),
+    ),
+  );
+  const seen = new Set<string>();
+  const books: BookSummary[] = [];
+  for (const list of lists) {
+    for (const b of list?.books ?? []) {
+      if (seen.has(b.slug)) continue;
+      seen.add(b.slug);
+      books.push(b);
+    }
+  }
+  return { books };
+}
+
 export function getPodcastFeed(limit = 50) {
   return backendSafe<PodcastFeedResponse>(`/api/v1/podcast/feed?limit=${limit}`, {
     revalidate: 600,

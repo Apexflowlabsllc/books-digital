@@ -23,7 +23,7 @@ import { empty } from '@/lib/voice';
 import type { Wave } from '@/lib/types';
 
 export const metadata = buildMetadata({
-  title: 'Apex Book Publishing — 636 books. 12 series. One war manual library.',
+  title: 'Apex Publishing House — 636 books. 12 series. One war manual library.',
   description:
     '636 books. 12 series. Operator-grade self-help built on 13 years of operations at Spiker Carpet and Tile Care.',
   path: '/',
@@ -101,7 +101,7 @@ export default async function HomePage() {
 
   return (
     <PageShell>
-      <JsonLdSchema bundle={seo} fallback={fallbackPageSchema('/', 'Apex Book Publishing')} />
+      <JsonLdSchema bundle={seo} fallback={fallbackPageSchema('/', 'Apex Publishing House')} />
 
       <HomeHero books={heroCovers} totalBooks={totalBooks} />
 

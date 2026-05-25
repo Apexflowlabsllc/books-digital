@@ -6,6 +6,7 @@ import { Cursor } from '@/components/Cursor';
 import { BackgroundLoader } from '@/components/BackgroundLoader';
 import { BooksConcierge } from '@/components/BooksConcierge';
 import { ExitIntentModalTrigger } from '@/components/EmailCaptureModal';
+import { LaunchBanner } from '@/components/LaunchBanner';
 import './globals.css';
 
 const geist = Geist({
@@ -30,22 +31,22 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(env.siteUrl || 'https://books.apexflowlabs.com'),
   title: {
-    default: 'Apex Book Publishing — 636 books. 12 series. One war manual library.',
-    template: '%s | Apex Book Publishing',
+    default: 'Apex Publishing House — 636 books. 12 series. One war manual library.',
+    template: '%s | Apex Publishing House',
   },
   description:
     '636 books. 12 series. One war-manual library. Built on 13 years of operations at Spiker Carpet and Tile Care. Not therapist-speak — operator-grade self-help.',
-  applicationName: 'Apex Book Publishing',
+  applicationName: 'Apex Publishing House',
   authors: [{ name: 'Brian Spiker', url: `${env.siteUrl}/about-brian` }],
   creator: 'Brian Spiker',
-  publisher: 'Apex Book Publishing',
+  publisher: 'Apex Publishing House',
   keywords: [
     'r-rated self-help',
     'war manual',
     'discipline books',
     'operator books',
     'Brian Spiker',
-    'Apex Book Publishing',
+    'Apex Publishing House',
   ],
   formatDetection: { telephone: false, email: false, address: false },
 };
@@ -76,6 +77,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         <SmoothScroll />
         <Cursor />
+        {/* Launch-week promo bar — sits above everything else; dismiss
+            persists per browser via localStorage. */}
+        <LaunchBanner />
         {children}
         <BooksConcierge />
         <ExitIntentModalTrigger />

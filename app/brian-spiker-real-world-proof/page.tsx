@@ -10,7 +10,7 @@ import { empty } from '@/lib/voice';
 export const metadata = buildMetadata({
   title: 'The Receipts — Brian Spiker, 13 years at Spiker Carpet and Tile Care',
   description:
-    'The receipts. Brian Spiker has run Spiker Carpet and Tile Care since 2013. 13 years of trucks, customers, payroll, weather, and bad days. The foundation under every Apex Book Publishing book.',
+    'The receipts. Brian Spiker has run Spiker Carpet and Tile Care since 2013. 13 years of trucks, customers, payroll, weather, and bad days. The foundation under every Apex Publishing House book.',
   path: '/brian-spiker-real-world-proof',
 });
 

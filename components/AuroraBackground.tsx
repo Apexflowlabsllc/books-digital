@@ -3,7 +3,7 @@
 // Gold-themed aurora background — ported from the Aceternity AuroraBackground
 // composition (same gradient layering technique as
 // apex-flow-labs/components/apex/GlobalBackground.tsx) but recolored to the
-// Apex Book Publishing palette: warm-dark base, gold + amber + ember bands
+// Apex Publishing House palette: warm-dark base, gold + amber + ember bands
 // instead of the original blue/violet. This layer is meant to be visible on
 // every section of every page — keep section/card backgrounds translucent
 // so it bleeds through.

@@ -191,10 +191,10 @@ export default async function AboutBrianPage() {
               </a>
             </li>
             <li>
-              <span className="text-accent">Apex Book Publishing</span> — the books (you&apos;re here)
+              <span className="text-accent">Apex Publishing House</span> — the books (you&apos;re here)
             </li>
             <li>
-              <span className="text-accent">Apex Book Publishing podcast</span> — free, every weekday
+              <span className="text-accent">Apex Publishing House podcast</span> — free, every weekday
             </li>
           </ul>
           <p className="mt-8 italic text-ink-dim">

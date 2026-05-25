@@ -5,7 +5,7 @@ import { getPageSeo } from '@/lib/api';
 import { buildMetadata, fallbackPageSchema } from '@/lib/seo';
 
 export const metadata = buildMetadata({
-  title: 'Contact — Apex Book Publishing',
+  title: 'Contact — Apex Publishing House',
   description:
     'Reach Brian. Press, speaking, bulk orders, interview requests. Real inbox, real reply within 7 days.',
   path: '/contact',

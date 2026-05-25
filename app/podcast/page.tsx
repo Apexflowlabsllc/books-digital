@@ -13,7 +13,7 @@ import { empty } from '@/lib/voice';
 import type { BookDetail, PodcastFeed } from '@/lib/types';
 
 export const metadata = buildMetadata({
-  title: 'Podcast — Apex Book Publishing',
+  title: 'Podcast — Apex Publishing House',
   description:
     '14 feeds. One per series, plus master + apex daily. Subscribe in Apple, Spotify, Amazon, YouTube Music, iHeart, Pandora, Stitcher, Pocket Casts, or Overcast.',
   path: '/podcast',
@@ -55,7 +55,7 @@ const SERIES_FIRST_BOOK_SLUG: Record<number, string> = {
 function cleanTitle(raw: string): string {
   return raw
     .replace(/^Apex Raw Motivation\s*[—-]\s*/i, '')
-    .replace(/^Apex Book Publishing\s*[—-]\s*/i, '')
+    .replace(/^Apex Publishing House\s*[—-]\s*/i, '')
     .trim();
 }
 
@@ -121,7 +121,7 @@ export default async function PodcastPage() {
 
   return (
     <PageShell>
-      <JsonLdSchema bundle={seo} fallback={fallbackPageSchema('/podcast', 'Apex Book Publishing Podcast')} />
+      <JsonLdSchema bundle={seo} fallback={fallbackPageSchema('/podcast', 'Apex Publishing House Podcast')} />
 
       <Hero
         eyebrow="Podcast"

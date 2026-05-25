@@ -3,7 +3,7 @@ import { env } from './env';
 import type { BookDetail, SeriesDetail } from './types';
 import { imageProxy } from './utils';
 
-const SITE_NAME = 'Apex Book Publishing';
+const SITE_NAME = 'Apex Publishing House';
 const DEFAULT_DESCRIPTION =
   '636 books. 12 series. One war-manual library. Written by Brian Spiker — founder of Spiker Carpet and Tile Care, operating since 2013 (13 years).';
 
@@ -63,7 +63,7 @@ const BRIAN_PERSON = {
   url: `${env.siteUrl}/about-brian`,
   jobTitle: 'Founder & Author',
   description:
-    'Founder of Spiker Carpet and Tile Care (operating since 2013, 13 years). Author of Apex Book Publishing (636 books, 12 series). Founder of Apex Flow Labs.',
+    'Founder of Spiker Carpet and Tile Care (operating since 2013, 13 years). Author of Apex Publishing House (636 books, 12 series). Founder of Apex Flow Labs.',
   worksFor: [
     {
       '@type': 'Organization',
@@ -173,6 +173,59 @@ export function fallbackBookSchema(book: BookDetail): unknown[] {
         ]
       : [];
 
+  // Per-format workExample[] — drives Google Rich Results "where to
+  // buy" + "available formats" surfaces. Prices come from the
+  // BookDetail (defaulted in adapter when backend hasn't shipped the
+  // *DirectPriceUsd fields yet).
+  const workExample = [
+    book.paperback_isbn
+      ? {
+          '@type': 'Book',
+          bookFormat: 'https://schema.org/Paperback',
+          isbn: book.paperback_isbn,
+          offers: {
+            '@type': 'Offer',
+            price: book.paperback_direct_price_usd.toFixed(2),
+            priceCurrency: 'USD',
+            availability: 'https://schema.org/InStock',
+          },
+        }
+      : null,
+    book.hardcover_isbn
+      ? {
+          '@type': 'Book',
+          bookFormat: 'https://schema.org/Hardcover',
+          isbn: book.hardcover_isbn,
+          offers: {
+            '@type': 'Offer',
+            price: book.hardcover_direct_price_usd.toFixed(2),
+            priceCurrency: 'USD',
+            availability: 'https://schema.org/InStock',
+          },
+        }
+      : null,
+    {
+      '@type': 'Book',
+      bookFormat: 'https://schema.org/EBook',
+      offers: {
+        '@type': 'Offer',
+        price: book.ebook_direct_price_usd.toFixed(2),
+        priceCurrency: 'USD',
+        availability: 'https://schema.org/InStock',
+      },
+    },
+    {
+      '@type': 'Book',
+      bookFormat: 'https://schema.org/AudiobookFormat',
+      offers: {
+        '@type': 'Offer',
+        price: book.audiobook_direct_price_usd.toFixed(2),
+        priceCurrency: 'USD',
+        availability: 'https://schema.org/InStock',
+      },
+    },
+  ].filter(Boolean);
+
   return [
     {
       '@context': 'https://schema.org',
@@ -182,8 +235,12 @@ export function fallbackBookSchema(book: BookDetail): unknown[] {
       image,
       author: BRIAN_PERSON,
       publisher: APEX_ORG,
+      inLanguage: 'en',
+      description: book.description,
+      ...(book.paperback_isbn ? { isbn: book.paperback_isbn } : {}),
       bookFormat: 'https://schema.org/EBook',
       isBasedOn: SPIKER_BASED_ON,
+      workExample,
       ...(reviews.length ? { review: reviews } : {}),
     },
     { '@context': 'https://schema.org', ...BRIAN_PERSON },
@@ -218,7 +275,7 @@ export function fallbackSeriesSchema(series: SeriesDetail): unknown[] {
     {
       '@context': 'https://schema.org',
       '@type': 'CollectionPage',
-      name: `${series.name} — Apex Book Publishing`,
+      name: `${series.name} — Apex Publishing House`,
       url,
       isBasedOn: SPIKER_BASED_ON,
       mainEntity: {
@@ -256,5 +313,54 @@ export function fallbackPageSchema(path: string, title: string): unknown[] {
     },
     { '@context': 'https://schema.org', ...BRIAN_PERSON },
     { '@context': 'https://schema.org', ...APEX_ORG },
+  ];
+}
+
+/* CollectionPage schema for topic cluster hubs (/books/<topic>).
+ * mainEntity is the list of Books in this cluster — gives Google a
+ * structured "this page is about <topic>, here are the books" signal
+ * for the SEO landing surface.
+ */
+interface ClusterLike {
+  slug: string;
+  name: string;
+  keyword: string;
+  description: string;
+}
+interface ClusterBookLike {
+  slug: string;
+  title: string;
+}
+export function fallbackClusterSchema(
+  cluster: ClusterLike,
+  books: ClusterBookLike[],
+): unknown[] {
+  const url = `${env.siteUrl}/books/${cluster.slug}`;
+  return [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      name: `Apex Publishing — ${cluster.name}`,
+      url,
+      description: cluster.description,
+      isPartOf: APEX_ORG,
+      mainEntity: books.slice(0, 25).map((b) => ({
+        '@type': 'Book',
+        name: b.title,
+        url: `${env.siteUrl}/books/${b.slug}`,
+        author: BRIAN_PERSON,
+        publisher: APEX_ORG,
+      })),
+    },
+    { '@context': 'https://schema.org', ...BRIAN_PERSON },
+    { '@context': 'https://schema.org', ...APEX_ORG },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Books', item: `${env.siteUrl}/books` },
+        { '@type': 'ListItem', position: 2, name: cluster.name, item: url },
+      ],
+    },
   ];
 }

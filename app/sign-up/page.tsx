@@ -3,7 +3,7 @@ import { SignUpForm } from '@/components/auth/SignUpForm';
 import { buildMetadata } from '@/lib/seo';
 
 export const metadata = buildMetadata({
-  title: 'Create an account — Apex Book Publishing',
+  title: 'Create an account — Apex Publishing House',
   description:
     'Create your Apex account. One sign-in covers every brand — books, digital, apparel, the lot.',
   path: '/sign-up',

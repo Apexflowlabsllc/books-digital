@@ -10,12 +10,14 @@ import { BookReviews } from '@/components/BookReviews';
 import { EmailGate } from '@/components/EmailGate';
 import { JsonLdSchema } from '@/components/JsonLdSchema';
 import { ClusterHub } from '@/components/ClusterHub';
+import { ComingSoonBook } from '@/components/ComingSoonBook';
 import { getBook, getBookSeo, getCluster } from '@/lib/api';
 import { getAudioPreviewPool, getPodcastPreviewPool } from '@/lib/preview-pool';
 import { buildMetadata, fallbackBookSchema, fallbackClusterSchema } from '@/lib/seo';
 import { SHOW_PODCAST_VIDEO_ON_BOOK } from '@/lib/flags';
 import { getClusterBySlug, isClusterSlug } from '@/lib/clusters';
 import { LAUNCH } from '@/lib/launch';
+import { isComingSoonBook } from '@/lib/series-status';
 import { imageProxy, intensityGlyphs, waveLabel } from '@/lib/utils';
 
 interface BookRouteProps {
@@ -84,6 +86,18 @@ export default async function BookDetailPage({ params }: BookRouteProps) {
   ]);
 
   if (!book) notFound();
+
+  // Coming-soon branch: S06–S12 don't have written manuscripts yet
+  // (per Brian's roadmap). Render the minimal cover + "Coming soon"
+  // panel + notify-me capture instead of the full purchase stack.
+  if (isComingSoonBook(book)) {
+    return (
+      <PageShell seriesColor={book.series_color}>
+        <JsonLdSchema bundle={seo} fallback={fallbackBookSchema(book)} />
+        <ComingSoonBook book={book} />
+      </PageShell>
+    );
+  }
 
   // Authenticity gates whether the player shows full audio or a 30s
   // preview from a borrowed peer. Per backend handoff: when

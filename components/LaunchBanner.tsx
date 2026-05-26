@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
+import { launchCountdownLabel } from '@/lib/launch';
 
 const STORAGE_KEY = 'apex-launch-banner-dismissed';
 
@@ -38,6 +39,8 @@ export function LaunchBanner() {
     setHidden(true);
   };
 
+  const countdown = launchCountdownLabel();
+
   return (
     <div
       role="region"
@@ -56,13 +59,26 @@ export function LaunchBanner() {
             </span>
             30% off every direct purchase. Use code{' '}
             <span className="font-mono font-bold text-accent">APEX30</span> at checkout.
+            {countdown ? (
+              <>
+                <span className="mx-3 text-white/40" aria-hidden>
+                  ·
+                </span>
+                <span className="font-mono text-white/80">{countdown}</span>
+              </>
+            ) : null}
           </span>
           {/* Mobile compressed copy */}
           <span className="sm:hidden">
             <span className="font-mono font-bold text-accent">30% OFF</span>
             <span className="mx-2 text-white/40">·</span>
-            code{' '}
-            <span className="font-mono font-bold text-accent">APEX30</span>
+            code <span className="font-mono font-bold text-accent">APEX30</span>
+            {countdown ? (
+              <>
+                <span className="mx-2 text-white/40">·</span>
+                <span className="text-white/80">{countdown}</span>
+              </>
+            ) : null}
           </span>
         </p>
         <button

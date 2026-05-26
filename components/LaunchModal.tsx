@@ -3,9 +3,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Copy, Check, Sparkles } from 'lucide-react';
+import { X, Copy, Check, Sparkles, Clock } from 'lucide-react';
 import Link from 'next/link';
-import { LAUNCH } from '@/lib/launch';
+import { LAUNCH, launchCountdownLabel } from '@/lib/launch';
+import { OPEN_MODAL_EVENT } from './LaunchPill';
 
 const STORAGE_KEY = 'apex-launch-modal-seen';
 // Wait this many ms after mount before showing — keeps it from
@@ -32,6 +33,17 @@ export function LaunchModal() {
     }
     const t = setTimeout(() => setOpen(true), OPEN_DELAY_MS);
     return () => clearTimeout(t);
+  }, []);
+
+  // Re-open trigger: any LaunchPill click (or any other surface that
+  // dispatches the event) opens the modal again, ignoring the
+  // dismissed-localStorage flag. Once the user explicitly asks for
+  // it, persistence doesn't matter.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const onOpen = () => setOpen(true);
+    window.addEventListener(OPEN_MODAL_EVENT, onOpen);
+    return () => window.removeEventListener(OPEN_MODAL_EVENT, onOpen);
   }, []);
 
   // Esc to close + body scroll lock while open.
@@ -114,12 +126,22 @@ export function LaunchModal() {
               <X className="h-4 w-4" aria-hidden />
             </button>
 
-            {/* Decorative sparkle eyebrow */}
-            <div className="flex items-center gap-2 text-accent">
-              <Sparkles className="h-4 w-4" aria-hidden />
-              <span className="font-mono text-[10px] uppercase tracking-[0.4em]">
-                Launch week
-              </span>
+            {/* Decorative sparkle eyebrow + countdown */}
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2 text-accent">
+                <Sparkles className="h-4 w-4" aria-hidden />
+                <span className="font-mono text-[10px] uppercase tracking-[0.4em]">
+                  Launch week
+                </span>
+              </div>
+              {launchCountdownLabel() ? (
+                <div className="flex items-center gap-1.5 border border-accent/30 px-2 py-1">
+                  <Clock className="h-3 w-3 text-accent" aria-hidden />
+                  <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-accent">
+                    {launchCountdownLabel()}
+                  </span>
+                </div>
+              ) : null}
             </div>
 
             <h2

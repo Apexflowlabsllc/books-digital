@@ -2,6 +2,7 @@ import { PageShell } from '@/components/PageShell';
 import { Hero } from '@/components/Hero';
 import { CatalogFilters } from '@/components/CatalogFilters';
 import { JsonLdSchema } from '@/components/JsonLdSchema';
+import { SaleCallout } from '@/components/SaleCallout';
 import { getCatalog, getPageSeo } from '@/lib/api';
 import { buildMetadata, fallbackPageSchema } from '@/lib/seo';
 import { empty } from '@/lib/voice';
@@ -36,6 +37,10 @@ export default async function BooksPage() {
         }
         body="Filter by series, wave, format, or voice intensity. Sort defaults to Wave I → Wave IV, then by book number inside each series."
       />
+
+      <section className="container-x pt-8">
+        <SaleCallout />
+      </section>
 
       <section className="container-x py-12">
         {books.length === 0 ? (

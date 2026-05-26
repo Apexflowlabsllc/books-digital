@@ -8,6 +8,7 @@ import { BooksConcierge } from '@/components/BooksConcierge';
 import { ExitIntentModalTrigger } from '@/components/EmailCaptureModal';
 import { LaunchBanner } from '@/components/LaunchBanner';
 import { LaunchModal } from '@/components/LaunchModal';
+import { LaunchPill } from '@/components/LaunchPill';
 import './globals.css';
 
 const geist = Geist({
@@ -85,8 +86,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <BooksConcierge />
         <ExitIntentModalTrigger />
         {/* Launch-week promo modal — auto-opens once per browser ~3.5s
-            after the user lands. Dismiss persists via localStorage. */}
+            after the user lands. Dismiss persists via localStorage,
+            but the floating LaunchPill re-opens it on demand. */}
         <LaunchModal />
+        {/* Persistent floating pill bottom-left — opens the modal
+            anytime, shows live countdown. */}
+        <LaunchPill />
       </body>
     </html>
   );

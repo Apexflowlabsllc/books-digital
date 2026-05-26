@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import { ArrowUpRight, Sparkles, Tag } from 'lucide-react';
-import { LAUNCH, launchPrice } from '@/lib/launch';
+import { ArrowUpRight, Sparkles, Tag, Clock } from 'lucide-react';
+import { LAUNCH, launchPrice, launchCountdownLabel } from '@/lib/launch';
 
 interface LaunchOfferProps {
   totalBooks?: number;
@@ -35,6 +35,7 @@ export function LaunchOffer({ totalBooks }: LaunchOfferProps) {
   if (!LAUNCH.active) return null;
 
   const booksLabel = totalBooks && totalBooks > 0 ? totalBooks.toLocaleString() : '636';
+  const countdown = launchCountdownLabel();
 
   return (
     <section
@@ -60,6 +61,12 @@ export function LaunchOffer({ totalBooks }: LaunchOfferProps) {
             <Sparkles className="h-3 w-3" aria-hidden />
             <span>§03 · Launch Week · {LAUNCH.percent}% off</span>
           </p>
+          {countdown ? (
+            <p className="mt-4 inline-flex items-center gap-2 border border-accent/30 bg-bg-subtle/60 px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.25em] text-accent">
+              <Clock className="h-3 w-3" aria-hidden />
+              <span>{countdown}</span>
+            </p>
+          ) : null}
           <h2
             className="mt-7 font-display font-light leading-[0.95] tracking-[-0.04em] text-cream"
             style={{ fontSize: 'clamp(3rem, 7vw, 6.5rem)' }}

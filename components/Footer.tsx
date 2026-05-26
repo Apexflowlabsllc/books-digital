@@ -24,7 +24,6 @@ const FOOTER_COLUMNS = [
     links: [
       { href: '/books', label: 'All books' },
       { href: '/series', label: 'The 12 series' },
-      { href: '/podcast', label: 'Podcast' },
       { href: '/bundles', label: 'Series bundles' },
     ],
   },

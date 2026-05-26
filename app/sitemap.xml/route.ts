@@ -6,8 +6,9 @@ export const revalidate = 3600;
 
 const BOOKS_PER_PAGE = 200;
 
-// Sitemap index — points at paginated book sitemaps + series + podcast +
-// the static page sitemap. Master §6.6 — every URL discoverable.
+// Sitemap index — points at paginated book sitemaps + series + the
+// static page sitemap. The podcast surface was retired; podcast
+// playback now lives on book detail pages only.
 export async function GET() {
   const siteUrl = env.siteUrl.replace(/\/$/, '');
 
@@ -20,7 +21,6 @@ export async function GET() {
   const entries: Array<{ loc: string; lastmod?: string }> = [
     { loc: `${siteUrl}/sitemap-static.xml`, lastmod: today },
     { loc: `${siteUrl}/sitemap-series.xml`, lastmod: today },
-    { loc: `${siteUrl}/sitemap-podcast.xml`, lastmod: today },
   ];
 
   for (let i = 1; i <= pages; i++) {

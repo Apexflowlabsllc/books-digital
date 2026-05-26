@@ -55,7 +55,6 @@ KEY LINKS (use these inline, NEVER invent paths):
   /free-chapter/<book-slug> — get chapter one via email
   /membership — the Insider Pass: $99/year, all 636 books, all audio, 20% off every other Apex brand
   /bundles — series bundles
-  /podcast — 14 podcast feeds (master + 13 series feeds)
   /brian-spiker-real-world-proof — Brian's 13-year Spiker timeline (proof he's a real operator)
   /about-brian — author page
 

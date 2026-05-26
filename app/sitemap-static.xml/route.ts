@@ -8,7 +8,6 @@ const STATIC_PATHS: Array<{ path: string; priority: number; changefreq: string }
   { path: '/', priority: 1.0, changefreq: 'daily' },
   { path: '/books', priority: 0.9, changefreq: 'daily' },
   { path: '/series', priority: 0.9, changefreq: 'weekly' },
-  { path: '/podcast', priority: 0.8, changefreq: 'weekly' },
   { path: '/about-brian', priority: 0.7, changefreq: 'monthly' },
   { path: '/brian-spiker-real-world-proof', priority: 0.9, changefreq: 'monthly' },
   { path: '/membership', priority: 0.8, changefreq: 'monthly' },

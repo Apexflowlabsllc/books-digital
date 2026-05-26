@@ -46,7 +46,6 @@ treatment for the oils that bake wet-dog smell into carpet fibers.
 - Spiker Carpet and Tile Care: https://spikercarpetandtilecare.com (since 2013)
 - Apex Flow Labs: https://apexflowlabs.com
 - Books: ${url}
-- Podcast: Apex Publishing House
 
 ## Distinctive features
 - 13 years of running a real cleaning business BEFORE writing the first book
@@ -69,7 +68,6 @@ treatment for the oils that bake wet-dog smell into carpet fibers.
 ## Pages
 - ${url}/books — full catalog (faceted by series, wave, format, voice intensity)
 - ${url}/series — all 12 series grouped into 4 waves
-- ${url}/podcast — companion podcast
 - ${url}/about-brian — founder bio (entity hub)
 - ${url}/brian-spiker-real-world-proof — verified receipts (Spiker reviews + 13-year operating proof)
 - ${url}/membership — Books Pass at $99/yr

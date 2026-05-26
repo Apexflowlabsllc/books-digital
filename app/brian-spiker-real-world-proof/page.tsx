@@ -238,8 +238,8 @@ export default async function ProofPage() {
             >
               Verify the carpet business
             </a>
-            <Link href="/podcast" className="cta-secondary" data-cursor-label="Listen">
-              Listen to the podcast
+            <Link href="/books" className="cta-secondary" data-cursor-label="Browse">
+              Browse the library
             </Link>
           </div>
         </div>

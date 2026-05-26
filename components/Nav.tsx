@@ -14,7 +14,6 @@ interface NavProps {
 const LINKS = [
   { href: '/books', label: 'Books' },
   { href: '/series', label: 'Series' },
-  { href: '/podcast', label: 'Podcast' },
   { href: '/about-brian', label: 'Brian' },
   { href: '/brian-spiker-real-world-proof', label: 'Proof' },
   { href: '/membership', label: 'Pass' },

@@ -308,11 +308,11 @@ export function HomeHero({ books, totalBooks }: HomeHeroProps) {
               </Magnetic>
               <Magnetic strength={0.18}>
                 <Link
-                  href="/podcast"
+                  href="/series"
                   className="font-mono text-[11px] uppercase tracking-[0.3em] text-accent/80 transition-colors hover:text-cream border-b border-[rgba(217,204,140,0.3)] hover:border-cream pb-1"
-                  data-cursor-label="Listen"
+                  data-cursor-label="See"
                 >
-                  Or listen to the podcast →
+                  Or see the 12 series →
                 </Link>
               </Magnetic>
             </div>

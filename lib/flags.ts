@@ -2,14 +2,12 @@
  * dependency — these are decisions, not configuration.
  */
 
-// Per-surface podcast-video flags. Brian wants video off on the book
-// detail page (cleaner buy flow) but on for the dedicated /podcast
-// page where the whole grid is visible. Books without a real MP4
-// self-hide via VideoPlayer's onError handler — the 403/404 trips
-// the listener and the player unmounts.
-export const SHOW_PODCAST_VIDEO_ON_BOOK = false;
-export const SHOW_PODCAST_VIDEO_ON_PODCAST_PAGE = true;
+// The /podcast page was retired — podcast audio + video now live
+// inline on each book detail page only. Books without a real MP4 /
+// MP3 self-hide via the player's onError handler, so the visible
+// section auto-matches what the backend has uploaded.
+export const SHOW_PODCAST_VIDEO_ON_BOOK = true;
 
-// Legacy export kept for safety in case any imports remain — points
-// at the more permissive flag so behavior matches /podcast page.
-export const SHOW_PODCAST_VIDEO = SHOW_PODCAST_VIDEO_ON_PODCAST_PAGE;
+// Legacy exports kept so old imports compile during transition.
+export const SHOW_PODCAST_VIDEO_ON_PODCAST_PAGE = false;
+export const SHOW_PODCAST_VIDEO = SHOW_PODCAST_VIDEO_ON_BOOK;

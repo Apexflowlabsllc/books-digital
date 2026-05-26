@@ -360,18 +360,10 @@ export default async function BookDetailPage({ params }: BookRouteProps) {
           ) : null}
         </div>
 
-        {book.related_podcast_slug ? (
-          <Link
-            href={`/podcast/${book.related_podcast_slug}`}
-            className="mt-6 flex items-center gap-3 border border-line bg-bg-subtle p-5 hover:border-accent transition-colors"
-          >
-            <Mic className="h-5 w-5 text-accent" aria-hidden />
-            <div>
-              <p className="eyebrow">Related episode</p>
-              <p className="font-display text-lg text-ink">Brian walks through this book on the podcast →</p>
-            </div>
-          </Link>
-        ) : null}
+        {/* Related-podcast deep link removed — podcast audio + video
+            now play inline on this same page above, so there's nowhere
+            for "Listen to the podcast" to go that the user isn't
+            already looking at. */}
       </section>
     </PageShell>
   );

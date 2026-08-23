@@ -151,21 +151,15 @@ code, pre, kbd, samp, .font-mono {
     letter-spacing: 0.18em;
     white-space: nowrap;
     text-transform: uppercase;
-    color: #001428;
+    color: #FFFFFF;
     isolation: isolate;
-    background:
-      linear-gradient(
-        180deg,
-        #2E3A2A 0%, #4A5C44 8%, #8A8F55 22%,
-        #D9CC8C 42%, #F2E2A6 50%, #D9CC8C 58%,
-        #8A8F55 78%, #4A5C44 92%, #2E3A2A 100%
-      );
-    border: 1px solid #1F2A1C;
+    background: #0F766E;
+    border: 1px solid #0B5F59;
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.35),
       inset 0 -1px 0 rgba(0, 0, 0, 0.55),
       0 1px 0 rgba(0, 0, 0, 0.55),
-      0 18px 36px -10px rgba(217, 204, 140, 0.4),
+      0 18px 36px -10px rgba(15, 118, 110, 0.4),
       0 14px 28px -8px rgba(0, 0, 0, 0.7);
     transition:
       transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
@@ -196,14 +190,14 @@ code, pre, kbd, samp, .font-mono {
     mix-blend-mode: overlay;
   }
   .cta-primary:hover {
-    color: #001428;
+    color: #FFFFFF;
     transform: translateY(-2px);
     filter: saturate(1.1) brightness(1.04);
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.45),
       inset 0 -1px 0 rgba(0, 0, 0, 0.55),
       0 1px 0 rgba(0, 0, 0, 0.6),
-      0 28px 52px -12px rgba(217, 204, 140, 0.6),
+      0 28px 52px -12px rgba(15, 118, 110, 0.6),
       0 18px 34px -8px rgba(0, 0, 0, 0.75);
   }
   .cta-primary:hover::before { transform: none; }

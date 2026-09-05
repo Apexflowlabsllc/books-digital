@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { JoinPass } from '@/components/JoinPass';
 import { Check } from 'lucide-react';
 import { PageShell } from '@/components/PageShell';
 import { Hero } from '@/components/Hero';
@@ -89,20 +90,7 @@ export default async function MembershipPage() {
           <p className="mx-auto mt-4 max-w-xl text-ink-dim">
             One charge. Cancel anytime. We&apos;re not a gym in 2009.
           </p>
-          <form
-            action={`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/checkout/start`}
-            method="post"
-            className="mx-auto mt-8 inline-flex flex-col items-center gap-3"
-          >
-            <input type="hidden" name="product" value="books-insider-pass" />
-            <input type="hidden" name="source" value="books-frontend-membership" />
-            <button type="submit" className="cta-primary px-10 py-4 text-base">
-              Get the Pass — $99/yr
-            </button>
-            <p className="text-xs text-ink-mute">
-              Or buy one at a time. Up to you.
-            </p>
-          </form>
+          <JoinPass />
         </div>
       </section>
 

@@ -16,7 +16,7 @@ export const metadata = buildMetadata({
 export const revalidate = 3600;
 
 const BENEFITS = [
-  'All 636 books — read on any device, forever, including the ones not written yet',
+  'All 636 books — read on any device for as long as your Pass is active, including the ones not written yet',
   'All 636 audiobooks — streamed, narrated, mastered, in your ears on the way to a job',
   'Early access to new releases — you read before the public because you’re paying us $99 and the public is not',
   '20% off every other Apex brand — Digital, Apparel, Beauty, Health, Pets, Academy, Kids, Companion AI, Affiliates, Spiker, and the parent at apexflowlabs.com',
@@ -119,7 +119,7 @@ export default async function MembershipPage() {
             actually use.
           </p>
           <Link href="/founder-edition" className="cta-secondary mt-6 inline-flex">
-            Want lifetime + a call with Brian? Founder Edition →
+            Want the founding tier + a call with Brian? Founder Edition →
           </Link>
         </div>
       </section>

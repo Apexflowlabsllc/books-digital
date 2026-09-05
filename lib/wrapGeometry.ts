@@ -130,3 +130,61 @@ export function useWrapAspect(url: string | undefined): number | null {
 
   return a;
 }
+
+/**
+ * The first of several candidate wraps that actually loads, with its aspect.
+ *
+ * WHY A LADDER RATHER THAN JUST BOOK 1
+ * ------------------------------------
+ * The wall used book 1 of each series for its spine. Only 253 of the 636
+ * cover_wrap.jpg files are in the bucket today, and book 1 specifically is
+ * missing for several series — series 4 starts at book 11, series 5 at book
+ * 21, series 9 at book 2. Hardcoding book 1 left those spines blank.
+ *
+ * So it tries a short ladder and takes the first that loads. This self-heals:
+ * as wraps are uploaded, earlier candidates start winning with no code change
+ * and no manifest to keep in sync. `done` goes true when every candidate has
+ * failed, which is the signal to draw a designed fallback instead of waiting
+ * forever on artwork that is not there.
+ */
+export function useFirstLoadableWrap(
+  urls: string[],
+): { url: string | null; aspect: number | null; done: boolean } {
+  const key = urls.join('|');
+  const [state, setState] = useState<{ url: string | null; aspect: number | null; done: boolean }>({
+    url: null,
+    aspect: null,
+    done: false,
+  });
+
+  useEffect(() => {
+    let alive = true;
+    setState({ url: null, aspect: null, done: false });
+    const list = key ? key.split('|').filter(Boolean) : [];
+
+    const tryAt = (i: number) => {
+      if (!alive) return;
+      if (i >= list.length) {
+        setState({ url: null, aspect: null, done: true });
+        return;
+      }
+      const img = new Image();
+      img.decoding = 'async';
+      img.onload = () => {
+        if (!alive) return;
+        if (img.naturalWidth > 0 && img.naturalHeight > 0) {
+          setState({ url: list[i], aspect: img.naturalWidth / img.naturalHeight, done: true });
+        } else tryAt(i + 1);
+      };
+      img.onerror = () => tryAt(i + 1);
+      img.src = list[i];
+    };
+
+    tryAt(0);
+    return () => {
+      alive = false;
+    };
+  }, [key]);
+
+  return state;
+}

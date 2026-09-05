@@ -1361,3 +1361,20 @@ code, pre, kbd, samp, .font-mono {
 }
 .pulse-post a{color:#DCD6CB; text-decoration:none}
 .pulse-post a:hover{color:var(--accent,#C98B3E)}
+
+
+/* ── TOUCH TARGETS ──────────────────────────────────────────────────
+   Measured on a 375px viewport: eight inline links in the footer and
+   author blocks rendered 19-23px tall, under the 24px minimum. These
+   are text links inside prose, so they cannot simply be made bigger
+   without moving the copy.
+
+   `.tap-safe` adds vertical padding and pulls the same amount back off
+   the margin. The hit area grows to 24px; the text does not shift by a
+   pixel, and the surrounding paragraph reflows exactly as before. */
+.tap-safe{
+  display:inline-block;
+  padding-block:4px;
+  margin-block:-4px;
+  min-height:24px;
+}

@@ -31,7 +31,13 @@ export function LiquidMetal({ accent = [0.79, 0.54, 0.24] as [number, number, nu
   useEffect(() => {
     const cv = ref.current;
     if (!cv) return;
-    const gl = cv.getContext('webgl', { antialias: false, alpha: true });
+    /* preserveDrawingBuffer: a WebGL canvas whose buffer is not preserved is
+     * CLEARED after each composite. Combined with the frame throttle below,
+     * every skipped frame could show as blank rather than holding the previous
+     * image — a flicker, or a black background if rAF is throttled by the
+     * browser. Preserving costs a little memory and removes that class of bug
+     * entirely. */
+    const gl = cv.getContext('webgl', { antialias: false, alpha: true, preserveDrawingBuffer: true });
     if (!gl) return;
 
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -77,10 +83,10 @@ void main(){
   // the fold highlight goes up to .52 so the veins carry the drama instead of
   // the midtones. Body text sits on the dark, not on the bright.
   vec3 dark=vec3(.020,.019,.023);
-  vec3 metal=vec3(.26,.225,.165);
+  vec3 metal=vec3(.325,.28,.205);
   vec3 lit=vec3(.94,.90,.82);
   vec3 col=mix(dark,metal,smoothstep(.34,.80,f));
-  col=mix(col,lit,band2*.52);
+  col=mix(col,lit,band2*.50);
   col+=ACC*pow(1.-f,3.5)*.38;
   // Ripple crest untouched at .42 — the ripple brightness is already right.
   col+=vec3(1.0,.90,.72)*max(crest,0.)*0.42;
@@ -88,7 +94,7 @@ void main(){
   // Vignette relaxed from .84 to .58 and pushed outward, so the edges of the
   // viewport still show the flow rather than crushing to black.
   float d2=length(uv*vec2(.70,1.));
-  col*=1.-smoothstep(.30,1.22,d2)*.72;
+  col*=1.-smoothstep(.32,1.26,d2)*.62;
   gl_FragColor=vec4(col,1.);
 }`;
 
@@ -163,7 +169,9 @@ void main(){
     let lastDraw = 0;
     const frame = (ts: number) => {
       if (!reduced) raf = requestAnimationFrame(frame);
-      if (document.hidden) return;
+      // No document.hidden check: browsers already stop rAF in a hidden tab,
+      // and returning early here was a second path that left the canvas
+      // unpainted for a frame.
       if (ts - lastDraw < MIN_FRAME_MS) return;
       lastDraw = ts;
       const T = now();

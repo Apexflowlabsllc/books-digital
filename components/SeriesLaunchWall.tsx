@@ -33,11 +33,28 @@ const BUCKET =
 
 const pad2 = (n: number) => String(n).padStart(2, '0');
 
-/** Series number is not on SeriesSummary, so derive it from wave order once. */
+/** Series number is not on SeriesSummary, so derive it from catalog order. */
 function coverUrl(seriesNumber: number, bookNumber: number, w = 220) {
   return `${BUCKET}/s${pad2(seriesNumber)}_b${pad2(bookNumber)}/cover_ebook.jpg?width=${w}&height=${Math.round(
     w * 1.5,
   )}&resize=cover&quality=72`;
+}
+
+/**
+ * The REAL spine.
+ *
+ * cover_wrap.jpg is the print wrap — back cover, spine, front cover laid out
+ * left to right at 3851x2775. Edge detection across a scanline puts the spine
+ * boundaries at 48% and 52% of the width, which is exactly where a 6x9 spine
+ * falls, so the middle 4% of that file is the actual designed spine with its
+ * own title treatment on it.
+ *
+ * Rendered as a background sized to 2500% (100/4) and centred, so the element
+ * shows only that strip. That is why these read as the real books rather than
+ * generic cloth with a sliver of front cover stuck on the edge.
+ */
+function spineWrapUrl(seriesNumber: number, bookNumber: number) {
+  return `${BUCKET}/s${pad2(seriesNumber)}_b${pad2(bookNumber)}/cover_wrap.jpg?width=1200&quality=82`;
 }
 
 type Props = {
@@ -266,8 +283,11 @@ export function SeriesLaunchWall({ series, numbers }: Props) {
               onClick={(e) => launch(e.currentTarget, s)}
             >
               {n ? (
-                /* eslint-disable-next-line @next/next/no-img-element */
-                <img className="spine-art" src={coverUrl(n, 1, 140)} alt="" aria-hidden loading="lazy" />
+                <span
+                  className="spine-wrap"
+                  aria-hidden
+                  style={{ backgroundImage: `url(${spineWrapUrl(n, 1)})` }}
+                />
               ) : null}
               <span className="spine-no">{n || '·'}</span>
               <span className="spine-name">{s.name}</span>

@@ -723,19 +723,32 @@ code, pre, kbd, samp, .font-mono {
   outline:none;
 }
 
-/* the cover wrapping round the leading edge of the spine */
-.series-spine .spine-art{
-  position:absolute; right:0; top:0; bottom:0; width:26px;
-  height:100%; object-fit:cover; object-position:left center;
-  opacity:.9; pointer-events:none;
-  border-left:1px solid rgba(0,0,0,.7);
-  filter:brightness(.82) saturate(1.05);
+/* THE REAL SPINE.
+ * cover_wrap.jpg is the print wrap: back | spine | front, left to right.
+ * Edge detection put the spine boundaries at 48% and 52% of the width, so the
+ * middle 4% is the designed spine with its own title treatment. Scaling the
+ * background to 2500% (100/4) and centring it shows exactly that strip — so
+ * these are the books' actual spines, not cloth with a sliver of cover. */
+.series-spine .spine-wrap{
+  position:absolute; inset:0; pointer-events:none; z-index:1;
+  background-repeat:no-repeat;
+  background-size:2500% 100%;
+  background-position:50% 50%;
+  border-radius:2px 5px 5px 2px;
+}
+/* a touch of shelf lighting over the artwork, so it sits in the scene */
+.series-spine .spine-wrap::after{
+  content:""; position:absolute; inset:0;
+  background:linear-gradient(90deg,
+    rgba(0,0,0,.55) 0%, rgba(255,255,255,.12) 8%,
+    rgba(0,0,0,0) 34%, rgba(0,0,0,.30) 82%, rgba(0,0,0,.62) 100%);
 }
 /* page block: the cream edge of the paper, so it reads as a physical book */
 .series-spine::before{
-  content:""; position:absolute; right:26px; top:6px; bottom:6px; width:5px;
+  /* page block on the leading edge — real books show paper, not a hard edge */
+  content:""; position:absolute; right:0; top:5px; bottom:5px; width:4px; z-index:2;
   background:repeating-linear-gradient(180deg,#EDE6D6 0 2px,#C6BCA6 2px 3px);
-  opacity:.55; pointer-events:none;
+  opacity:.5; pointer-events:none; border-radius:0 3px 3px 0;
 }
 /* headband + foil rule near the top of the spine */
 .series-spine::after{
@@ -744,19 +757,18 @@ code, pre, kbd, samp, .font-mono {
   opacity:.9; pointer-events:none;
 }
 .spine-no{
-  position:relative; z-index:2; margin-right:26px;
+  position:relative; z-index:2;
   font-size:22px; line-height:1; font-weight:300;
   color:var(--accent,#C98B3E); text-shadow:0 1px 6px rgba(0,0,0,.9);
 }
 .spine-name{
-  position:relative; z-index:2; margin-right:26px;
-  writing-mode:vertical-rl; transform:rotate(180deg);
-  font-size:10px; letter-spacing:.18em; text-transform:uppercase;
-  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-height:196px;
-  color:#F2EDE2; text-shadow:0 1px 8px rgba(0,0,0,.95);
+  /* the wrap artwork already carries the real title, so this is a screen-reader
+   * label only — printing it again would double the type on the spine */
+  position:absolute; width:1px; height:1px; overflow:hidden;
+  clip:rect(0 0 0 0); white-space:nowrap;
 }
 .spine-count{
-  position:relative; z-index:2; margin-right:26px;
+  position:relative; z-index:2;
   font-size:8.5px; letter-spacing:.18em;
   color:rgba(242,237,226,.5);
 }

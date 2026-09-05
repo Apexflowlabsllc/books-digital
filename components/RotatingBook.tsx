@@ -19,13 +19,25 @@
 import { useCallback, useEffect, useRef } from 'react';
 
 type Props = {
-  coverUrl: string;
+  /**
+   * The PRINT WRAP — back cover, spine, front cover in one file, laid out left
+   * to right. Every face of this book is rendered from it, so the object you
+   * turn is the actual printed book rather than a front cover with invented
+   * boards behind it.
+   *
+   * Edge detection across the wrap puts the spine at 48%-52% of the width.
+   * Therefore:
+   *   back   = 0%   .. 48%   -> background-size 208%, position left
+   *   spine  = 48%  .. 52%   -> background-size 2500%, position centre
+   *   front  = 52%  .. 100%  -> background-size 208%, position right
+   */
+  wrapUrl: string;
   title: string;
   seriesLabel: string;
   accent: string;
 };
 
-export function RotatingBook({ coverUrl, title, seriesLabel, accent }: Props) {
+export function RotatingBook({ wrapUrl, title, seriesLabel, accent }: Props) {
   const bookRef = useRef<HTMLDivElement>(null);
   const state = useRef({ ry: -28, rx: 6, drag: false, lx: 0, ly: 0, touched: false });
 
@@ -124,14 +136,14 @@ export function RotatingBook({ coverUrl, title, seriesLabel, accent }: Props) {
         aria-label={`${title} — three-dimensional book, drag or use arrow keys to rotate`}
         style={{ ['--accent' as string]: accent }}
       >
-        <div className="face f-back" />
-        <div className="face f-spine">
-          <span className="spine-title">{title}</span>
+        {/* Every face cut from the one wrap file — real back, real spine,
+          * real front, in the printer's own artwork. */}
+        <div className="face f-back" style={{ backgroundImage: `url(${wrapUrl})` }} />
+        <div className="face f-spine" style={{ backgroundImage: `url(${wrapUrl})` }}>
+          <span className="sr-only">{title}</span>
         </div>
         <div className="face f-pages" />
-        <div className="face f-front">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={coverUrl} alt="" aria-hidden className="f-art" />
+        <div className="face f-front" style={{ backgroundImage: `url(${wrapUrl})` }}>
           <span className="f-mark">{seriesLabel}</span>
         </div>
       </div>

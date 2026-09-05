@@ -540,6 +540,9 @@ export const ENCYCLOPEDIA: EncyclopediaEntry[] = [
       'how to calm my nervous system',
       'why do I panic over small things',
       'stuck in survival mode',
+      'panic attacks out of nowhere',
+      'I cannot relax even when nothing is wrong',
+      'my chest goes tight for no reason',
     ],
   },
   {
@@ -739,6 +742,8 @@ export const ENCYCLOPEDIA: EncyclopediaEntry[] = [
       'how to find meaning',
       'I have no direction',
       'is it too late to change direction',
+      'I have no idea what I actually want',
+      'I do not want anything anymore',
     ],
   },
   {

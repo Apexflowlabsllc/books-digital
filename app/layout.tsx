@@ -73,14 +73,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <BackgroundLoader />
         <TactileRipple />
         <FoilTracker />
-        {/* Site-wide backdrop blur — sits above the shader background
-            (z: -10) and below all page content (z: 2). Every route picks
-            this up automatically. */}
-        <div
-          aria-hidden
-          className="pointer-events-none fixed inset-0 backdrop-blur-xl"
-          style={{ zIndex: -8 }}
-        />
+        {/*
+          THE BLUR IS GONE — and that is why you can now see the shader.
+
+          A full-viewport `backdrop-blur-xl` used to sit here at z-index -8,
+          directly on top of LiquidMetal at -10. backdrop-blur-xl is a 24px
+          blur, and the shader's whole character is fine domain-warped detail:
+          24px of blur averaged every fold and highlight into flat grey-black,
+          so the canvas was rendering perfectly and arriving invisible.
+
+          Text legibility was the reason it was added, but the shader already
+          solves that itself — it is a dark ground with a heavy vignette, and
+          the sections that need more contrast carry their own backgrounds.
+          Blurring the entire site to protect type that was never at risk cost
+          us the one effect the store is built around.
+        */}
         <SmoothScroll />
         <Cursor />
         {/* Launch-week promo bar — sits above everything else; dismiss

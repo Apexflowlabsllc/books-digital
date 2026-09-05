@@ -19,11 +19,15 @@ export function Hero({ eyebrow, title, body, primary, secondary }: HeroProps) {
       ? { duration: 0.001 }
       : { duration: 0.8, delay, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] };
 
+  // bg-bg/55 rather than bg-bg: an opaque hero panel on every page was the
+  // second reason the liquid metal was never visible — the first being the
+  // site-wide backdrop blur removed in app/layout.tsx. A 55% scrim keeps the
+  // headline readable and lets the shader flow underneath it.
   return (
-    <section className="relative overflow-hidden border-b border-line bg-bg">
+    <section className="relative overflow-hidden border-b border-line bg-bg/55">
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-50"
+        className="pointer-events-none absolute inset-0 opacity-30"
         style={{
           background:
             'radial-gradient(60% 60% at 50% 0%, rgba(217,204,140,0.22) 0%, transparent 70%), radial-gradient(40% 50% at 100% 100%, rgba(217,204,140,0.08) 0%, transparent 70%)',

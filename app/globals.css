@@ -977,3 +977,238 @@ code, pre, kbd, samp, .font-mono {
   position:absolute;width:1px;height:1px;padding:0;margin:-1px;
   overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   THE CATALOG — shelves, not a heap.
+
+   636 large cards in one grid, each wearing a gold badge and a gold
+   label, read as a single wall of yellow. The shelf treatment replaces
+   it: twelve series, each ruled in ITS OWN colour, each showing one row
+   until asked. Colour now carries meaning instead of volume.
+   ═══════════════════════════════════════════════════════════════════ */
+
+.cat-bar{
+  display:flex; flex-wrap:wrap; align-items:flex-end; gap:14px 18px;
+  border-top:1px solid rgba(255,255,255,.09);
+  border-bottom:1px solid rgba(255,255,255,.09);
+  padding:16px 0; margin:0 0 42px;
+}
+.cat-field{display:flex; flex-direction:column; gap:5px; min-width:0}
+.cat-field>span{
+  font-family:var(--font-mono); font-size:9px; letter-spacing:.24em;
+  text-transform:uppercase; color:rgba(255,255,255,.36);
+}
+.cat-field>select{
+  appearance:none; -webkit-appearance:none;
+  background-color:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.12); border-radius:2px;
+  color:#EDE7DC; font-family:var(--font-mono); font-size:11.5px;
+  padding:8px 28px 8px 10px;
+  background-image:
+    linear-gradient(45deg,transparent 50%,rgba(255,255,255,.40) 50%),
+    linear-gradient(135deg,rgba(255,255,255,.40) 50%,transparent 50%);
+  background-position:right 12px center, right 7px center;
+  background-size:5px 5px, 5px 5px;
+  background-repeat:no-repeat;
+}
+.cat-field>select:focus{outline:none; border-color:rgba(201,139,62,.65)}
+.cat-field>select option{background:#0B0A0B; color:#EDE7DC}
+.cat-count{
+  margin-left:auto; display:flex; align-items:center; gap:16px;
+  padding-bottom:9px;
+  font-family:var(--font-mono); font-size:10.5px; letter-spacing:.2em;
+  text-transform:uppercase; color:rgba(255,255,255,.40);
+}
+.cat-reset{
+  background:none; border:none; padding:0;
+  font-family:var(--font-mono); font-size:10.5px; letter-spacing:.2em;
+  text-transform:uppercase; color:rgba(201,139,62,.85);
+  border-bottom:1px solid rgba(201,139,62,.4);
+}
+.cat-reset:hover{color:#E0A75B; border-bottom-color:#E0A75B}
+
+/* ── one shelf ──────────────────────────────────────────────────── */
+.shelf{margin:0 0 56px}
+.shelf-head{
+  position:relative; display:flex; align-items:baseline; gap:14px;
+  padding-top:13px; margin-bottom:20px;
+}
+/* The rule is the series colour, fading out — twelve different hues down
+   the page is what stops the whole catalog reading as one block. */
+.shelf-head::before{
+  content:''; position:absolute; left:0; top:0; height:2px; width:100%;
+  background:linear-gradient(90deg,var(--series) 0%,transparent 60%);
+  opacity:.6;
+}
+.shelf-no{
+  font-family:var(--font-mono); font-size:11px; letter-spacing:.16em;
+  color:var(--series); opacity:.9;
+}
+.shelf-name{
+  margin:0; font-family:var(--font-display); font-weight:300;
+  font-size:clamp(19px,2.2vw,27px); letter-spacing:-.012em; color:#F2ECE1;
+}
+.shelf-count{
+  margin-left:auto; font-family:var(--font-mono); font-size:10px;
+  letter-spacing:.2em; text-transform:uppercase; color:rgba(255,255,255,.32);
+}
+
+/* Eight to a row on a wide screen, which is exactly the peek count, so an
+   unopened shelf is one clean line rather than a ragged partial grid. */
+.shelf-grid{
+  display:grid; gap:22px 16px;
+  grid-template-columns:repeat(auto-fill,minmax(108px,1fr));
+}
+@media(min-width:1280px){ .shelf-grid{grid-template-columns:repeat(8,1fr)} }
+
+.shelf-more{
+  margin-top:20px; display:inline-flex; align-items:center; gap:9px;
+  padding:9px 16px; border-radius:2px;
+  border:1px solid rgba(255,255,255,.14); background:transparent;
+  font-family:var(--font-mono); font-size:10px; letter-spacing:.2em;
+  text-transform:uppercase; color:rgba(255,255,255,.60);
+  transition:border-color .25s ease, color .25s ease;
+}
+.shelf-more:hover{border-color:var(--series); color:var(--series)}
+
+/* ── one tile ───────────────────────────────────────────────────── */
+.tile{display:block; min-width:0; text-decoration:none;
+  transition:transform .32s cubic-bezier(.2,.7,.3,1)}
+.tile:hover{transform:translateY(-5px)}
+.tile-art{
+  position:relative; display:block; width:100%; aspect-ratio:2/3;
+  overflow:hidden; border-radius:3px; background:#100F12;
+  box-shadow:0 8px 20px -12px rgba(0,0,0,.9);
+  transition:box-shadow .32s ease;
+}
+.tile:hover .tile-art{
+  box-shadow:0 16px 34px -14px rgba(0,0,0,.95), 0 0 0 1px var(--series);
+}
+.tile-pending{
+  display:flex; align-items:center; justify-content:center; height:100%;
+  color:rgba(255,255,255,.18); font-size:22px;
+}
+.tile-title{
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+  overflow:hidden; margin-top:9px;
+  font-size:12px; line-height:1.28; color:#D8D2C7;
+  transition:color .25s ease;
+}
+.tile:hover .tile-title{color:var(--series)}
+.tile-price{
+  display:block; margin-top:3px;
+  font-family:var(--font-mono); font-size:10px; letter-spacing:.08em;
+  color:rgba(255,255,255,.34);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SAY THE PROBLEM — the front door of the library.
+
+   Sits above the filters because filters assume you already know what
+   you want. Nobody arriving here does. They know the sentence, not the
+   word, so the sentence is what the box asks for.
+   ═══════════════════════════════════════════════════════════════════ */
+
+.finder{margin:0 0 34px}
+.finder-label{
+  display:block; margin-bottom:12px;
+  font-family:var(--font-display); font-weight:300;
+  font-size:clamp(20px,2.6vw,30px); letter-spacing:-.015em; color:#F2ECE1;
+}
+.finder-box{
+  position:relative; display:flex; align-items:center;
+  border:1px solid rgba(255,255,255,.16); border-radius:3px;
+  background:rgba(10,9,11,.72);
+  transition:border-color .25s ease, box-shadow .25s ease;
+}
+.finder-box:focus-within{
+  border-color:rgba(201,139,62,.75);
+  box-shadow:0 0 0 1px rgba(201,139,62,.30), 0 18px 44px -26px rgba(201,139,62,.55);
+}
+.finder-icon{
+  width:19px; height:19px; flex:0 0 auto; margin-left:16px;
+  color:rgba(255,255,255,.34);
+}
+.finder-box input{
+  flex:1 1 auto; min-width:0; background:transparent; border:none; outline:none;
+  padding:17px 14px; color:#F2ECE1;
+  font-family:var(--font-sans); font-size:clamp(15px,1.6vw,17px);
+}
+.finder-box input::placeholder{color:rgba(255,255,255,.30)}
+.finder-box input::-webkit-search-cancel-button{display:none}
+.finder-clear{
+  flex:0 0 auto; margin-right:12px; padding:6px 10px;
+  background:none; border:none; color:rgba(255,255,255,.42); font-size:13px;
+}
+.finder-clear:hover{color:#E0A75B}
+
+/* Starter phrasings — real saidAs lines, so clicking one always resolves. */
+.finder-chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px}
+.say-chip{
+  position:relative; overflow:hidden;
+  border:1px solid rgba(255,255,255,.12); border-radius:100px;
+  background:rgba(255,255,255,.025); color:rgba(255,255,255,.62);
+  font-size:12.5px; line-height:1; padding:9px 14px; text-align:left;
+  transition:border-color .22s ease, color .22s ease, background-color .22s ease;
+}
+.say-chip:hover{
+  border-color:rgba(201,139,62,.55); color:#EFE6D8;
+  background:rgba(201,139,62,.08);
+}
+
+/* ── the answer ─────────────────────────────────────────────────── */
+.finder-out{margin-top:6px}
+.concept{
+  position:relative; margin:0 0 38px; padding:26px 26px 24px;
+  border:1px solid rgba(201,139,62,.30); border-radius:4px;
+  background:linear-gradient(180deg,rgba(201,139,62,.075),rgba(201,139,62,.015));
+}
+.concept-kicker{
+  margin:0 0 9px;
+  font-family:var(--font-mono); font-size:10px; letter-spacing:.22em;
+  text-transform:uppercase; color:rgba(224,167,91,.9);
+}
+.concept-term{
+  margin:0; font-family:var(--font-display); font-weight:300;
+  font-size:clamp(24px,3.4vw,38px); letter-spacing:-.02em; color:#F6F0E5;
+}
+.concept-term em{
+  font-style:normal; font-family:var(--font-mono); font-size:12px;
+  letter-spacing:.06em; color:rgba(255,255,255,.38); white-space:nowrap;
+}
+.concept-def{
+  margin:14px 0 0; max-width:66ch; font-size:15px; line-height:1.62;
+  color:rgba(240,234,224,.86);
+}
+.concept-do{
+  margin:18px 0 0; padding-top:16px; max-width:66ch;
+  border-top:1px solid rgba(255,255,255,.10);
+  font-size:15px; line-height:1.6; color:#F2ECE1;
+}
+.concept-do>span{
+  display:block; margin-bottom:5px;
+  font-family:var(--font-mono); font-size:9.5px; letter-spacing:.24em;
+  text-transform:uppercase; color:rgba(224,167,91,.9);
+}
+.concept-also{
+  margin:16px 0 0;
+  font-family:var(--font-mono); font-size:11px; letter-spacing:.06em;
+  color:rgba(255,255,255,.40);
+}
+.concept-also button{
+  background:none; border:none; padding:0; font:inherit;
+  color:rgba(224,167,91,.92); border-bottom:1px solid rgba(224,167,91,.35);
+}
+.concept-also button:hover{color:#F0BE7A}
+.concept-link{
+  display:inline-block; margin-top:16px;
+  font-family:var(--font-mono); font-size:10px; letter-spacing:.2em;
+  text-transform:uppercase; color:rgba(255,255,255,.48);
+  border-bottom:1px solid rgba(255,255,255,.18);
+}
+.concept-link:hover{color:#E0A75B; border-bottom-color:rgba(224,167,91,.6)}
+.finder-none{
+  margin:6px 0 0; padding:24px; max-width:70ch;
+  border:1px solid rgba(255,255,255,.10); border-radius:3px;
+  font-size:14.5px; line-height:1.65; color:rgba(255,255,255,.60);
+}

@@ -14,17 +14,25 @@ const STORAGE_KEY = 'apex-launch-banner-dismissed';
  * Pure announcement — not clickable, no scroll-trap.
  */
 export function LaunchBanner() {
-  // Hidden by default until we read localStorage on mount — avoids the
-  // "show then hide" flicker for users who already dismissed it.
-  const [hidden, setHidden] = useState(true);
+  /*
+   * VISIBLE BY DEFAULT, hidden only once localStorage says it was dismissed.
+   *
+   * It used to start hidden and appear after mount, which meant it dropped in
+   * and shoved the entire page down a moment after first paint — measured as
+   * a 0.058 layout shift, and the only CLS on the homepage.
+   *
+   * Flipping the default removes the shift for everyone seeing it for the
+   * first time, which is the common case and the one Lighthouse measures. A
+   * returning visitor who dismissed it sees it disappear instead, which shifts
+   * content upward once and is the rarer path.
+   */
+  const [hidden, setHidden] = useState(false);
 
   useEffect(() => {
     try {
-      const dismissed = localStorage.getItem(STORAGE_KEY) === '1';
-      if (!dismissed) setHidden(false);
+      if (localStorage.getItem(STORAGE_KEY) === '1') setHidden(true);
     } catch {
-      // Private mode / cookies blocked — still show the banner once.
-      setHidden(false);
+      // Private mode / cookies blocked — still show the banner.
     }
   }, []);
 

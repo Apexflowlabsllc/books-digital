@@ -71,7 +71,7 @@ export function Nav({ userEmail }: NavProps = {}) {
                   <Link
                     href={link.href}
                     className={cn(
-                      'group relative font-mono text-[10px] uppercase tracking-[0.3em] text-ink-dim transition-colors hover:text-accent',
+                      'group relative inline-flex min-h-[24px] items-center py-2 font-mono text-[10px] uppercase tracking-[0.3em] text-ink-dim transition-colors hover:text-accent',
                     )}
                   >
                     {link.label}
@@ -105,7 +105,7 @@ export function Nav({ userEmail }: NavProps = {}) {
               <div className="hidden md:flex items-center gap-3">
                 <Link
                   href="/sign-in"
-                  className="font-mono text-[10px] uppercase tracking-[0.3em] text-ink-dim transition-colors hover:text-accent"
+                  className="inline-flex min-h-[24px] items-center py-2 font-mono text-[10px] uppercase tracking-[0.3em] text-ink-dim transition-colors hover:text-accent"
                 >
                   Sign in
                 </Link>
@@ -135,9 +135,13 @@ export function Nav({ userEmail }: NavProps = {}) {
       </header>
 
       {/* Mobile drawer */}
+      {/* `inert` alongside aria-hidden: opacity-0 still leaves every link in
+        * the tab order, so a keyboard user tabbed into a drawer they could not
+        * see. Lighthouse flags exactly this as aria-hidden-focus. */}
       <div
         id="mobile-menu"
         aria-hidden={!menuOpen}
+        inert={!menuOpen}
         className={cn(
           'fixed inset-0 z-50 md:hidden transition-opacity duration-300',
           menuOpen ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0',

@@ -27,7 +27,6 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { SeriesSummary } from '@/lib/types';
-import { useFirstLoadableWrap, spineBackgroundSize, spineDepthRatio } from '@/lib/wrapGeometry';
 
 const BUCKET =
   'https://rleowvglnvbraslessch.supabase.co/storage/v1/render/image/public/book-assets';
@@ -51,9 +50,11 @@ function coverUrl(seriesNumber: number, bookNumber: number, w = 220) {
  * plates when their artwork was sitting right there.
  */
 function faceUrl(seriesNumber: number, bookNumber: number) {
+  /* The face renders at ~117px wide. 300 is a 2x buffer for retina; 560 was
+   * nearly 5x oversampled and cost ~100kB per book for no visible gain. */
   return `${BUCKET}/s${pad2(seriesNumber)}_b${pad2(
     bookNumber,
-  )}/cover_ebook.jpg?width=560&resize=contain&quality=86`;
+  )}/cover_ebook.jpg?width=300&resize=contain&quality=82`;
 }
 
 /**
@@ -81,19 +82,10 @@ function faceUrl(seriesNumber: number, bookNumber: number) {
  * is still the genuine printed spine, just seen at an angle where its width is
  * foreshortened rather than faked.
  *
- * Every face is cut from cover_wrap.jpg by lib/wrapGeometry, so nothing here is
- * invented and nothing is distorted.
+ * The front cover is the real artwork (cover_ebook.jpg). The spine edge draws
+ * in the series colour rather than downloading a 250kB print wrap to paint
+ * about 11px — that alone was 2.6MB of the page.
  */
-function spineWrapUrl(seriesNumber: number, bookNumber: number) {
-  /* `resize=contain` IS LOAD-BEARING. Without it Supabase's transform returns
-   * width x ORIGINAL HEIGHT — 1600x2775 for a wrap that is really 3851x2775 —
-   * i.e. the artwork horizontally squashed to 42% of its width. Everything
-   * downstream then breaks: the measured aspect comes back 0.58 instead of
-   * 1.39, spineFraction sees a width narrower than two covers and falls back,
-   * and every spine on the wall renders the same wrong crop. With `contain`
-   * the aspect is exact and the file is smaller (394kB vs 524kB). */
-  return `${BUCKET}/s${pad2(seriesNumber)}_b${pad2(bookNumber)}/cover_wrap.jpg?width=1400&resize=contain&quality=88`;
-}
 
 /**
  * One series, standing as a book.
@@ -109,16 +101,27 @@ function spineWrapUrl(seriesNumber: number, bookNumber: number) {
 function SeriesSpine({
   s,
   n,
+  visible,
   onLaunch,
 }: {
   s: SeriesSummary;
   n: number;
+  visible: boolean;
   onLaunch: (el: HTMLButtonElement, s: SeriesSummary) => void;
 }) {
-  /* Front cover: always available. Spine: from whichever wrap has synced. */
-  const cover = n ? faceUrl(n, 1) : undefined;
-  const candidates = n ? [1, 2, 11, 21, 31, 41].map((b) => spineWrapUrl(n, b)) : [];
-  const { url, aspect } = useFirstLoadableWrap(candidates);
+  /*
+   * THE SPINE NO LONGER DOWNLOADS A PRINT WRAP.
+   *
+   * It used to, and it was the single most expensive thing on the site:
+   * twelve full wraps at 180-270kB each, 2.6MB, to paint a spine edge that is
+   * about 11px wide once the book is rotated 34 degrees. Lighthouse measured
+   * 3.19MB of images out of a 3.75MB page because of it.
+   *
+   * The edge now draws in the series colour. At 11px nobody could read the
+   * printed spine anyway, and the front cover — which is what people actually
+   * look at — is still the real artwork.
+   */
+  const cover = visible && n ? faceUrl(n, 1) : undefined;
 
   return (
     <figure className="shelf-slot">
@@ -129,7 +132,9 @@ function SeriesSpine({
           {
             '--accent': s.color_hex,
             /* Real thickness, foreshortened by the rotation in CSS. */
-            '--thick': `calc(var(--cw) * ${spineDepthRatio(aspect).toFixed(4)})`,
+            /* A representative 6x9 thickness. Measuring the real one meant
+             * downloading the wrap, which is what this change removes. */
+            '--thick': 'calc(var(--cw) * 0.0805)',
           } as React.CSSProperties
         }
         aria-label={`${s.name} — ${s.book_count} books`}
@@ -143,14 +148,7 @@ function SeriesSpine({
             style={cover ? { backgroundImage: `url(${cover})` } : undefined}
           />
           {/* The genuine printed spine at the leading edge. */}
-          <span
-            className="wb-spine"
-            style={
-              url
-                ? { backgroundImage: `url(${url})`, backgroundSize: spineBackgroundSize(aspect) }
-                : undefined
-            }
-          />
+          <span className="wb-spine" />
           <span className="wb-pages" />
         </span>
       </button>
@@ -170,6 +168,21 @@ type Props = {
 
 export function SeriesLaunchWall({ series, numbers }: Props) {
   const railRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLElement>(null);
+  /*
+   * COVERS STAY OFF THE CRITICAL PATH UNTIL THE WALL IS NEAR.
+   *
+   * These are CSS background-images inside server-rendered markup, so the
+   * browser discovered all twelve during the initial parse and fetched about
+   * 360kB before the page had finished painting. On a phone the wall is well
+   * below the fold, and Lighthouse's simulated LCP was pricing in that
+   * contention: observed LCP was 236ms while simulated LCP was 3,959ms.
+   *
+   * Held back until the rail is within a screen of the viewport, so first
+   * paint competes with nothing and the covers are already there by the time
+   * anyone scrolls to them.
+   */
+  const [railNear, setRailNear] = useState(false);
   const blastRef = useRef<HTMLCanvasElement>(null);
   const [open, setOpen] = useState<SeriesSummary | null>(null);
   const flyingRef = useRef(false);
@@ -360,12 +373,39 @@ export function SeriesLaunchWall({ series, numbers }: Props) {
   );
 
   useEffect(() => {
+    const el = railRef.current;
+    if (!el) return;
+    if (typeof IntersectionObserver === 'undefined') {
+      setRailNear(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) {
+          setRailNear(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: '100% 0px' },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setOpen(null);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, []);
+
+  /* Bring the opened shelf into view. It expands in the flow rather than
+   * covering the page, so without this the covers can open below the fold. */
+  useEffect(() => {
+    if (!open || !panelRef.current) return;
+    panelRef.current.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, [open]);
 
   const openNo = open ? numbers[open.slug] : 0;
 
@@ -375,54 +415,60 @@ export function SeriesLaunchWall({ series, numbers }: Props) {
 
       <div ref={railRef} className="series-rail">
         {series.map((s) => (
-          <SeriesSpine key={s.slug} s={s} n={numbers[s.slug]} onLaunch={launch} />
+          <SeriesSpine key={s.slug} s={s} n={numbers[s.slug]} visible={railNear} onLaunch={launch} />
         ))}
       </div>
 
+      {/* ── THE SHELF, IN THE PAGE ──────────────────────────────────
+        * This used to be a fixed overlay that covered the site, and the page
+        * behind it kept scrolling underneath so the next section's text ran
+        * over the covers. It is a normal block in the flow now: the wall
+        * opens, the shelf pushes the rest of the page down, and everything
+        * below stays below. One page, no layer on top of it. */}
       {open && (
-        <div
-          className="series-detail"
-          role="dialog"
-          aria-modal="true"
+        <section
+          ref={panelRef}
+          className="series-panel"
           aria-label={open.name}
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setOpen(null);
-          }}
+          style={{ ['--accent' as string]: open.color_hex }}
         >
-          <div className="series-card" style={{ borderColor: open.color_hex }}>
-            <p className="series-kicker" style={{ color: open.color_hex }}>
-              {open.book_count} books · 90 days each
-            </p>
-            <h2 className="series-title">{open.name}</h2>
-            {open.short_desc && <p className="series-desc">{open.short_desc}</p>}
-
-            <div className="series-shelf">
-              {Array.from({ length: open.book_count }, (_, i) => i + 1).map((b) => (
-                <a key={b} href={`/series/${open.slug}`} className="shelf-item">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={coverUrl(openNo, b, 160)}
-                    alt={`${open.name} book ${b}`}
-                    loading="lazy"
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).style.visibility = 'hidden';
-                    }}
-                  />
-                  <span>{pad2(b)}</span>
-                </a>
-              ))}
+          <header className="series-panel-head">
+            <div>
+              <p className="series-kicker">{open.book_count} books · 90 days each</p>
+              <h2 className="series-title">{open.name}</h2>
             </div>
+            <button type="button" className="series-close" onClick={() => setOpen(null)}>
+              Close
+            </button>
+          </header>
+          {open.short_desc && <p className="series-desc">{open.short_desc}</p>}
 
-            <div className="series-actions">
-              <a href={`/series/${open.slug}`} className="series-cta" style={{ background: open.color_hex }}>
-                Open {open.name}
+          <div className="series-shelf">
+            {Array.from({ length: open.book_count }, (_, i) => i + 1).map((b) => (
+              <a key={b} href={`/series/${open.slug}`} className="shelf-item">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={coverUrl(openNo, b, 150)}
+                  alt={`${open.name} book ${b}`}
+                  loading="lazy"
+                  decoding="async"
+                  width={150}
+                  height={240}
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).style.visibility = 'hidden';
+                  }}
+                />
+                <span>{pad2(b)}</span>
               </a>
-              <button type="button" className="series-close" onClick={() => setOpen(null)}>
-                Back to the wall
-              </button>
-            </div>
+            ))}
           </div>
-        </div>
+
+          <div className="series-actions">
+            <a href={`/series/${open.slug}`} className="series-cta">
+              Open {open.name}
+            </a>
+          </div>
+        </section>
       )}
     </>
   );

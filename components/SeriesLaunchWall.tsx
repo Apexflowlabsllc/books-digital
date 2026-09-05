@@ -37,8 +37,23 @@ const pad2 = (n: number) => String(n).padStart(2, '0');
 /** Series number is not on SeriesSummary, so derive it from catalog order. */
 function coverUrl(seriesNumber: number, bookNumber: number, w = 220) {
   return `${BUCKET}/s${pad2(seriesNumber)}_b${pad2(bookNumber)}/cover_ebook.jpg?width=${w}&height=${Math.round(
-    w * 1.5,
+    w * 1.6,
   )}&resize=cover&quality=72`;
+}
+
+/**
+ * The front cover for the wall.
+ *
+ * Deliberately cover_ebook.jpg and NOT the print wrap. The wrap is only needed
+ * for the spine; the front face just needs the front cover, and cover_ebook
+ * exists for all 636 books while only ~370 wraps have synced so far. Sourcing
+ * the front from the wrap is what left Purpose, Warrior and Legend as blank
+ * plates when their artwork was sitting right there.
+ */
+function faceUrl(seriesNumber: number, bookNumber: number) {
+  return `${BUCKET}/s${pad2(seriesNumber)}_b${pad2(
+    bookNumber,
+  )}/cover_ebook.jpg?width=560&resize=contain&quality=86`;
 }
 
 /**
@@ -100,9 +115,10 @@ function SeriesSpine({
   n: number;
   onLaunch: (el: HTMLButtonElement, s: SeriesSummary) => void;
 }) {
+  /* Front cover: always available. Spine: from whichever wrap has synced. */
+  const cover = n ? faceUrl(n, 1) : undefined;
   const candidates = n ? [1, 2, 11, 21, 31, 41].map((b) => spineWrapUrl(n, b)) : [];
-  const { url, aspect, done } = useFirstLoadableWrap(candidates);
-  const missing = done && !url;
+  const { url, aspect } = useFirstLoadableWrap(candidates);
 
   return (
     <figure className="shelf-slot">
@@ -124,10 +140,8 @@ function SeriesSpine({
             * `auto 100%`, so this is exact with no measurement. */}
           <span
             className="wb-front"
-            style={url ? { backgroundImage: `url(${url})` } : undefined}
-          >
-            {missing ? <span className="wb-plate">{s.name}</span> : null}
-          </span>
+            style={cover ? { backgroundImage: `url(${cover})` } : undefined}
+          />
           {/* The genuine printed spine at the leading edge. */}
           <span
             className="wb-spine"

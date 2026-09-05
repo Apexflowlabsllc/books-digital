@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { Gift, Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { LAUNCH } from '@/lib/launch';
 import { EmailCaptureModal } from './EmailCaptureModal';
 import { NavUserMenu } from './auth/NavUserMenu';
 
@@ -96,7 +97,7 @@ export function Nav({ userEmail }: NavProps = {}) {
               data-cursor-label="Open"
             >
               <Gift className="h-3.5 w-3.5" aria-hidden />
-              <span>15% off</span>
+              <span>{LAUNCH.shortLabel}</span>
             </button>
 
             {userEmail ? (
@@ -253,7 +254,7 @@ export function Nav({ userEmail }: NavProps = {}) {
               data-cursor-label="Open"
             >
               <Gift className="h-3.5 w-3.5" aria-hidden />
-              <span>15% off your first order</span>
+              <span>{LAUNCH.percent}% off with {LAUNCH.code}</span>
             </button>
           </div>
         </aside>

@@ -10,7 +10,7 @@ import { buildMetadata, fallbackPageSchema } from '@/lib/seo';
 export const metadata = buildMetadata({
   title: 'Brian Spiker — carpet guy since 2013, writes books at night',
   description:
-    'Brian Spiker. Cleans carpets for a living — Spiker Carpet and Tile Care, since 2013. Carpet cleaning, upholstery, tile and grout, pet odors with enzyme treatment. Wrote 636 books in between jobs.',
+    'Brian Spiker. Cleans carpets for a living — Spiker Carpet and Tile Care, since 2013. Carpet cleaning, upholstery, tile and grout, pet odors with enzyme treatment. Writing a 636-title library in between jobs.',
   path: '/about-brian',
 });
 
@@ -113,7 +113,7 @@ export default async function AboutBrianPage() {
               thought.
             </p>
             <p>
-              Now there&apos;s 636 books planned. 12 series. First 12 are out.
+              Now there&apos;s 636 titles planned. 12 series. Hundreds are out already, and the rest land book by book.
             </p>
           </div>
         </div>

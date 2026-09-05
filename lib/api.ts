@@ -247,11 +247,16 @@ function adaptBookDetail(raw: RawBookDetail): BookDetail {
     // to the Brian-approved defaults from the 2026-05-25 handoff. Once
     // the backend adds the *DirectPriceUsd fields these flip over
     // automatically. Print prices are all-in (shipping included v1).
-    ebook_direct_price_usd: raw.ebookDirectPriceUsd ?? 5.99,
-    audiobook_direct_price_usd: raw.audiobookDirectPriceUsd ?? 12.99,
-    bundle_direct_price_usd: raw.bundleDirectPriceUsd ?? 16.99,
-    paperback_direct_price_usd: raw.paperbackDirectPriceUsd ?? 19.99,
-    hardcover_direct_price_usd: raw.hardcoverDirectPriceUsd ?? 34.99,
+    /* These fallbacks feed the Offer prices in the Book schema, so a wrong
+     * default does not just mislead a reader — it publishes a wrong price to
+     * Google. They were 5.99/12.99/16.99/19.99/34.99 while the catalog charges
+     * 6.99/14.99/-/14.99/24.99, i.e. every one of them was wrong. Corrected to
+     * the catalog's actual figures. */
+    ebook_direct_price_usd: raw.ebookDirectPriceUsd ?? 6.99,
+    audiobook_direct_price_usd: raw.audiobookDirectPriceUsd ?? 14.99,
+    bundle_direct_price_usd: raw.bundleDirectPriceUsd ?? 19.99,
+    paperback_direct_price_usd: raw.paperbackDirectPriceUsd ?? 14.99,
+    hardcover_direct_price_usd: raw.hardcoverDirectPriceUsd ?? 24.99,
     sample_chapter,
     audiobook,
     podcast_episode_url: raw.podcast?.episodeUrl || undefined,

@@ -202,7 +202,7 @@ export default async function ProofPage() {
           ))}
         </ol>
         <p className="mt-10 italic text-ink-dim text-center">
-          All 636 books come from this. From figuring it out. Not from a podcast booth.
+          All 636 titles come from this. From figuring it out. Not from a podcast booth.
         </p>
       </section>
 

@@ -20,7 +20,7 @@ export const revalidate = 3600;
 const DELIVERABLES = [
   {
     title: 'The 12-Series Complete Hardcover Set',
-    body: 'All 636 books, hardcover, signed by Brian. Shipped in a custom case as books release. Yes, all 636. Yes, the case is heavy. Yes, you need a shelf.',
+    body: 'All 636 titles, hardcover, signed by Brian, shipped in a custom case as each one releases. Yes, all 636. Yes, the case is heavy. Yes, you need a shelf.',
   },
   {
     title: 'Apex Vault membership',

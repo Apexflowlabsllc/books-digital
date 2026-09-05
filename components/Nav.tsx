@@ -14,6 +14,8 @@ interface NavProps {
 
 const LINKS = [
   { href: '/books', label: 'Books' },
+  /* Problem-first entry point: most visitors know the sentence, not the term. */
+  { href: '/problems', label: 'Problems' },
   { href: '/series', label: 'Series' },
   { href: '/about-brian', label: 'Brian' },
   { href: '/brian-spiker-real-world-proof', label: 'Proof' },

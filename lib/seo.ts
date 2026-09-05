@@ -5,7 +5,7 @@ import { imageProxy } from './utils';
 
 const SITE_NAME = 'Apex Flow Publishing House';
 const DEFAULT_DESCRIPTION =
-  '636 books. 12 series. One war-manual library. Written by Brian Spiker — founder of Spiker Carpet and Tile Care, operating since 2013 (13 years).';
+  'A 636-title war-manual library across 12 series, releasing book by book. Written by Brian Spiker — founder of Spiker Carpet and Tile Care, operating since 2013 (13 years).';
 
 // Canonical Spiker reference — used in every Person sameAs + isBasedOn pull.
 const SPIKER_URL = 'https://spikercarpetandtilecare.com';
@@ -63,7 +63,7 @@ const BRIAN_PERSON = {
   url: `${env.siteUrl}/about-brian`,
   jobTitle: 'Founder & Author',
   description:
-    'Founder of Spiker Carpet and Tile Care (operating since 2013, 13 years). Author of Apex Flow Publishing House (636 books, 12 series). Founder of Apex Flow Labs.',
+    'Founder of Spiker Carpet and Tile Care (operating since 2013, 13 years). Author of Apex Flow Publishing House (a 636-title library across 12 series). Founder of Apex Flow Labs.',
   worksFor: [
     {
       '@type': 'Organization',

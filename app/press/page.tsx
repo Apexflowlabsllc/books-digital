@@ -18,10 +18,10 @@ const FACTS = [
   ['Founder', 'Brian Spiker'],
   ['Original business', 'Spiker Carpet and Tile Care (since 2013 · spikercarpetandtilecare.com)'],
   ['What Spiker does', 'Carpet cleaning + protection · upholstery cleaning + protection · tile and grout cleaning + sealing · pet odor removal (enzymes for urine, treatment for wet-dog oils)'],
-  ['Library size', '636 books · 12 series · 53 books per series'],
+  ['Library size', '636-title programme · 12 series · 53 titles per series · releasing book by book'],
   ['Cadence', 'One short chapter per day · 90 chapters per book'],
-  ['Pricing', 'Ebook $6.99 · Paperback $14.99 · Hardcover $24.99 · Audiobook $19.95'],
-  ['Insider Pass', '$99 / year — all 636 books + audio + 20% off every Apex brand'],
+  ['Pricing', 'Ebook $6.99 · Paperback $14.99 · Hardcover $24.99 · Audiobook $14.99'],
+  ['Insider Pass', '$99 / year — the whole library as it releases, audio as it is narrated, 20% off every Apex brand'],
   ['Founder Edition', '$9,999 — 100 founding spots ever · application only'],
   ['Audiobook narration', 'AI-narrated · supervised by Brian'],
 ];

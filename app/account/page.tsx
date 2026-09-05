@@ -53,7 +53,7 @@ export default async function AccountPage() {
             <p className="eyebrow mb-2">Library</p>
             <p className="font-display text-2xl text-ink">Coming with the Pass</p>
             <p className="mt-2 text-sm text-ink-dim">
-              All 636 books + all audio once you have an active Insider Pass.
+              The whole library, plus every audiobook as it is narrated, once you have an active Insider Pass.
             </p>
             <Link href="/membership" className="cta-secondary mt-5 inline-flex">
               <span>See the Pass</span>

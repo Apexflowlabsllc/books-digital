@@ -111,7 +111,7 @@ export function AuthorByline({
         </a>
         {' '}(operating since 2013) · Author of{' '}
         <span className="text-cream">Apex Flow Publishing House</span>{' '}
-        (636 books) · Founder,{' '}
+        (636-title library) · Founder,{' '}
         <a
           href="https://apexflowlabs.com"
           target="_blank"

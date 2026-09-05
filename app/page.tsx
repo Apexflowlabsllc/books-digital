@@ -6,11 +6,12 @@ import { getCatalog, getSeriesList, getPageSeo } from '@/lib/api';
 import { buildMetadata, fallbackPageSchema } from '@/lib/seo';
 import { TERM_COUNT, PHRASE_COUNT } from '@/lib/encyclopedia';
 import { catalogPrices } from '@/lib/pricing';
+import { catalogFacts } from '@/lib/catalogFacts';
 
 export const metadata = buildMetadata({
   title: 'Apex Flow Publishing House',
   description:
-    'Twelve series. 636 books. Every one a 90-day course. Pick your fight and the shelf opens.',
+    'Twelve series. A 636-title programme, releasing book by book. Every one a 90-day course. Pick your fight and the shelf opens.',
   path: '/',
 });
 
@@ -48,6 +49,10 @@ export default async function HomePage() {
   /* Derived from the catalog, never hardcoded — the four numbers that used to
    * live here as strings were every one of them wrong. */
   const prices = catalogPrices(catalog?.books ?? []);
+  /* PLANNED vs AVAILABLE. The site said "636 books" everywhere while 252 of
+   * them cannot be bought. Both numbers are real and both get said; the big
+   * one is never allowed to stand in for the small one. */
+  const facts = catalogFacts(catalog?.books ?? []);
   const firstSeries = series[0];
 
   return (
@@ -59,7 +64,7 @@ export default async function HomePage() {
         <div className="mx-auto grid w-full max-w-7xl items-center gap-12 lg:grid-cols-[1.05fr_.95fr]">
         <div>
           <p className="font-mono text-[10px] uppercase tracking-[0.36em] text-accent">
-            {series.length} series · {totalBooks.toLocaleString()} books · 90 days each
+            {facts.seriesCount} series · {facts.titlesAvailable.toLocaleString()} available now · {facts.titlesPlanned.toLocaleString()}-title programme
           </p>
 
           <h1 className="mt-6 font-display text-[clamp(44px,8vw,104px)] font-light leading-[0.94] tracking-[-0.04em] text-ink">
@@ -81,7 +86,7 @@ export default async function HomePage() {
               href="/books"
               className="rounded-sm bg-accent px-7 py-4 font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-bg"
             >
-              See all {totalBooks.toLocaleString()} books
+              See all {facts.titlesAvailable.toLocaleString()} books
             </a>
             <a
               href="/encyclopedia"

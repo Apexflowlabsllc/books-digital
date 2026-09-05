@@ -7,17 +7,17 @@ import { getPageSeo } from '@/lib/api';
 import { buildMetadata, fallbackPageSchema } from '@/lib/seo';
 
 export const metadata = buildMetadata({
-  title: 'The Insider Pass — $99/yr · 636 books · all audio · 20% off the empire',
+  title: 'The Insider Pass — $99/yr · the whole library · 20% off the empire',
   description:
-    'The Insider Pass — $99/year. All 636 books, all 636 audiobooks, 20% off every Apex brand. One credit card swipe per year for the whole library.',
+    'The Insider Pass — $99/year. Every book in the library as it releases, every audiobook as it is narrated, and 20% off every Apex brand. One card swipe a year.',
   path: '/membership',
 });
 
 export const revalidate = 3600;
 
 const BENEFITS = [
-  'All 636 books — read on any device for as long as your Pass is active, including the ones not written yet',
-  'All 636 audiobooks — streamed, narrated, mastered, in your ears on the way to a job',
+  'Every book in the library on any device for as long as your Pass is active — including the ones not written yet',
+  'Every audiobook as it is narrated — streamed, mastered, in your ears on the way to a job. Narration is still in production across most of the library.',
   'Early access to new releases — you read before the public because you’re paying us $99 and the public is not',
   '20% off every other Apex brand — Digital, Apparel, Beauty, Health, Pets, Academy, Kids, Companion AI, Affiliates, Spiker, and the parent at apexflowlabs.com',
   'Field notes — a Saturday email from Brian, written from a job site or his couch at 11 PM, no theme, just whatever’s on his mind',
@@ -45,7 +45,7 @@ export default async function MembershipPage() {
         body={
           <>
             You can buy the books one at a time at $6.99 each. You can do the math on that. ($6.99
-            × 636 = a lot.) Or for $99/year you get all 636 books, all 636 audiobooks, 20% off
+            × 636 = a lot.) Or for $99/year you get the whole library as it releases, every audiobook as it is narrated, 20% off
             every other Apex brand, and a Saturday email from me.
           </>
         }
@@ -114,7 +114,7 @@ export default async function MembershipPage() {
           </h3>
           <p className="mt-3 max-w-2xl text-ink-dim text-base leading-[1.65]">
             Apex Flow Publishing House runs multiple storefronts. Each owns its own Pass. The Books Pass
-            covers everything you read on this site — all 636 books, all the audio, 20% off every
+            covers everything you read on this site — the whole library as it releases, the audio as it is narrated, 20% off every
             other Apex brand. There is no upgrade ladder — we just charge once for what you
             actually use.
           </p>

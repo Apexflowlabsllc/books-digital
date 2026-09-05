@@ -4,11 +4,12 @@ import { JsonLdSchema } from '@/components/JsonLdSchema';
 import { getCatalog, getPageSeo } from '@/lib/api';
 import { buildMetadata, fallbackPageSchema, collectionPageSchema } from '@/lib/seo';
 import { empty } from '@/lib/voice';
+import { catalogFacts } from '@/lib/catalogFacts';
 
 export const metadata = buildMetadata({
   title: 'All books — Apex Flow Publishing House',
   description:
-    'The full Apex Flow Publishing House library. 636 books across 12 series. Filter by series, wave, format, or voice intensity.',
+    'The full Apex Flow Publishing House library — a 636-title programme across 12 series, releasing book by book. Filter by series, wave, format, or voice intensity.',
   path: '/books',
 });
 
@@ -36,7 +37,8 @@ export default async function BooksPage() {
   ]);
 
   const books = catalog?.books ?? [];
-  const seriesCount = new Set(books.map((b) => b.series_slug)).size;
+  const facts = catalogFacts(books);
+  const seriesCount = facts.seriesCount;
 
   /* Audited live: this page carried only Organization/Person/WebPage. 636
    * books listed and no ItemList, CollectionPage or BreadcrumbList — an engine
@@ -44,7 +46,7 @@ export default async function BooksPage() {
   const collection = collectionPageSchema({
     path: '/books',
     name: 'All books',
-    description: `Every Apex Flow Publishing House book: ${books.length} titles across ${seriesCount} series, each a 90-day course.`,
+    description: `Every Apex Flow Publishing House title: ${facts.titlesAvailable} available now of a ${facts.titlesPlanned}-title programme across ${seriesCount} series, each a 90-day course.`,
     items: books.map((b) => ({ url: `/books/${b.slug}`, name: b.title })),
   });
 
@@ -63,7 +65,7 @@ export default async function BooksPage() {
           Every book, by series.
         </h1>
         <p className="mt-5 max-w-[58ch] text-[15px] leading-relaxed text-ink-dim">
-          {books.length.toLocaleString()} books across {seriesCount} series, each one a 90-day
+          {facts.titlesAvailable.toLocaleString()} books available now, from a {facts.titlesPlanned.toLocaleString()}-title programme across {seriesCount} series, each one a 90-day
           course. Shelves open one at a time — pick a fight and the rest gets out of the way.
         </p>
       </section>

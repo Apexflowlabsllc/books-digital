@@ -197,7 +197,7 @@ export function LaunchModal() {
                 onClick={close}
                 className="cta-primary flex-1 justify-center"
               >
-                <span>Browse all 636 books</span>
+                <span>Browse the library</span>
               </Link>
               <Link
                 href="/books/discipline"

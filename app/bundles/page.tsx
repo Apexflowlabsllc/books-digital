@@ -33,15 +33,15 @@ const BUNDLES = [
   {
     name: 'The Twelve — Ebook Library',
     price: '$499',
-    note: '636 books · all 12 series · ebook',
-    body: 'The complete library in ebook. 636 books. Every series. Every chapter. For the reader who wants the whole catalog in one purchase instead of a membership.',
+    note: '636-title library · all 12 series · ebook',
+    body: 'The complete library in ebook — all 636 titles as they release. Every series. Every chapter. For the reader who wants the whole catalog in one purchase instead of a membership.',
     sku: 'twelve-series-ebook',
   },
   {
     name: 'The Full Arsenal',
     price: '$1,499',
-    note: '636 books · ebook + audiobook',
-    body: 'Every book, every format. 636 ebooks + 636 audiobooks. The whole 90-day program across all 12 fronts. The cheapest path to the entire library without picking the Pass.',
+    note: '636-title library · ebook + audiobook',
+    body: 'Every book, every format — ebook and audiobook, delivered as each one releases. The whole 90-day program across all 12 fronts. The cheapest path to the entire library without picking the Pass.',
     sku: 'twelve-series-everything',
   },
 ];
@@ -61,7 +61,7 @@ export default async function BundlesPage() {
             <span className="metallic-text">is exhausting.</span>
           </>
         }
-        body="Pick a single series at $79. Grab the whole 636-book library in ebook at $499. Or get every book in every format — 636 ebooks + 636 audiobooks — for $1,499 and never think about it again."
+        body="Pick a single series at $79. Grab the whole 636-title library in ebook at $499. Or get every book in every format, ebook and audiobook, delivered as each releases — $1,499 and never think about it again."
       />
 
       <section className="container-x py-16">

@@ -18,7 +18,9 @@ export const revalidate = 300;
 
 export default async function BooksPage() {
   const [catalog, seo] = await Promise.all([
-    getCatalog({ limit: 200 }),
+    // No limit — getCatalog reads the backend's own `total` and fetches all of
+    // them. Passing 200 here is what kept 436 of the 636 books off this page.
+    getCatalog(),
     getPageSeo('/books'),
   ]);
 

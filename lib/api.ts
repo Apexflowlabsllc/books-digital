@@ -293,14 +293,40 @@ export async function getCatalog(q: CatalogQuery = {}): Promise<CatalogResponse 
   if (q.series) qs.set('series', q.series);
   if (q.wave) qs.set('wave', String(q.wave));
   if (q.filter) qs.set('filter', q.filter);
-  qs.set('limit', String(q.limit ?? 200));
-  const raw = await backendSafe<RawCatalogResponse>(
-    `/api/v1/books/catalog?${qs.toString()}`,
-    { revalidate: 300, tags: ['catalog'] },
-  );
+  /* Default to the WHOLE catalog.
+   *
+   * This used to default to 200 while the backend held 636, so /books rendered
+   * exactly 200 books and two thirds of the catalog was invisible on the store
+   * — with no error anywhere, because 200 of 200 requested came back fine.
+   *
+   * A bigger hardcoded number would just move the cliff, so the request is now
+   * self-correcting: ask, read the `total` the backend reports, and if it says
+   * there are more than we received, ask once more for exactly that many. The
+   * page cannot silently truncate again as the catalog grows. */
+  const requested = q.limit;
+  qs.set('limit', String(requested ?? 1000));
+
+  const fetchPage = (limit: number) => {
+    const params = new URLSearchParams(qs);
+    params.set('limit', String(limit));
+    return backendSafe<RawCatalogResponse>(`/api/v1/books/catalog?${params.toString()}`, {
+      revalidate: 300,
+      tags: ['catalog'],
+    });
+  };
+
+  let raw = await fetchPage(requested ?? 1000);
   if (!raw) return null;
+
+  const total = raw.total ?? raw.count ?? raw.books?.length ?? 0;
+
+  // Only top up when the caller did not deliberately ask for a smaller page.
+  if (requested === undefined && total > (raw.books?.length ?? 0)) {
+    const complete = await fetchPage(total);
+    if (complete?.books?.length) raw = complete;
+  }
+
   // Catalog returns BookSummary[] natively — no per-book transform needed.
-  // Just normalise count vs total.
   return {
     books: raw.books ?? [],
     total: raw.total ?? raw.count ?? raw.books?.length ?? 0,

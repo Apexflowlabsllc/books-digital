@@ -48,7 +48,7 @@ function deriveBookId(seriesSlug: string, bookNumber: number): string | null {
  * Pool grew from 16 → 22 books in the 2026-05-25 backfill (S1 + S2).
  */
 export async function getAudioPreviewPool(): Promise<PreviewPoolItem[]> {
-  const res = await getCatalog({ limit: 636 });
+  const res = await getCatalog();
   if (!res) return [];
   const pool: PreviewPoolItem[] = [];
   for (const b of res.books) {
@@ -68,7 +68,7 @@ export async function getAudioPreviewPool(): Promise<PreviewPoolItem[]> {
  * audio availability per Brian's handoff).
  */
 export async function getPodcastPreviewPool(): Promise<PreviewPoolItem[]> {
-  const res = await getCatalog({ limit: 636 });
+  const res = await getCatalog();
   if (!res) return [];
   // If the catalog doesn't carry podcastAvailable, reuse the audio pool.
   const hasPodcastFlag = res.books.some(

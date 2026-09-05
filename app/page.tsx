@@ -1,436 +1,164 @@
-import Link from 'next/link';
 import { PageShell } from '@/components/PageShell';
-import { HomeHero } from '@/components/HomeHero';
-import { SeriesLaunchWall } from '@/components/SeriesLaunchWall';
-import { BookCard } from '@/components/BookCard';
 import { JsonLdSchema } from '@/components/JsonLdSchema';
-import { Reveal, RevealStagger, RevealItem } from '@/components/Reveal';
-import { ReviewTile } from '@/components/ReviewTile';
-import { Magnetic } from '@/components/Magnetic';
-import { LeadCapture } from '@/components/LeadCapture';
-import { FoundationSection } from '@/components/FoundationSection';
-import { FeaturedShowcase } from '@/components/FeaturedShowcase';
-import { LaunchOffer } from '@/components/LaunchOffer';
-import { SeriesRosterMarquee } from '@/components/SeriesRosterMarquee';
-import { LAUNCH } from '@/lib/launch';
-import { TrustBar } from '@/components/TrustBar';
-import { AnimatedReviewsRail } from '@/components/AnimatedReviewsRail';
-import { WholePitch } from '@/components/WholePitch';
-import { FounderNote } from '@/components/FounderNote';
-import { AcrossEcosystem } from '@/components/AcrossEcosystem';
-import { HomeReviews } from '@/components/HomeReviews';
-import { getCatalog, getPageSeo, getSeriesList, getSpikerReviews } from '@/lib/api';
+import { SeriesLaunchWall } from '@/components/SeriesLaunchWall';
+import { getCatalog, getSeriesList, getPageSeo } from '@/lib/api';
 import { buildMetadata, fallbackPageSchema } from '@/lib/seo';
-import { intensityGlyphs, waveLabel } from '@/lib/utils';
-import { empty } from '@/lib/voice';
-import type { Wave } from '@/lib/types';
+import { TERM_COUNT, PHRASE_COUNT } from '@/lib/encyclopedia';
 
 export const metadata = buildMetadata({
-  title: 'Apex Flow Publishing House — 636 books. 12 series. One war manual library.',
+  title: 'Apex Flow Publishing House',
   description:
-    '636 books. 12 series. Operator-grade self-help built on 13 years of operations at Spiker Carpet and Tile Care.',
+    'Twelve series. 636 books. Every one a 90-day course. Pick your fight and the shelf opens.',
   path: '/',
 });
 
 export const revalidate = 300;
 
-const WAVE_TILES: Array<{
-  wave: Wave;
-  label: string;
-  tagline: string;
-  body: string;
-  gradient: string;
-  border: string;
-  accent: string;
-  eyebrow: string;
-}> = [
-  // All four wave tiles use the same black + gold treatment; the rank is
-  // signaled by intensity (border alpha + gold gradient strength), not hue.
-  {
-    wave: 1,
-    label: 'Wave I · Foundation',
-    tagline: 'The intake protocols.',
-    body: 'Discipline, mornings, money basics, fitness, sleep. Three series, 159 books. Start here if the floor is wet.',
-    gradient: 'from-accent/20 to-accent/0',
-    border: 'border-accent/15',
-    accent: 'text-accent/70',
-    eyebrow: 'Live now',
-  },
-  {
-    wave: 2,
-    label: 'Wave II · Pressure',
-    tagline: 'When the company starts pulling.',
-    body: 'Hiring, leadership, scaling, customer ops, hard conversations. Three series, 159 books.',
-    gradient: 'from-accent/25 to-accent/0',
-    border: 'border-accent/25',
-    accent: 'text-accent/80',
-    eyebrow: 'Live now',
-  },
-  {
-    wave: 3,
-    label: 'Wave III · Edge',
-    tagline: 'Where most operators break.',
-    body: 'Burnout, marriage under pressure, second-location math, identity-vs-role. Three series, 159 books.',
-    gradient: 'from-accent/30 to-accent/0',
-    border: 'border-accent/35',
-    accent: 'text-accent/90',
-    eyebrow: 'Drops Q3 2026',
-  },
-  {
-    wave: 4,
-    label: 'Wave IV · Apex',
-    tagline: 'The boring kind of winning.',
-    body: 'Post-grind operations. Long-arc strategy. Legacy + handoff. Three series, 159 books.',
-    gradient: 'from-accent/35 to-accent/0',
-    border: 'border-accent/45',
-    accent: 'text-accent',
-    eyebrow: 'Drops Q1 2027',
-  },
-];
-
+/**
+ * THE HOME PAGE.
+ *
+ * Rebuilt around the wall rather than around a marketing stack. The previous
+ * version opened with a hero and then ran nine support sections — trust bar,
+ * foundation, launch offer, featured carousel, marquee, reviews, founder note,
+ * ecosystem — before a visitor reached anything they could act on.
+ *
+ * The catalog IS the pitch here: twelve series, 636 books, every one a 90-day
+ * course. So the page is the wall, the proof, and the way in. Nothing else
+ * competes with it above the fold.
+ *
+ * Every number renders from a query — series count, book total, encyclopedia
+ * size. None are typed, so none can go stale.
+ */
 export default async function HomePage() {
-  const [catalog, series, reviews, seo] = await Promise.all([
-    getCatalog({ limit: 12 }),
+  const [catalog, seriesData, seo] = await Promise.all([
+    getCatalog({ limit: 1 }), // total only — the wall renders covers by id
     getSeriesList(),
-    getSpikerReviews(3),
     getPageSeo('/'),
   ]);
 
-  const featured = (catalog?.books ?? []).slice(0, 8);
-  const heroCovers = (catalog?.books ?? []).slice(0, 7);
-  const allSeries = (series?.series ?? []).slice(0, 12);
-  const spikerReviews = reviews?.reviews ?? [];
-  const totalBooks = catalog?.total ?? 0;
+  const series = seriesData?.series ?? [];
+  const totalBooks = catalog?.total ?? series.reduce((n, s) => n + s.book_count, 0);
+  const numbers = Object.fromEntries(series.map((s, i) => [s.slug, i + 1]));
 
   return (
     <PageShell>
       <JsonLdSchema bundle={seo} fallback={fallbackPageSchema('/', 'Apex Flow Publishing House')} />
 
-      <HomeHero books={heroCovers} totalBooks={totalBooks} />
+      {/* ── THE OPENING ─────────────────────────────────────────────── */}
+      <section className="relative z-10 px-6 pt-16 pb-8 sm:pt-24">
+        <div className="mx-auto w-full max-w-7xl">
+          <p className="font-mono text-[10px] uppercase tracking-[0.36em] text-accent">
+            {series.length} series · {totalBooks.toLocaleString()} books · 90 days each
+          </p>
 
-      {/* THE WALL — the first thing under the hero, because it IS the store.
-        * Twelve series spines; tap one and it launches, detonates, and opens
-        * that series' entire 53-book shelf. Everything below this is support.
-        *
-        * Series numbers derive from catalog order rather than being hardcoded,
-        * so the cover bucket keys (s01..s12) stay correct if the catalog is
-        * reordered or extended. */}
-      {allSeries.length > 0 && (
-        <section className="relative z-10 px-6 pt-10 sm:pt-14">
+          <h1 className="mt-6 font-display text-[clamp(44px,8vw,104px)] font-light leading-[0.94] tracking-[-0.04em] text-ink">
+            Books that do
+            <br />
+            the <span className="metallic-text italic">hard part</span>
+            <br />
+            with you.
+          </h1>
+
+          <p className="mt-8 max-w-[52ch] text-[clamp(15px,1.5vw,19px)] leading-relaxed text-ink-dim">
+            Most self-help sells you a feeling.{' '}
+            <strong className="font-normal text-ink">These are working manuals</strong> — sequenced,
+            numbered, and built to be used on the days you least feel like it.
+          </p>
+
+          <div className="mt-10 flex flex-wrap gap-3">
+            <a
+              href="/books"
+              className="rounded-sm bg-accent px-7 py-4 font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-bg"
+            >
+              See all {totalBooks.toLocaleString()} books
+            </a>
+            <a
+              href="/encyclopedia"
+              className="rounded-sm border border-line px-7 py-4 font-mono text-[11px] uppercase tracking-[0.14em] text-ink"
+            >
+              The encyclopedia
+            </a>
+          </div>
+
+          <p className="mt-5 font-mono text-[10.5px] text-ink-dim">
+            Ebook · audiobook · 6×9 paperback · hardcover — every format, one catalog
+          </p>
+        </div>
+      </section>
+
+      {/* ── THE WALL ────────────────────────────────────────────────────
+        * The store itself. Tap a spine: it rattles loose, ignites, climbs off
+        * the top of the screen and detonates, and the blast opens that
+        * series' entire shelf. */}
+      {series.length > 0 && (
+        <section className="relative z-10 px-6 pb-6">
           <div className="mx-auto w-full max-w-7xl">
-            <p className="text-[10px] uppercase tracking-[0.36em] text-accent">The wall</p>
-            <div className="mt-3 flex flex-wrap items-baseline justify-between gap-4">
-              <h2 className="font-display text-4xl text-ink sm:text-5xl">
-                Twelve series. Pick your fight.
-              </h2>
-              <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-dim">
-                {allSeries.length} series ·{' '}
-                {allSeries.reduce((n, s) => n + s.book_count, 0)} books · tap one and stand back
+            <div className="flex flex-wrap items-baseline justify-between gap-4 border-t border-line pt-10">
+              <h2 className="font-display text-3xl font-light text-ink sm:text-4xl">The wall</h2>
+              <span className="font-mono text-[10.5px] uppercase tracking-[0.2em] text-ink-dim">
+                Tap a series and stand back
               </span>
             </div>
-            <SeriesLaunchWall
-              series={allSeries}
-              numbers={Object.fromEntries(allSeries.map((s, i) => [s.slug, i + 1]))}
-            />
+            <SeriesLaunchWall series={series} numbers={numbers} />
           </div>
         </section>
       )}
 
-      {/* Press credibility strip */}
-      <TrustBar />
+      {/* ── WHAT MAKES THEM DIFFERENT ───────────────────────────────── */}
+      <section className="relative z-10 px-6 py-16">
+        <div className="mx-auto w-full max-w-7xl border-t border-line pt-14">
+          <h2 className="font-display text-3xl font-light text-ink sm:text-4xl">
+            Every book is a 90-day course.
+          </h2>
+          <p className="mt-4 max-w-[60ch] leading-relaxed text-ink-dim">
+            Not a book with a plan bolted on. Ninety numbered days, each with a truth, one action,
+            a reflection and tomorrow&rsquo;s teaser. Later books assume the work in the earlier
+            ones, so the numbering is real rather than decorative.
+          </p>
 
-      {/* The Foundation — cinematic chrome-text section */}
-      <FoundationSection />
-
-      {/* Launch-week offer — replaces the Featured parallax during the
-          promo window. When LAUNCH.active flips to false in
-          lib/launch.ts, falls back to the Featured carousel
-          automatically. */}
-      {LAUNCH.active ? (
-        <LaunchOffer totalBooks={totalBooks} />
-      ) : featured.length === 0 ? (
-        <section id="featured" className="relative z-10 px-6 py-12 sm:py-28 lg:py-32">
-          <div className="mx-auto w-full max-w-7xl">
-            <Reveal>
-              <p className="text-[10px] uppercase tracking-[0.36em] text-accent">Featured</p>
-              <h2 className="mt-3 font-display text-4xl text-ink sm:text-5xl">
-                Fresh from the warehouse.
-              </h2>
-              <p className="mt-14 rounded-[1.5rem] border border-line bg-bg/40 p-8 text-sm text-ink-dim backdrop-blur-md">
-                {empty.catalogColdBackend}
-              </p>
-            </Reveal>
-          </div>
-        </section>
-      ) : (
-        <FeaturedShowcase totalBooks={totalBooks} books={featured} />
-      )}
-
-      {/* The 12 series — 4 wave tiles, digital-art categories style */}
-      <section className="relative z-10 border-t border-white/5 px-6 py-12 sm:py-28 lg:py-32">
-        <div className="mx-auto w-full max-w-7xl">
-          <Reveal>
-            <p className="text-[10px] uppercase tracking-[0.36em] text-accent">The 12 series</p>
-            <h2 className="mt-3 max-w-3xl font-display text-4xl text-ink sm:text-6xl">
-              Four waves. Twelve fronts. <span className="metallic-text">One operator.</span>
-            </h2>
-            <p className="mt-4 max-w-2xl text-base text-ink-dim md:text-lg">
-              Foundation, Pressure, Edge, Apex. Each wave compounds on the last. Each series picks
-              a different battlefield — pick the war you are fighting now.
-            </p>
-          </Reveal>
-
-          <RevealStagger className="mt-14 grid gap-5 md:grid-cols-2" amount={0.1}>
-            {WAVE_TILES.map((t) => (
-              <RevealItem key={t.wave}>
-                <Link
-                  href={`/series?wave=${t.wave}`}
-                  className={`group relative block overflow-hidden rounded-[2rem] border ${t.border} bg-gradient-to-br ${t.gradient} p-10 backdrop-blur-md transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_30px_60px_-20px_rgba(217,204,140,0.4)]`}
-                  data-cursor-label="Open wave"
-                >
-                  <div className="flex items-start justify-between">
-                    <p className={`text-[10px] uppercase tracking-[0.32em] ${t.accent}`}>
-                      {t.eyebrow}
-                    </p>
-                    <span className="font-display text-2xl text-ink/50">0{t.wave}</span>
-                  </div>
-                  <h3 className="mt-6 font-display text-3xl text-ink md:text-4xl">{t.label}</h3>
-                  <p className="mt-3 font-display text-xl text-ink-dim italic">{t.tagline}</p>
-                  <p className="mt-5 text-sm leading-relaxed text-ink-dim">{t.body}</p>
-                  <p className="mt-8 text-[11px] uppercase tracking-[0.28em] text-ink-dim transition-colors group-hover:text-accent">
-                    Browse wave →
-                  </p>
-                </Link>
-              </RevealItem>
+          <dl className="mt-10 grid gap-px overflow-hidden rounded-sm border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              ['Ebook', '$5.99', 'EPUB, delivered by email. Nothing ships.'],
+              ['Audiobook', '$12.99', 'Narrated MP3. Download and keep the files.'],
+              ['Paperback', '$20.09', '6×9 inches, perfect bound, printed and shipped.'],
+              ['Hardcover', '$34.99', '6×9 inches, case wrap, printed and shipped.'],
+            ].map(([name, price, note]) => (
+              <div key={name} className="bg-bg p-6">
+                <dt className="font-mono text-[9.5px] uppercase tracking-[0.2em] text-accent">
+                  {name}
+                </dt>
+                <dd className="mt-3">
+                  <span className="font-display text-3xl font-light text-ink">{price}</span>
+                  <span className="mt-2 block text-[13px] leading-relaxed text-ink-dim">{note}</span>
+                </dd>
+              </div>
             ))}
-          </RevealStagger>
+          </dl>
         </div>
       </section>
 
-      {/* All 12 series — real series data from the live backend, displayed
-          via the locked b1–b12 local covers. */}
-      <SeriesRosterMarquee seriesList={allSeries} />
-
-      {/* Authority — real-world proof, gradient bg */}
-      <section className="relative z-10 overflow-hidden border-t border-white/5 px-6 py-12 sm:py-28 lg:py-36">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              'radial-gradient(70% 80% at 80% 50%, rgba(217,204,140,0.12) 0%, transparent 70%), radial-gradient(50% 70% at 0% 100%, rgba(217,204,140,0.06) 0%, transparent 70%)',
-          }}
-        />
-        <div className="relative z-10 mx-auto grid w-full max-w-7xl gap-16 md:grid-cols-[5fr_4fr]">
-          <Reveal>
-            <p className="text-[10px] uppercase tracking-[0.36em] text-accent">Real-world proof</p>
-            <h2 className="mt-3 font-display text-4xl text-ink sm:text-6xl">
-              <span className="metallic-text">13 years.</span>
-              <br />
-              Not a single ghostwriter.
-            </h2>
-            <p className="mt-6 max-w-xl text-base text-ink-dim md:text-lg">
-              Brian ran Spiker Carpet and Tile Care for thirteen years before he wrote a word. Every chapter is
-              back-tested against a real payroll, real customers, real failures. The books are the
-              field notes — and the schema on every page on this site points at the original
-              business so AI search can verify the receipts.
-            </p>
-            <div className="mt-10 flex flex-wrap gap-3">
-              <Magnetic>
-                <Link
-                  href="/brian-spiker-real-world-proof"
-                  className="cta-primary"
-                  data-cursor-label="See proof"
-                >
-                  <span>See the 16-year timeline</span>
-                </Link>
-              </Magnetic>
-              <Magnetic strength={0.2}>
-                <a
-                  href="https://spikercarpetandtilecare.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="cta-secondary"
-                  data-cursor-label="Open"
-                >
-                  <span>Visit Spiker Carpet and Tile Care</span>
-                </a>
-              </Magnetic>
-            </div>
-          </Reveal>
-
-          {spikerReviews.length === 0 ? (
-            <Reveal>
-              <AnimatedReviewsRail />
-            </Reveal>
-          ) : (
-            <RevealStagger className="grid gap-4" amount={0.1}>
-              {spikerReviews.map((r) => (
-                <RevealItem key={r.id}>
-                  <ReviewTile review={r} />
-                </RevealItem>
-              ))}
-            </RevealStagger>
-          )}
-        </div>
-      </section>
-
-      {/* Lead capture banner */}
-      <section className="relative z-10 px-6 py-10 sm:py-24">
-        <div className="mx-auto w-full max-w-3xl">
-          <Reveal>
-            <LeadCapture
-              sourcePage="/"
-              optInAsset="home-banner"
-              heading="Free chapter + 15% off your first order"
-              subheading="Drop your email. We send chapter one of The Discipline Blueprint and a one-time 15% discount code. No drip, no daily nag — that is a promise."
-              cta="Send chapter one"
-            />
-          </Reveal>
-        </div>
-      </section>
-
-      {/* Membership / bundles / founder — pricing trifecta, digital-art vault style */}
-      <section className="relative z-10 border-t border-white/5 bg-gradient-to-b from-transparent via-[#1a0a07]/40 to-transparent px-6 py-12 sm:py-28 lg:py-32">
-        <div className="mx-auto w-full max-w-7xl">
-          <Reveal className="max-w-3xl">
-            <p className="text-[10px] uppercase tracking-[0.36em] text-accent">Three ways in</p>
-            <h2 className="mt-3 font-display text-4xl text-ink sm:text-6xl">
-              Pick your tier.
-            </h2>
-            <p className="mt-4 text-base text-ink-dim md:text-lg">
-              One annual Pass, four one-time bundles, or a 100/year application-only Founder
-              Edition. Same library, different relationship with it.
-            </p>
-          </Reveal>
-
-          <RevealStagger className="mt-14 grid gap-6 md:grid-cols-3" amount={0.1}>
-            <RevealItem>
-              <Tier
-                eyebrow="Books Pass"
-                price="$99"
-                priceSub="/ year"
-                body="Full audiobook library, 20% off all hardcovers, monthly bonus episode, early access."
-                href="/membership"
-                cta="Get the Pass"
-                tone="default"
-              />
-            </RevealItem>
-            <RevealItem>
-              <Tier
-                eyebrow="Series bundles"
-                price="$79"
-                priceSub="ebook · $149 audio"
-                body="One series — 53 books — one price. Or the 12-series everything bundle at $1,499."
-                href="/bundles"
-                cta="See bundles"
-                tone="default"
-              />
-            </RevealItem>
-            <RevealItem>
-              <Tier
-                eyebrow="Founder Edition"
-                price="$9,999"
-                priceSub="application only · 100/year"
-                body="Signed 636-book hardcover set, lifetime Pass, 90-min call with Brian, numbered 1–100."
-                href="/founder-edition"
-                cta="Apply"
-                tone="accent"
-              />
-            </RevealItem>
-          </RevealStagger>
-        </div>
-      </section>
-
-      {/* Reader file — site-wide reviews marquee */}
-      <HomeReviews reviews={spikerReviews} />
-
-      {/* The whole pitch — Scale.tsx-style climax */}
-      <WholePitch />
-
-      {/* Founder note — handwritten card from Brian */}
-      <FounderNote />
-
-      {/* Across the ecosystem — 11 sister Apex Flow Labs + Spiker */}
-      <AcrossEcosystem />
-
-      {/* AI Concierge invite — like CompanionInvite */}
-      <section className="relative z-10 px-6 py-10 sm:py-24">
-        <div className="mx-auto w-full max-w-7xl">
-          <Reveal
-            className="relative overflow-hidden rounded-[2rem] border border-accent/30 bg-gradient-to-br from-accent/15 to-transparent p-10 backdrop-blur-md md:p-16"
+      {/* ── THE ENCYCLOPEDIA ────────────────────────────────────────── */}
+      <section className="relative z-10 px-6 pb-24">
+        <div className="mx-auto w-full max-w-7xl border-t border-line pt-14">
+          <p className="font-mono text-[10px] uppercase tracking-[0.36em] text-accent">
+            {TERM_COUNT} terms · {PHRASE_COUNT} ways people say them
+          </p>
+          <h2 className="mt-4 font-display text-3xl font-light text-ink sm:text-4xl">
+            We explain the thing we sell.
+          </h2>
+          <p className="mt-4 max-w-[62ch] leading-relaxed text-ink-dim">
+            Nobody searches for &ldquo;rumination&rdquo;. They search for &ldquo;I can&rsquo;t stop
+            replaying that argument&rdquo;. Both are in the encyclopedia, and both find the same
+            answer — with what to actually do about it.
+          </p>
+          <a
+            href="/encyclopedia"
+            className="mt-8 inline-block rounded-sm border border-line px-7 py-4 font-mono text-[11px] uppercase tracking-[0.14em] text-ink"
           >
-            <span
-              aria-hidden
-              className="absolute right-12 top-12 hidden h-2.5 w-2.5 rounded-full bg-accent shadow-[0_0_16px_4px_rgba(217,204,140,0.6)] md:block"
-            />
-            <p className="text-[10px] uppercase tracking-[0.36em] text-accent">
-              Section · 10 · Concierge AI
-            </p>
-            <h2 className="mt-6 max-w-[14ch] font-display text-5xl text-ink md:text-7xl lg:text-[80px]">
-              Talk to the <span className="metallic-text">system.</span>
-            </h2>
-            <p className="mt-8 max-w-2xl text-base text-ink-dim md:text-xl">
-              The chat button in the corner is wired to a concierge trained on the entire library.
-              Ask what to start with, what the 12 series cover, or which book maps to your
-              operation. It points, it does not pitch.
-            </p>
-            <p className="mt-6 text-xs uppercase tracking-[0.28em] text-ink-mute">
-              ↘ Tap the floating button bottom-right
-            </p>
-          </Reveal>
+            Read the encyclopedia
+          </a>
         </div>
       </section>
     </PageShell>
-  );
-}
-
-function Tier({
-  eyebrow,
-  price,
-  priceSub,
-  body,
-  href,
-  cta,
-  tone,
-}: {
-  eyebrow: string;
-  price: string;
-  priceSub: string;
-  body: string;
-  href: string;
-  cta: string;
-  tone: 'default' | 'accent';
-}) {
-  return (
-    <div
-      className={`group relative flex h-full flex-col overflow-hidden rounded-[2rem] border p-10 backdrop-blur-md transition-all duration-500 hover:-translate-y-1 ${
-        tone === 'accent'
-          ? 'border-accent/40 bg-gradient-to-br from-accent/20 to-transparent hover:border-accent'
-          : 'border-white/10 bg-black/30 hover:border-ink-dim'
-      }`}
-    >
-      <p
-        className={`text-[10px] uppercase tracking-[0.32em] ${
-          tone === 'accent' ? 'text-accent' : 'text-ink-dim'
-        }`}
-      >
-        {eyebrow}
-      </p>
-      <p className="mt-6 font-display text-5xl text-ink">
-        {price}
-        <span className="ml-2 text-base text-ink-dim">{priceSub}</span>
-      </p>
-      <p className="mt-5 flex-1 text-sm leading-relaxed text-ink-dim">{body}</p>
-      <Magnetic strength={0.2}>
-        <Link
-          href={href}
-          className="cta-primary mt-8 rounded-full px-8 py-3.5 tracking-[0.28em]"
-          data-cursor-label="Open"
-        >
-          <span>{cta} →</span>
-        </Link>
-      </Magnetic>
-    </div>
   );
 }

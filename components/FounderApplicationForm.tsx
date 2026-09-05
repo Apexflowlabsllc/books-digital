@@ -98,7 +98,7 @@ export function FounderApplicationForm() {
         </p>
       ) : (
         <p className="text-xs text-ink-mute">
-          Application only. 100 per year. Brian reads every one.
+          Application only. 100 spots ever. Brian reads every one.
         </p>
       )}
     </form>

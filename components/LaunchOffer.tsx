@@ -112,7 +112,7 @@ export function LaunchOffer({ totalBooks }: LaunchOfferProps) {
 
         {/* Price grid — every format with strikethrough */}
         <div className="mt-14">
-          <p className="eyebrow mb-4 text-center text-ink-dim">All 5 formats — every book</p>
+          <p className="eyebrow mb-4 text-center text-ink-dim">Every edition — every book</p>
           <ul className="mx-auto grid max-w-4xl grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {FORMATS.map((f) => {
               const discounted = launchPrice(f.price);

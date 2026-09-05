@@ -146,3 +146,43 @@ test('formatMoney renders cents correctly', () => {
   assert.equal(formatMoney(2499), '$24.99');
   assert.equal(formatMoney(1500), '$15.00');
 });
+
+/* ── stale backend boilerplate in book descriptions ────────────────── */
+
+import { sanitizeDescription } from '../sanitizeDescription';
+
+test('sanitizeDescription removes the retired series boilerplate', () => {
+  const out = sanitizeDescription(
+    'Real prose here. This is Book 1 in the Apex Raw Motivation series. Four books total. More prose.',
+  );
+  assert.ok(!out.includes('Apex Raw Motivation'));
+  assert.ok(!out.includes('Four books total'));
+  assert.ok(out.includes('Real prose here.'));
+  assert.ok(out.includes('More prose.'));
+});
+
+test('sanitizeDescription points the domain at this store', () => {
+  assert.ok(
+    sanitizeDescription('Explore at apexflowlabs.com/books.').includes('books.apexflowlabs.com'),
+  );
+  assert.ok(
+    !sanitizeDescription('Explore at https://www.apexflowlabs.com/books').includes('.com/books'),
+  );
+});
+
+test('sanitizeDescription corrects the brand name', () => {
+  assert.ok(
+    sanitizeDescription('the Apex Publishing House').includes('Apex Flow Publishing House'),
+  );
+});
+
+test('sanitizeDescription leaves clean prose untouched', () => {
+  const clean = 'You know what discipline is not? Waking up at 4 AM.';
+  assert.equal(sanitizeDescription(clean), clean);
+});
+
+test('sanitizeDescription handles empty input', () => {
+  assert.equal(sanitizeDescription(undefined), '');
+  assert.equal(sanitizeDescription(null), '');
+  assert.equal(sanitizeDescription(''), '');
+});

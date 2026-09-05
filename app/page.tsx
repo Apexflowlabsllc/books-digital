@@ -5,6 +5,7 @@ import { RotatingBook } from '@/components/RotatingBook';
 import { getCatalog, getSeriesList, getPageSeo } from '@/lib/api';
 import { buildMetadata, fallbackPageSchema } from '@/lib/seo';
 import { TERM_COUNT, PHRASE_COUNT } from '@/lib/encyclopedia';
+import { catalogPrices } from '@/lib/pricing';
 
 export const metadata = buildMetadata({
   title: 'Apex Flow Publishing House',
@@ -36,7 +37,7 @@ const COVER_BASE =
  */
 export default async function HomePage() {
   const [catalog, seriesData, seo] = await Promise.all([
-    getCatalog({ limit: 1 }), // total only — the wall renders covers by id
+    getCatalog(), // full catalog: the total AND the real prices
     getSeriesList(),
     getPageSeo('/'),
   ]);
@@ -44,6 +45,9 @@ export default async function HomePage() {
   const series = seriesData?.series ?? [];
   const totalBooks = catalog?.total ?? series.reduce((n, s) => n + s.book_count, 0);
   const numbers = Object.fromEntries(series.map((s, i) => [s.slug, i + 1]));
+  /* Derived from the catalog, never hardcoded — the four numbers that used to
+   * live here as strings were every one of them wrong. */
+  const prices = catalogPrices(catalog?.books ?? []);
   const firstSeries = series[0];
 
   return (
@@ -137,18 +141,15 @@ export default async function HomePage() {
           </p>
 
           <dl className="mt-10 grid gap-px overflow-hidden rounded-sm border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              ['Ebook', '$5.99', 'EPUB, delivered by email. Nothing ships.'],
-              ['Audiobook', '$12.99', 'Narrated MP3. Download and keep the files.'],
-              ['Paperback', '$20.09', '6×9 inches, perfect bound, printed and shipped.'],
-              ['Hardcover', '$34.99', '6×9 inches, case wrap, printed and shipped.'],
-            ].map(([name, price, note]) => (
-              <div key={name} className="fmt-tile bg-bg p-6">
+            {prices.map(({ format, label, price, note }) => (
+              <div key={format} className="fmt-tile bg-bg p-6">
                 <dt className="font-mono text-[9.5px] uppercase tracking-[0.2em] text-accent">
-                  {name}
+                  {label}
                 </dt>
                 <dd className="mt-3">
-                  <span className="font-display text-3xl font-light text-ink">{price}</span>
+                  <span className="font-display text-3xl font-light text-ink">
+                    {price ?? 'Coming soon'}
+                  </span>
                   <span className="mt-2 block text-[13px] leading-relaxed text-ink-dim">{note}</span>
                 </dd>
               </div>

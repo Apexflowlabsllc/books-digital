@@ -1,6 +1,15 @@
 import { NextResponse } from 'next/server';
 import { generateText } from 'ai';
 import { openai } from '@ai-sdk/openai';
+import { rateLimit, clientKey } from '@/lib/rateLimit';
+import { env } from '@/lib/env';
+import { getCatalog } from '@/lib/api';
+import { catalogPrices } from '@/lib/pricing';
+import {
+  safeHistory,
+  safeMessage,
+  isAllowedOrigin,
+} from '@/lib/conciergeGuards';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;
@@ -39,12 +48,9 @@ Wave IV (Apex):
 
 CADENCE: one chapter per day for 90 days.
 
-PRICES (direct from books.apexflowlabs.com):
-  Ebook: $5.99 — instant download (ePub + PDF)
-  Audiobook: $12.99 — instant MP3
-  Bundle (ebook + audiobook): $16.99 — best deal
-  Paperback (signed): $19.99 — ships in 5-7 days
-  Hardcover (signed): $34.99 — ships in 5-7 days
+PRICES: see the CURRENT PRICES block appended below. Use ONLY those numbers.
+Never quote a price that is not in that block. If a format is not listed there,
+say it is not available yet rather than guessing.
 
 LAUNCH WEEK PROMO: code APEX30 for 30% off every direct purchase. Auto-applies at checkout.
 
@@ -94,7 +100,48 @@ const VOICE_FALLBACK = [
   '- Curious about the whole library: /books',
 ].join('\n');
 
+/** Reject cross-site callers. This endpoint exists for our own widget. */
+function sameOrigin(req: Request): boolean {
+  const hosts: string[] = [];
+  try {
+    if (env.siteUrl) hosts.push(new URL(env.siteUrl).host);
+  } catch {
+    /* a malformed siteUrl should not open the door */
+  }
+  const host = req.headers.get('host');
+  if (host) hosts.push(host);
+  return isAllowedOrigin(req.headers.get('origin'), hosts);
+}
+
+/** Real prices, read from the catalog, injected per request. */
+async function currentPricesBlock(): Promise<string> {
+  try {
+    const catalog = await getCatalog();
+    const rows = catalogPrices(catalog?.books ?? []).filter((p) => p.price);
+    const NONE = '\n\nCURRENT PRICES: unavailable right now — do not quote any price.';
+    if (!rows.length) return NONE;
+    const lines = rows.map((r) => `  ${r.label}: ${r.price}`).join('\n');
+    return `\n\nCURRENT PRICES (authoritative, read from the live catalog):\n${lines}`;
+  } catch {
+    return '\n\nCURRENT PRICES: unavailable right now — do not quote any price.';
+  }
+}
+
 export async function POST(req: Request) {
+  if (!sameOrigin(req)) {
+    return NextResponse.json({ reply: VOICE_FALLBACK }, { status: 403 });
+  }
+
+  /* 8 messages then roughly one every 12s. Enough for a real conversation,
+   * nowhere near enough to be worth abusing. */
+  const limit = rateLimit(`concierge:${clientKey(req)}`, { capacity: 8, refillPerSecond: 1 / 12 });
+  if (!limit.ok) {
+    return NextResponse.json(
+      { reply: 'Give me a second — too many messages at once. Try again shortly.' },
+      { status: 429, headers: { 'Retry-After': String(limit.retryAfter) } },
+    );
+  }
+
   let body: ConciergeBody;
   try {
     body = (await req.json()) as ConciergeBody;
@@ -102,35 +149,24 @@ export async function POST(req: Request) {
     return NextResponse.json({ reply: VOICE_FALLBACK }, { status: 200 });
   }
 
-  const userMessage = (body.message ?? '').trim();
+  const userMessage = safeMessage(body.message);
   if (!userMessage) {
     return NextResponse.json({ reply: VOICE_FALLBACK }, { status: 200 });
   }
 
-  // If OPENAI_API_KEY isn't set we never get a chance to error from the
-  // SDK — short-circuit with the fallback so the UI shows something
-  // useful instead of a stack trace.
   if (!process.env.OPENAI_API_KEY) {
     return NextResponse.json({ reply: VOICE_FALLBACK }, { status: 200 });
   }
 
-  // Rebuild the conversation. Cap to the last 10 turns so the prompt
-  // doesn't bloat over a long session.
-  const trimmed = (body.history ?? []).slice(-10);
-  const messages = [
-    ...trimmed.map((m) => ({
-      role: m.role,
-      content: m.content,
-    })),
-    { role: 'user' as const, content: userMessage },
-  ];
+  const messages = [...safeHistory(body.history), { role: 'user' as const, content: userMessage }];
 
   try {
     const result = await generateText({
       model: openai('gpt-4o-mini'),
-      system: SYSTEM_PROMPT,
+      system: SYSTEM_PROMPT + (await currentPricesBlock()),
       messages,
       temperature: 0.4,
+      maxOutputTokens: 700,
     });
     return NextResponse.json({ reply: result.text.trim() }, { status: 200 });
   } catch (err) {

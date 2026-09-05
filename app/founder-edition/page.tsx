@@ -8,7 +8,7 @@ import { buildMetadata, fallbackPageSchema } from '@/lib/seo';
 export const metadata = buildMetadata({
   title: 'Founder Edition — $9,999 · 100 spots ever · application only',
   description:
-    'Founder Edition — $9,999, lifetime. Signed 636-book hardcover set, lifetime Insider Pass to every Apex store, one-hour private call with Brian, your name in the next book’s Founding Operators appendix. Only 100 spots ever sold. Application only.',
+    'Founder Edition — $9,999. Signed 636-book hardcover set, Apex Vault membership across every Apex store, one-hour private call with Brian, your name in the next book’s Founding Operators appendix. Only 100 spots ever sold. Application only.',
   path: '/founder-edition',
 });
 
@@ -23,8 +23,8 @@ const DELIVERABLES = [
     body: 'All 636 books, hardcover, signed by Brian. Shipped in a custom case as books release. Yes, all 636. Yes, the case is heavy. Yes, you need a shelf.',
   },
   {
-    title: 'Lifetime Insider Pass',
-    body: 'Forever. As long as Apex exists. No annual renewal. No price increases. Books Pass, Digital Pass, every other Apex storefront pass we ever launch — you’re in.',
+    title: 'Apex Vault membership',
+    body: 'The top tier, across the whole ecosystem. Books, Digital, and every Apex storefront we launch — you’re in, at founding rate, for as long as you keep the membership active.',
   },
   {
     title: 'One-Hour Call With Brian',
@@ -32,15 +32,15 @@ const DELIVERABLES = [
   },
   {
     title: 'Your Name in the Next Book',
-    body: '"Founding Operators" appendix. Forever printed. Future readers will see it. The names that funded the empire when it was 12 books deep.',
+    body: '"Founding Operators" appendix. Printed in the book. Future readers will see it. The names that funded the empire when it was 12 books deep.',
   },
   {
     title: 'Early Access to Everything Apex Ever Makes',
     body: 'Books, courses, apparel, AI tools, future brands. You’re in at founder level. Treated accordingly.',
   },
   {
-    title: 'Limited to 100 Lifetime Spots',
-    body: 'Not a recurring revenue stream. A one-time founders class. When 100 are sold, the door closes. Forever.',
+    title: 'Limited to 100 Founding Spots',
+    body: 'A single founding class. When 100 are sold, the door closes and does not reopen.',
   },
 ];
 
@@ -67,7 +67,7 @@ export default async function FounderEditionPage() {
             This isn&apos;t for everyone. This isn&apos;t even for most of the people who buy the
             books. This is for the max 100 people, ever, who want to be part of the early Apex
             story.{' '}
-            <span className="text-accent">$9,999. Lifetime. Only 100 spots ever.</span>
+            <span className="text-accent">$9,999. Founding tier. Only 100 spots ever.</span>
           </>
         }
         primary={{ href: '#apply', label: 'Reserve a spot' }}
@@ -149,15 +149,15 @@ export default async function FounderEditionPage() {
             />
             <Faq
               q="What if the 100 are gone?"
-              a={"The application closes. Forever. We don’t open a “next cohort” the next year — there are only 100 lifetime spots. We don’t waitlist. Wait is dishonest."}
+              a={"The application closes and does not reopen. We don’t run a “next cohort” — there are only 100 founding spots. We don’t waitlist. Wait is dishonest."}
             />
             <Faq
               q="Do I get the audiobook versions too?"
-              a="Yes. The lifetime Pass covers every audiobook for every Apex store, for life. The hardcover set is the physical version; the Pass is the audio + future books."
+              a="Yes. The Apex Vault membership covers every audiobook across every Apex store while it is active. The hardcover set is the physical version; the membership is the audio + future books."
             />
             <Faq
               q="When does my number ship?"
-              a="Book by book, as each title releases. The shelf and signature plate ship within 30 days of acceptance. The lifetime Pass is active the same day you’re accepted."
+              a="Book by book, as each title releases. The shelf and signature plate ship after acceptance. The Apex Vault membership is active the same day you’re accepted."
             />
             <Faq
               q="Can I email Brian before I apply?"

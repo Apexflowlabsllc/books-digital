@@ -34,7 +34,7 @@ const BUNDLES = [
     name: 'The Twelve — Ebook Library',
     price: '$499',
     note: '636 books · all 12 series · ebook',
-    body: 'The complete library in ebook. 636 books. Every series. Every chapter. For the guy who doesn\'t want a subscription and just wants to own the whole catalog forever.',
+    body: 'The complete library in ebook. 636 books. Every series. Every chapter. For the reader who wants the whole catalog in one purchase instead of a membership.',
     sku: 'twelve-series-ebook',
   },
   {
@@ -98,7 +98,7 @@ export default async function BundlesPage() {
               <p className="eyebrow text-accent">$9,999 tier</p>
               <p className="font-display text-2xl text-ink">Founder Edition →</p>
               <p className="text-sm text-ink-dim">
-                Signed 636-book hardcover set + lifetime Pass to every Apex store + 90-min call
+                Signed 636-book hardcover set + Apex Vault membership + 90-min call
                 with Brian. Application only. 100 per year.
               </p>
             </Link>
@@ -109,7 +109,7 @@ export default async function BundlesPage() {
               <p className="eyebrow">Books Pass</p>
               <p className="font-display text-2xl text-ink">$99/yr — full audiobook library →</p>
               <p className="text-sm text-ink-dim">
-                Want unlimited audio + 20% off hardcovers instead of a one-time bundle? The Pass
+                Want unlimited audio + 20% off hardcovers instead of a bundle? The Pass
                 is the better deal if you read continuously.
               </p>
             </Link>

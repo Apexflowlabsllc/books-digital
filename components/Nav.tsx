@@ -18,6 +18,8 @@ const LINKS = [
   { href: '/brian-spiker-real-world-proof', label: 'Proof' },
   { href: '/membership', label: 'Pass' },
   { href: '/bundles', label: 'Bundles' },
+  /* Locked rule: every Apex Flow store carries Pulse. */
+  { href: '/pulse', label: 'Pulse' },
 ];
 
 export function Nav({ userEmail }: NavProps = {}) {

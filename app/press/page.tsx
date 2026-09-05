@@ -22,7 +22,7 @@ const FACTS = [
   ['Cadence', 'One short chapter per day · 90 chapters per book'],
   ['Pricing', 'Ebook $6.99 · Paperback $14.99 · Hardcover $24.99 · Audiobook $19.95'],
   ['Insider Pass', '$99 / year — all 636 books + audio + 20% off every Apex brand'],
-  ['Founder Edition', '$9,999 — 100 lifetime spots ever · application only'],
+  ['Founder Edition', '$9,999 — 100 founding spots ever · application only'],
   ['Audiobook narration', 'AI-narrated · supervised by Brian'],
 ];
 

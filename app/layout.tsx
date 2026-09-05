@@ -1,16 +1,25 @@
 import type { Metadata, Viewport } from 'next';
 import { Geist, Fraunces, JetBrains_Mono } from 'next/font/google';
 import { env } from '@/lib/env';
-import { SmoothScroll } from '@/components/SmoothScroll';
-import { Cursor } from '@/components/Cursor';
+import dynamic from 'next/dynamic';
+import { DeferUntilIdle } from '@/components/DeferUntilIdle';
+
+/* Split out of the first-load bundle. None of these paint anything a visitor
+ * needs in order to read the page, and together they were the bulk of the
+ * 205kB Lighthouse measured as unused JavaScript at load. */
+const SmoothScroll = dynamic(() => import('@/components/SmoothScroll').then((m) => m.SmoothScroll));
+const Cursor = dynamic(() => import('@/components/Cursor').then((m) => m.Cursor));
 import { BackgroundLoader } from '@/components/BackgroundLoader';
 import { TactileRipple } from '@/components/TactileRipple';
 import { FoilTracker } from '@/components/FoilTracker';
-import { BooksConcierge } from '@/components/BooksConcierge';
-import { ExitIntentModalTrigger } from '@/components/EmailCaptureModal';
 import { LaunchBanner } from '@/components/LaunchBanner';
-import { LaunchModal } from '@/components/LaunchModal';
-import { LaunchPill } from '@/components/LaunchPill';
+
+const BooksConcierge = dynamic(() => import('@/components/BooksConcierge').then((m) => m.BooksConcierge));
+const ExitIntentModalTrigger = dynamic(() =>
+  import('@/components/EmailCaptureModal').then((m) => m.ExitIntentModalTrigger),
+);
+const LaunchModal = dynamic(() => import('@/components/LaunchModal').then((m) => m.LaunchModal));
+const LaunchPill = dynamic(() => import('@/components/LaunchPill').then((m) => m.LaunchPill));
 import './globals.css';
 
 const geist = Geist({
@@ -19,11 +28,18 @@ const geist = Geist({
   display: 'swap',
 });
 
+/*
+ * Only the optical-size axis. Every variable axis ships inside the woff2
+ * whether it is used or not, and dropping SOFT cut this file materially.
+ * `swap` is kept: switching to `optional` was measured and changed LCP by
+ * nothing, so there is no reason to risk the fallback face showing.
+ */
 const fraunces = Fraunces({
   subsets: ['latin'],
   variable: '--font-display',
   display: 'swap',
-  axes: ['SOFT', 'opsz'],
+  axes: ['opsz'],
+  preload: true,
 });
 
 const jetbrainsMono = JetBrains_Mono({
@@ -71,8 +87,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           still gets full hydration checking. */}
       <body suppressHydrationWarning>
         <BackgroundLoader />
-        <TactileRipple />
-        <FoilTracker />
+        <DeferUntilIdle>
+          <TactileRipple />
+          <FoilTracker />
+        </DeferUntilIdle>
         {/*
           THE BLUR IS GONE — and that is why you can now see the shader.
 
@@ -88,21 +106,27 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Blurring the entire site to protect type that was never at risk cost
           us the one effect the store is built around.
         */}
-        <SmoothScroll />
-        <Cursor />
+        <DeferUntilIdle>
+          <SmoothScroll />
+          <Cursor />
+        </DeferUntilIdle>
         {/* Launch-week promo bar — sits above everything else; dismiss
             persists per browser via localStorage. */}
         <LaunchBanner />
         {children}
-        <BooksConcierge />
-        <ExitIntentModalTrigger />
+        <DeferUntilIdle>
+          <BooksConcierge />
+          <ExitIntentModalTrigger />
+        </DeferUntilIdle>
         {/* Launch-week promo modal — auto-opens once per browser ~3.5s
             after the user lands. Dismiss persists via localStorage,
             but the floating LaunchPill re-opens it on demand. */}
-        <LaunchModal />
-        {/* Persistent floating pill bottom-left — opens the modal
-            anytime, shows live countdown. */}
-        <LaunchPill />
+        <DeferUntilIdle>
+          <LaunchModal />
+          {/* Persistent floating pill bottom-left — opens the modal
+              anytime, shows live countdown. */}
+          <LaunchPill />
+        </DeferUntilIdle>
       </body>
     </html>
   );

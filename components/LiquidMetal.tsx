@@ -44,7 +44,7 @@ uniform vec3 RIP[${MAX_RIPPLES}];
 float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
 float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
  return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}
-float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*n(p);p*=2.02;a*=.5;}return v;}
+float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<3;i++){v+=a*n(p);p*=2.02;a*=.5;}return v;}
 void main(){
   vec2 frag=gl_FragCoord.xy;
   vec2 uv=(frag-.5*R)/R.y;
@@ -122,7 +122,7 @@ void main(){
 
     let dpr = 1;
     const size = () => {
-      dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      dpr = Math.min(window.devicePixelRatio || 1, 1.25);
       cv.width = window.innerWidth * dpr;
       cv.height = window.innerHeight * dpr;
       gl.viewport(0, 0, cv.width, cv.height);
@@ -154,15 +154,24 @@ void main(){
     window.addEventListener('pointerdown', onDown, { passive: true });
     window.addEventListener('pointermove', onMove, { passive: true });
 
+    /* Cost control. The shader is fullscreen and fixed, so it never leaves the
+     * viewport and cannot be paused on scroll — but it CAN be paused when the
+     * tab is hidden, and it does not need 60fps. Molten metal at 40fps is
+     * indistinguishable and costs a third less main-thread time. */
+    const MIN_FRAME_MS = 1000 / 40;
     let raf = 0;
-    const frame = () => {
+    let lastDraw = 0;
+    const frame = (ts: number) => {
+      if (!reduced) raf = requestAnimationFrame(frame);
+      if (document.hidden) return;
+      if (ts - lastDraw < MIN_FRAME_MS) return;
+      lastDraw = ts;
       const T = now();
       gl.uniform1f(uT, T);
       for (let i = 0; i < MAX_RIPPLES; i++) {
         gl.uniform3f(uRIP[i], rips[i][0], rips[i][1], rips[i][2]);
       }
       gl.drawArrays(gl.TRIANGLES, 0, 3);
-      if (!reduced) raf = requestAnimationFrame(frame);
     };
     if (reduced) {
       gl.uniform1f(uT, 7);

@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import { useEffect, useState } from 'react';
 
 /**
  * The site ground.
@@ -22,12 +23,41 @@ const LiquidMetal = dynamic(
   },
 );
 
+/**
+ * WHO GETS THE SHADER.
+ *
+ * Lighthouse measured 17,136ms of main-thread "Other" work on a mobile
+ * profile, with 120ms tasks still firing thirty seconds into the page — a
+ * domain-warped five-octave fbm running every frame on an emulated mid-range
+ * phone. It put mobile performance at 50.
+ *
+ * So phones and low-powered machines get the CSS ground instead. It is the
+ * same palette, costs nothing, and is what a visitor on a bus actually needs.
+ * Real desktops still get the metal.
+ */
+function wantsShader(): boolean {
+  if (typeof window === 'undefined') return false;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false;
+  // A phone-sized viewport, or a coarse pointer with no hover, is a phone.
+  if (window.matchMedia('(max-width: 900px)').matches) return false;
+  if (window.matchMedia('(hover: none) and (pointer: coarse)').matches) return false;
+  const cores = navigator.hardwareConcurrency;
+  if (typeof cores === 'number' && cores > 0 && cores <= 4) return false;
+  const mem = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
+  if (typeof mem === 'number' && mem > 0 && mem <= 4) return false;
+  return true;
+}
+
 export function BackgroundLoader() {
-  if (typeof window !== 'undefined') {
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduced) return <CssFallback />;
-  }
-  return <LiquidMetal />;
+  const [on, setOn] = useState(false);
+
+  // Decided after mount so the server and first client render agree, and so
+  // the shader never blocks first paint.
+  useEffect(() => {
+    setOn(wantsShader());
+  }, []);
+
+  return on ? <LiquidMetal /> : <CssFallback />;
 }
 
 /**

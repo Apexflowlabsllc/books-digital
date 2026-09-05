@@ -6,9 +6,9 @@ import { getPageSeo } from '@/lib/api';
 import { buildMetadata, fallbackPageSchema } from '@/lib/seo';
 
 export const metadata = buildMetadata({
-  title: 'About Apex Publishing House',
+  title: 'About Apex Flow Publishing House',
   description:
-    'Apex Publishing House is the books storefront of Brian Spiker — owner-operator of Spiker Carpet and Tile Care for 13 years. Operator-grade self-help, not therapist-speak.',
+    'Apex Flow Publishing House is the books storefront of Brian Spiker — owner-operator of Spiker Carpet and Tile Care for 13 years. Operator-grade self-help, not therapist-speak.',
   path: '/about',
 });
 
@@ -19,7 +19,7 @@ export default async function AboutPage() {
 
   return (
     <PageShell>
-      <JsonLdSchema bundle={seo} fallback={fallbackPageSchema('/about', 'About Apex Publishing House')} />
+      <JsonLdSchema bundle={seo} fallback={fallbackPageSchema('/about', 'About Apex Flow Publishing House')} />
 
       <Hero
         eyebrow="About"
@@ -30,7 +30,7 @@ export default async function AboutPage() {
             <span className="metallic-text">Back-tested against a real company.</span>
           </>
         }
-        body="Apex Publishing House is the books storefront of Brian Spiker. He runs Spiker Carpet and Tile Care. Every chapter has to survive contact with that company before it ships."
+        body="Apex Flow Publishing House is the books storefront of Brian Spiker. He runs Spiker Carpet and Tile Care. Every chapter has to survive contact with that company before it ships."
       />
 
       <section className="container-x py-16">

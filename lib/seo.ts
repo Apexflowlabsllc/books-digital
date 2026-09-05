@@ -3,7 +3,7 @@ import { env } from './env';
 import type { BookDetail, SeriesDetail } from './types';
 import { imageProxy } from './utils';
 
-const SITE_NAME = 'Apex Publishing House';
+const SITE_NAME = 'Apex Flow Publishing House';
 const DEFAULT_DESCRIPTION =
   '636 books. 12 series. One war-manual library. Written by Brian Spiker — founder of Spiker Carpet and Tile Care, operating since 2013 (13 years).';
 
@@ -63,7 +63,7 @@ const BRIAN_PERSON = {
   url: `${env.siteUrl}/about-brian`,
   jobTitle: 'Founder & Author',
   description:
-    'Founder of Spiker Carpet and Tile Care (operating since 2013, 13 years). Author of Apex Publishing House (636 books, 12 series). Founder of Apex Flow Labs.',
+    'Founder of Spiker Carpet and Tile Care (operating since 2013, 13 years). Author of Apex Flow Publishing House (636 books, 12 series). Founder of Apex Flow Labs.',
   worksFor: [
     {
       '@type': 'Organization',
@@ -275,7 +275,7 @@ export function fallbackSeriesSchema(series: SeriesDetail): unknown[] {
     {
       '@context': 'https://schema.org',
       '@type': 'CollectionPage',
-      name: `${series.name} — Apex Publishing House`,
+      name: `${series.name} — Apex Flow Publishing House`,
       url,
       isBasedOn: SPIKER_BASED_ON,
       mainEntity: {

@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/server';
 import { buildMetadata } from '@/lib/seo';
 
 export const metadata = buildMetadata({
-  title: 'Your account — Apex Publishing House',
+  title: 'Your account — Apex Flow Publishing House',
   description: 'Your Apex account — library, orders, audio, settings.',
   path: '/account',
 });

@@ -113,7 +113,7 @@ export default async function MembershipPage() {
             One Apex store. One Pass. No tier confusion.
           </h3>
           <p className="mt-3 max-w-2xl text-ink-dim text-base leading-[1.65]">
-            Apex Publishing House runs multiple storefronts. Each owns its own Pass. The Books Pass
+            Apex Flow Publishing House runs multiple storefronts. Each owns its own Pass. The Books Pass
             covers everything you read on this site — all 636 books, all the audio, 20% off every
             other Apex brand. There is no upgrade ladder — we just charge once for what you
             actually use.

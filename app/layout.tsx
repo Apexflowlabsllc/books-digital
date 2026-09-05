@@ -33,22 +33,22 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(env.siteUrl || 'https://books.apexflowlabs.com'),
   title: {
-    default: 'Apex Publishing House — 636 books. 12 series. One war manual library.',
-    template: '%s | Apex Publishing House',
+    default: 'Apex Flow Publishing House — 636 books. 12 series. One war manual library.',
+    template: '%s | Apex Flow Publishing House',
   },
   description:
     '636 books. 12 series. One war-manual library. Built on 13 years of operations at Spiker Carpet and Tile Care. Not therapist-speak — operator-grade self-help.',
-  applicationName: 'Apex Publishing House',
+  applicationName: 'Apex Flow Publishing House',
   authors: [{ name: 'Brian Spiker', url: `${env.siteUrl}/about-brian` }],
   creator: 'Brian Spiker',
-  publisher: 'Apex Publishing House',
+  publisher: 'Apex Flow Publishing House',
   keywords: [
     'r-rated self-help',
     'war manual',
     'discipline books',
     'operator books',
     'Brian Spiker',
-    'Apex Publishing House',
+    'Apex Flow Publishing House',
   ],
   formatDetection: { telephone: false, email: false, address: false },
 };

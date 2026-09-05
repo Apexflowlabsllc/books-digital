@@ -104,12 +104,27 @@ export function RotatingBook({ wrapUrl, title, seriesLabel, accent }: Props) {
     window.addEventListener('touchend', up);
     el.addEventListener('keydown', key);
 
+    /* IDLE MOTION.
+     *
+     * This used to add 0.16deg every frame forever, so the book rotated
+     * without limit — measured live it was sitting at 112deg, which is edge-on.
+     * A visitor arriving at any random moment was as likely to meet the back
+     * board or the paper edge as the cover, which is why it read as broken.
+     *
+     * It now breathes around a three-quarter pose instead: far enough to show
+     * the spine and prove it is a real object, never far enough to turn the
+     * cover away. Dragging still gives full 360 control. */
+    const IDLE_CENTER = -26;
+    const IDLE_SWING = 13;
     let raf = 0;
     if (!reduced) {
+      const t0 = performance.now();
       const spin = () => {
         const s = state.current;
         if (!s.touched && !s.drag) {
-          s.ry += 0.16;
+          const t = (performance.now() - t0) / 1000;
+          s.ry = IDLE_CENTER + Math.sin(t * 0.42) * IDLE_SWING;
+          s.rx = 5 + Math.sin(t * 0.29) * 2.5;
           apply();
         }
         raf = requestAnimationFrame(spin);

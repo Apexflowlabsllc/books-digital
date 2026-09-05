@@ -27,7 +27,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { SeriesSummary } from '@/lib/types';
-import { useFirstLoadableWrap, spineBackgroundSize, spineAspect } from '@/lib/wrapGeometry';
+import { useFirstLoadableWrap, spineBackgroundSize, spineDepthRatio } from '@/lib/wrapGeometry';
 
 const BUCKET =
   'https://rleowvglnvbraslessch.supabase.co/storage/v1/render/image/public/book-assets';
@@ -42,32 +42,54 @@ function coverUrl(seriesNumber: number, bookNumber: number, w = 220) {
 }
 
 /**
- * The REAL spine, at the REAL proportion.
+ * THE WALL — twelve books standing on a shelf.
  *
- * Two things were wrong here. The crop assumed the spine was a fixed 4% of the
- * wrap; measured across 33 wraps it runs from 1.50% to 4.62%, because a
- * thicker book has a wider spine while the covers either side never change. So
- * most spines were showing a slice of the back cover.
+ * WHY THIS IS NOT A ROW OF SPINE STRIPS
+ * -------------------------------------
+ * It was, twice, and both were wrong.
  *
- * And the strip was then stretched to fill a 90px-wide button. A real 6x9
- * spine is about 18:1 — squeezing it into 3:1 smeared the designer's vertical
- * title sideways by a factor of five.
+ * First it cropped a fixed 4% of the wrap and stretched that to fill a 90px
+ * button. The crop was wrong for nearly every book (the spine is 1.50%-4.62%
+ * depending on page count) and the stretch smeared the vertical title sideways
+ * by five.
  *
- * Now the crop is computed per book from the image's own aspect, and the
- * element is sized to the spine's true proportion so the artwork is never
- * distorted. The series name moves out from on top of the art to a caption
- * underneath, where it is legible and is not competing with the title already
- * printed on the spine.
+ * Then I fixed the crop and sized each spine to its TRUE proportion. The
+ * measurement was right and the result was worse: a real 6x9 spine at 320px
+ * tall is 20px wide, so the wall became twelve unreadable sticks. Truth to
+ * scale and legibility are mutually exclusive for twelve books across one
+ * screen — there is no tuning that gets both.
+ *
+ * So the books turn to face you instead. Each series stands as an actual book,
+ * rotated about 30 degrees, showing its front cover AND its real spine at the
+ * leading edge, overlapping its neighbour the way books lean on a shelf. The
+ * cover is the artwork worth showing and it is legible at this size; the spine
+ * is still the genuine printed spine, just seen at an angle where its width is
+ * foreshortened rather than faked.
+ *
+ * Every face is cut from cover_wrap.jpg by lib/wrapGeometry, so nothing here is
+ * invented and nothing is distorted.
  */
 function spineWrapUrl(seriesNumber: number, bookNumber: number) {
-  return `${BUCKET}/s${pad2(seriesNumber)}_b${pad2(bookNumber)}/cover_wrap.jpg?width=1400&quality=88`;
+  /* `resize=contain` IS LOAD-BEARING. Without it Supabase's transform returns
+   * width x ORIGINAL HEIGHT — 1600x2775 for a wrap that is really 3851x2775 —
+   * i.e. the artwork horizontally squashed to 42% of its width. Everything
+   * downstream then breaks: the measured aspect comes back 0.58 instead of
+   * 1.39, spineFraction sees a width narrower than two covers and falls back,
+   * and every spine on the wall renders the same wrong crop. With `contain`
+   * the aspect is exact and the file is smaller (394kB vs 524kB). */
+  return `${BUCKET}/s${pad2(seriesNumber)}_b${pad2(bookNumber)}/cover_wrap.jpg?width=1400&resize=contain&quality=88`;
 }
 
 /**
- * One spine on the wall.
+ * One series, standing as a book.
  *
- * Split into its own component so it can read its own wrap's aspect — the
- * crop is per book, and a hook cannot run inside a loop in the parent.
+ * Split out so it can read its own wrap's aspect — the crop is per book and a
+ * hook cannot run inside a loop in the parent.
+ *
+ * Only 253-370 of the 636 wraps are in the bucket while the sync runs, and
+ * book 1 is missing for several series (4 starts at 11, 5 at 21, 9 at 2). So it
+ * tries a ladder and takes whichever loads first, which self-heals as more
+ * arrive rather than needing a manifest kept in sync by hand.
  */
 function SeriesSpine({
   s,
@@ -78,52 +100,49 @@ function SeriesSpine({
   n: number;
   onLaunch: (el: HTMLButtonElement, s: SeriesSummary) => void;
 }) {
-  /* Only 253 of the 636 wraps are in the bucket, and book 1 is missing for
-   * several series (4 starts at 11, 5 at 21, 9 at 2). Try a ladder and take
-   * whichever loads first — this self-heals as more wraps are uploaded. */
   const candidates = n ? [1, 2, 11, 21, 31, 41].map((b) => spineWrapUrl(n, b)) : [];
   const { url, aspect, done } = useFirstLoadableWrap(candidates);
-
-  // The spine's own aspect — its width over the wrap's height. Shaping the
-  // element to this is what keeps the artwork undistorted: the element becomes
-  // the shape of the real spine, instead of the spine being stretched to fill
-  // whatever shape the element happened to be.
-  const ratio = spineAspect(aspect);
   const missing = done && !url;
 
   return (
-    <figure className="spine-slot">
+    <figure className="shelf-slot">
       <button
         type="button"
-        className="series-spine"
+        className="wall-book"
         style={
           {
             '--accent': s.color_hex,
-            '--spine-aspect': (missing ? 0.0533 : ratio).toFixed(4),
+            /* Real thickness, foreshortened by the rotation in CSS. */
+            '--thick': `calc(var(--cw) * ${spineDepthRatio(aspect).toFixed(4)})`,
           } as React.CSSProperties
         }
         aria-label={`${s.name} — ${s.book_count} books`}
         onClick={(e) => onLaunch(e.currentTarget, s)}
       >
-        {url ? (
+        <span className="wb-3d">
+          {/* Front cover. A face at the cover's own aspect crops itself with
+            * `auto 100%`, so this is exact with no measurement. */}
           <span
-            className="spine-wrap"
-            aria-hidden
-            style={{
-              backgroundImage: `url(${url})`,
-              backgroundSize: spineBackgroundSize(aspect),
-            }}
+            className="wb-front"
+            style={url ? { backgroundImage: `url(${url})` } : undefined}
+          >
+            {missing ? <span className="wb-plate">{s.name}</span> : null}
+          </span>
+          {/* The genuine printed spine at the leading edge. */}
+          <span
+            className="wb-spine"
+            style={
+              url
+                ? { backgroundImage: `url(${url})`, backgroundSize: spineBackgroundSize(aspect) }
+                : undefined
+            }
           />
-        ) : null}
-        {/* No wrap exists for this series yet (Purpose, Warrior and Legend
-          * have none at all). Draw a real spine in the series colour rather
-          * than leaving a blank slot in the middle of the wall. */}
-        {missing ? <span className="spine-blank" aria-hidden /> : null}
+          <span className="wb-pages" />
+        </span>
       </button>
-      <figcaption className="spine-cap">
-        <span className="spine-cap-no">{pad2(n || 0)}</span>
-        <span className="spine-cap-name">{s.name}</span>
-        <span className="spine-cap-count">{s.book_count}</span>
+      <figcaption className="shelf-cap">
+        <span className="shelf-cap-name">{s.name}</span>
+        <span className="shelf-cap-count">{s.book_count} books</span>
       </figcaption>
     </figure>
   );

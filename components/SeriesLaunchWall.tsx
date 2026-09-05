@@ -27,7 +27,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { SeriesSummary } from '@/lib/types';
-import { useWrapAspect, spineBackgroundSize, spineAspect } from '@/lib/wrapGeometry';
+import { useFirstLoadableWrap, spineBackgroundSize, spineAspect } from '@/lib/wrapGeometry';
 
 const BUCKET =
   'https://rleowvglnvbraslessch.supabase.co/storage/v1/render/image/public/book-assets';
@@ -78,14 +78,18 @@ function SeriesSpine({
   n: number;
   onLaunch: (el: HTMLButtonElement, s: SeriesSummary) => void;
 }) {
-  const url = n ? spineWrapUrl(n, 1) : undefined;
-  const aspect = useWrapAspect(url);
+  /* Only 253 of the 636 wraps are in the bucket, and book 1 is missing for
+   * several series (4 starts at 11, 5 at 21, 9 at 2). Try a ladder and take
+   * whichever loads first — this self-heals as more wraps are uploaded. */
+  const candidates = n ? [1, 2, 11, 21, 31, 41].map((b) => spineWrapUrl(n, b)) : [];
+  const { url, aspect, done } = useFirstLoadableWrap(candidates);
 
   // The spine's own aspect — its width over the wrap's height. Shaping the
   // element to this is what keeps the artwork undistorted: the element becomes
   // the shape of the real spine, instead of the spine being stretched to fill
   // whatever shape the element happened to be.
   const ratio = spineAspect(aspect);
+  const missing = done && !url;
 
   return (
     <figure className="spine-slot">
@@ -95,7 +99,7 @@ function SeriesSpine({
         style={
           {
             '--accent': s.color_hex,
-            '--spine-aspect': ratio.toFixed(4),
+            '--spine-aspect': (missing ? 0.0533 : ratio).toFixed(4),
           } as React.CSSProperties
         }
         aria-label={`${s.name} — ${s.book_count} books`}
@@ -111,6 +115,10 @@ function SeriesSpine({
             }}
           />
         ) : null}
+        {/* No wrap exists for this series yet (Purpose, Warrior and Legend
+          * have none at all). Draw a real spine in the series colour rather
+          * than leaving a blank slot in the middle of the wall. */}
+        {missing ? <span className="spine-blank" aria-hidden /> : null}
       </button>
       <figcaption className="spine-cap">
         <span className="spine-cap-no">{pad2(n || 0)}</span>

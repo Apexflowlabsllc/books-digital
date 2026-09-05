@@ -474,6 +474,396 @@ export const ENCYCLOPEDIA: EncyclopediaEntry[] = [
       'I cannot rely on discipline alone',
     ],
   },
+  {
+    term: 'Trauma bonding',
+    also: 'betrayal bond',
+    definition:
+      'A trauma bond is an attachment formed through cycles of harm followed by relief. The intermittent reward pattern is the same one that makes gambling compulsive, which is why leaving can feel physically unbearable even when you know the relationship is damaging you.',
+    action: 'Track the cycle in writing for two weeks. Seeing the pattern on paper breaks its spell faster than willpower does.',
+    saidAs: [
+      'why do I keep going back to him',
+      'I know he is bad for me but I cannot leave',
+      'why does leaving feel like withdrawal',
+      'addicted to someone who hurts me',
+      'the good days keep me stuck',
+      'I miss someone who treated me badly',
+      'why is it so hard to leave a toxic relationship',
+      'trauma bond or love',
+      'hot and cold relationship why',
+    ],
+  },
+  {
+    term: 'Gaslighting',
+    also: 'reality distortion',
+    definition:
+      'Gaslighting is a pattern where someone repeatedly denies your perception of events until you doubt your own memory and judgement. The tell is not one argument but a cumulative effect: you start recording conversations or asking other people whether you are being unreasonable.',
+    action: 'Keep a dated written record of what was said. The record is the antidote, because the tactic depends on memory being contestable.',
+    saidAs: [
+      'am I crazy or is he lying',
+      'I do not trust my own memory anymore',
+      'they say it never happened',
+      'why do I always end up apologising',
+      'I feel like I am losing my mind',
+      'he twists everything I say',
+      'how do I know if I am being gaslit',
+      'I second guess everything now',
+    ],
+  },
+  {
+    term: 'Self-sabotage',
+    definition:
+      'Self-sabotage is behaviour that undermines a goal you consciously hold. It is usually protective rather than irrational: the sabotage prevents an outcome some part of you finds threatening, such as visibility, responsibility, or having no excuse left.',
+    action: 'Ask what success would cost you. The answer is almost always what the sabotage is protecting.',
+    saidAs: [
+      'why do I ruin things when they are going well',
+      'I quit right before it works',
+      'I always mess it up myself',
+      'afraid of my own success',
+      'why do I procrastinate on things I want',
+      'I push away good things',
+      'I get close then blow it up',
+      'why do I self destruct',
+    ],
+  },
+  {
+    term: 'Nervous system regulation',
+    also: 'window of tolerance',
+    definition:
+      'Regulation is keeping your physiological arousal inside the range where you can still think clearly — not so activated you cannot reason, not so shut down you cannot act. It is trained through the body first: breath, movement, sleep and safety, rather than through insight.',
+    action: 'Lengthen your exhale beyond your inhale for two minutes. The body leads the mind, not the reverse.',
+    saidAs: [
+      'why am I always on edge',
+      'I cannot calm down',
+      'my body reacts before I can think',
+      'constant fight or flight',
+      'I go numb under stress',
+      'how to calm my nervous system',
+      'why do I panic over small things',
+      'stuck in survival mode',
+    ],
+  },
+  {
+    term: 'Hypervigilance',
+    definition:
+      'Hypervigilance is a permanently raised threat-detection setting, learned in an environment where danger was unpredictable. It reads neutral cues as warnings, which is exhausting and makes rest feel unsafe rather than restorative.',
+    action: 'Name three things in the room that are actually safe, out loud. Orienting is how the system stands down.',
+    saidAs: [
+      'I am always waiting for something bad',
+      'I read every tone of voice',
+      'cannot relax even when things are fine',
+      'always scanning for danger',
+      'why am I so jumpy',
+      'I brace for bad news constantly',
+      'exhausted from being alert all the time',
+    ],
+  },
+  {
+    term: 'People-pleasing',
+    also: 'fawn response',
+    definition:
+      'People-pleasing is a threat response, not a personality trait. Where conflict was historically dangerous, appeasing became the fastest route to safety, and the habit outlives the danger — showing up as agreement you do not mean and resentment you cannot explain.',
+    action: 'Say one honest no this week and let the discomfort pass without repairing it.',
+    saidAs: [
+      'I cannot say no',
+      'I agree to things I do not want to do',
+      'why do I apologise so much',
+      'I make myself smaller around people',
+      'conflict terrifies me',
+      'I go along to keep the peace',
+      'why do I feel responsible for everyone\'s mood',
+      'fawn response',
+    ],
+  },
+  {
+    term: 'Codependency',
+    definition:
+      'Codependency is organising your own wellbeing around managing someone else\'s. It often looks like devotion and functions like control, because your stability depends on regulating their behaviour or their mood.',
+    action: 'Ask what you would do this week if their reaction were not a factor. Then do one of those things.',
+    saidAs: [
+      'I lose myself in relationships',
+      'their mood runs my day',
+      'I cannot be happy if they are upset',
+      'why do I fix everyone',
+      'I do not know what I want anymore',
+      'enmeshed with my partner',
+      'I feel responsible for their feelings',
+    ],
+  },
+  {
+    term: 'No contact',
+    also: 'grey rock',
+    definition:
+      'No contact is a boundary of complete disengagement, used where a relationship cannot be made safe. Grey rock is its partial form for situations that cannot be fully exited — co-parenting, work — where you become deliberately unrewarding to engage with.',
+    action: 'Decide in advance what you will do when they make contact, so the decision is not made under pressure.',
+    saidAs: [
+      'should I go no contact',
+      'how to cut someone off completely',
+      'he keeps contacting me',
+      'grey rock method',
+      'how to stop responding to my ex',
+      'cutting off a family member',
+      'I broke no contact again',
+      'how long does no contact take',
+    ],
+  },
+  {
+    term: 'Love bombing',
+    definition:
+      'Love bombing is an intense, accelerated display of attention and affection early in a relationship. Its function is to create attachment faster than judgement can operate, which is why the contrast when it stops feels like withdrawal rather than a normal adjustment.',
+    action: 'Slow the pace deliberately. Anything genuine survives being taken slowly.',
+    saidAs: [
+      'it moved so fast',
+      'he was perfect at first then changed',
+      'why did they lose interest suddenly',
+      'too much too soon relationship',
+      'intense beginning then cold',
+      'was it love bombing',
+      'he called me his soulmate in two weeks',
+    ],
+  },
+  {
+    term: 'Emotional flashback',
+    definition:
+      'An emotional flashback is the sudden return of the feeling-state of an old experience without a clear memory attached. It presents as a disproportionate reaction to a small trigger, which is why it is so often mistaken for simply overreacting.',
+    action: 'Say today\'s date out loud. Anchoring to now is what ends it — the feeling is old, the moment is not.',
+    saidAs: [
+      'why do I overreact to small things',
+      'I feel like a child again suddenly',
+      'huge reaction out of nowhere',
+      'old feelings come flooding back',
+      'why does this tiny thing wreck me',
+      'triggered but I do not know why',
+    ],
+  },
+  {
+    term: 'Shame versus guilt',
+    definition:
+      'Guilt says I did something bad; shame says I am something bad. Guilt is workable because it points at an action you can repair. Shame is paralysing because it indicts the whole person and offers nothing to fix.',
+    action: 'Restate the shame sentence as a guilt sentence. Then repair the action it names.',
+    saidAs: [
+      'I feel worthless not just wrong',
+      'why do I hate myself after mistakes',
+      'difference between shame and guilt',
+      'I feel like a bad person',
+      'cannot forgive myself',
+      'toxic shame',
+      'I am the problem',
+    ],
+  },
+  {
+    term: 'Grief',
+    also: 'ambiguous loss',
+    definition:
+      'Grief is the response to losing something that mattered, and it does not require a death. Ambiguous loss — a living person you cannot have, a future that will not happen — is harder precisely because nothing socially marks it as a loss worth grieving.',
+    action: 'Name the loss precisely. Unnamed grief presents as depression and does not resolve.',
+    saidAs: [
+      'why am I so sad when nobody died',
+      'grieving someone still alive',
+      'mourning a relationship',
+      'I lost the future I planned',
+      'why does this hurt like a death',
+      'grieving who they could have been',
+      'how long does grief last',
+    ],
+  },
+  {
+    term: 'Burnout',
+    definition:
+      'Burnout is exhaustion, cynicism and reduced effectiveness caused by prolonged demand without adequate recovery. It is a systems problem rather than a character weakness, which is why rest alone does not resolve it if the conditions producing it are unchanged.',
+    action: 'Change one condition, not just your recovery. Resting inside the same load refills a bucket with a hole in it.',
+    saidAs: [
+      'I have nothing left to give',
+      'dread going to work',
+      'exhausted no matter how much I sleep',
+      'I used to care and now I do not',
+      'burnt out but cannot stop',
+      'why does rest not help anymore',
+      'am I burnt out or depressed',
+    ],
+  },
+  {
+    term: 'Perfectionism',
+    definition:
+      'Perfectionism is using an unreachable standard as protection against judgement. It reliably reduces output, because unstarted work cannot be criticised and unfinished work is never final — which is the actual purpose it serves.',
+    action: 'Ship one thing at eighty percent this week and let it be seen.',
+    saidAs: [
+      'nothing I do is good enough',
+      'I cannot finish anything',
+      'I redo it a hundred times',
+      'afraid to show my work',
+      'perfectionism is ruining my life',
+      'I never start because it will not be perfect',
+      'high standards or procrastination',
+    ],
+  },
+  {
+    term: 'Scarcity mindset',
+    definition:
+      'Scarcity is a mode of thinking produced by not having enough, which narrows attention onto the immediate shortfall and reduces the mental bandwidth available for long-range decisions. It is a consequence of conditions, not a personal failing.',
+    action: 'Automate one long-range decision so it stops competing with today\'s shortage for attention.',
+    saidAs: [
+      'I cannot think past this month',
+      'money stress makes me stupid',
+      'always in survival mode financially',
+      'why do I make bad money decisions when broke',
+      'cannot plan ahead',
+      'scarcity mindset money',
+    ],
+  },
+  {
+    term: 'Financial shame',
+    definition:
+      'Financial shame is treating your bank balance as a verdict on your worth. It causes avoidance — unopened statements, unchecked balances — which reliably makes the underlying situation worse and then deepens the shame.',
+    action: 'Look at the real number today. Avoidance is the expensive part, not the number.',
+    saidAs: [
+      'I am ashamed of my debt',
+      'cannot look at my bank account',
+      'I avoid opening bills',
+      'embarrassed about money',
+      'feel like a failure financially',
+      'everyone else has it together',
+      'money makes me feel worthless',
+    ],
+  },
+  {
+    term: 'Purpose',
+    definition:
+      'Purpose is a direction that organises effort, not a single destination discovered once. It is built from what you repeatedly move toward rather than found by introspection, which is why waiting to feel it before acting reliably fails.',
+    action: 'Follow the thing you keep returning to, before you have a story explaining why.',
+    saidAs: [
+      'I do not know what I am doing with my life',
+      'how do I find my purpose',
+      'feel like I am drifting',
+      'what am I even for',
+      'everyone else has a passion',
+      'how to find meaning',
+      'I have no direction',
+      'is it too late to change direction',
+    ],
+  },
+  {
+    term: 'Flow state',
+    definition:
+      'Flow is complete absorption in an activity where challenge and skill are closely matched. It requires clear goals, immediate feedback and no interruption — which is why it is nearly impossible in an environment designed to interrupt you.',
+    action: 'Remove the interruptions before you try to concentrate harder. Attention is a condition, not an effort.',
+    saidAs: [
+      'how to get in the zone',
+      'I cannot focus for more than ten minutes',
+      'deep work',
+      'why can I never concentrate',
+      'best conditions for focus',
+      'losing track of time working',
+      'distracted every five minutes',
+    ],
+  },
+  {
+    term: 'Deliberate practice',
+    definition:
+      'Deliberate practice is repetition targeted specifically at what you cannot yet do, with immediate feedback. Ordinary repetition of what you already do well produces comfort and very little improvement, which is why long experience and high skill so often diverge.',
+    action: 'Practise the part you are worst at, not the part that feels good.',
+    saidAs: [
+      'why am I not improving',
+      'been doing this for years and stuck',
+      'practice but no progress',
+      'how to actually get better at something',
+      'plateau in a skill',
+      'experience but not skilled',
+    ],
+  },
+  {
+    term: 'Emotional sovereignty',
+    definition:
+      'Sovereignty is the state where your emotional condition is not controlled by another person\'s behaviour. It is not detachment — you still feel the impact — but their mood stops functioning as the input that determines yours.',
+    action: 'Notice one moment today where you handed someone your state. Take it back without announcing it.',
+    saidAs: [
+      'they ruin my whole day',
+      'why do I let people affect me so much',
+      'how to stop caring what they think',
+      'his mood controls the house',
+      'I cannot be okay if they are not',
+      'emotional independence',
+      'taking my power back',
+    ],
+  },
+  {
+    term: 'Identity reconstruction',
+    definition:
+      'Identity reconstruction is deliberately rebuilding who you are after a period that dismantled the previous version — a divorce, an addiction, a collapse. It works forwards through behaviour rather than backwards through recovering the old self, which no longer fits.',
+    action: 'Choose one behaviour the new version does daily, and do it before you feel like that person.',
+    saidAs: [
+      'I do not know who I am anymore',
+      'rebuilding my life from scratch',
+      'who am I without them',
+      'starting over at 40',
+      'lost myself completely',
+      'how to reinvent yourself',
+      'I want to become a different person',
+    ],
+  },
+  {
+    term: 'Dissociation',
+    also: 'numbing',
+    definition:
+      'Dissociation is a protective disconnection from thoughts, feelings or surroundings under overwhelming stress. It is effective in the moment and costly over time, because a system that switches off under pressure also switches off during ordinary life.',
+    action: 'Ground through the senses: five things you can see, four you can touch. Reconnection is physical.',
+    saidAs: [
+      'I feel numb all the time',
+      'like I am watching myself',
+      'spacing out constantly',
+      'nothing feels real',
+      'I go blank in arguments',
+      'why can I not feel anything',
+      'checked out emotionally',
+      'autopilot all day',
+    ],
+  },
+  {
+    term: 'Anger as signal',
+    definition:
+      'Anger is information that a boundary has been crossed or a need is unmet. Treated as a fault it gets suppressed and re-emerges as resentment or collapse; treated as data it identifies precisely what needs addressing.',
+    action: 'Ask what line was crossed. Anger is almost always pointing at a specific one.',
+    saidAs: [
+      'why am I so angry all the time',
+      'I explode over nothing',
+      'angry but I do not know why',
+      'is my anger a problem',
+      'I suppress my anger then blow up',
+      'resentment building up',
+      'how to use anger productively',
+    ],
+  },
+  {
+    term: 'Attachment style',
+    also: 'anxious · avoidant · secure',
+    definition:
+      'Attachment style is the pattern you default to when closeness is at stake, learned early and revised through experience. Anxious pursues under threat, avoidant withdraws, and the pairing of the two produces the chase-and-retreat cycle most people mistake for chemistry.',
+    action: 'Notice which direction you move when things get tense. That direction is the pattern, not the person.',
+    saidAs: [
+      'why do I get clingy',
+      'I push people away when they get close',
+      'anxious attachment',
+      'avoidant partner',
+      'why do I chase unavailable people',
+      'he pulls away when I get closer',
+      'what is my attachment style',
+      'secure relationships feel boring',
+    ],
+  },
+  {
+    term: 'Radical acceptance',
+    definition:
+      'Radical acceptance is acknowledging reality as it is, without approving of it. It is not resignation: refusing to accept a situation keeps energy locked in protest, whereas accepting it frees that energy for whatever action is actually available.',
+    action: 'Say what is true out loud without adding should. Then decide what to do about it.',
+    saidAs: [
+      'I cannot accept what happened',
+      'it is not fair',
+      'why me',
+      'how to accept something terrible',
+      'stuck fighting reality',
+      'I keep wishing it were different',
+      'letting go of what I cannot change',
+    ],
+  },
 ];
 
 /** Derived, never hardcoded — a literal count goes stale on the first edit. */

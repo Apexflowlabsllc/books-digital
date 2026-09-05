@@ -153,7 +153,7 @@ export function PriceSelector({ book }: PriceSelectorProps) {
               <p className="text-[12px] text-ink-dim">
                 Use code{' '}
                 <span className="font-mono font-bold text-accent">{LAUNCH.code}</span> at
-                checkout. All 5 formats.
+                checkout. Every edition.
               </p>
             </div>
           </div>

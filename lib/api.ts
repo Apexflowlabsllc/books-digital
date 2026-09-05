@@ -1,4 +1,5 @@
 import { env } from './env';
+import { sanitizeDescription } from './sanitizeDescription';
 import type {
   BookDetail,
   BookSummary,
@@ -206,7 +207,9 @@ function adaptBookDetail(raw: RawBookDetail): BookDetail {
 
   // Sample chapter: until the manuscript pipeline exposes a real excerpt,
   // surface the description body as the day-one teaser.
-  const sampleBody = raw.description || raw.backCover?.body || '';
+  /* Same stale boilerplate reaches the reader through the sample teaser and
+   * the back-cover body, so both go through the sanitiser too. */
+  const sampleBody = sanitizeDescription(raw.description || raw.backCover?.body || '');
   const sample_chapter = {
     title: 'Day 1',
     body: sampleBody,
@@ -239,7 +242,7 @@ function adaptBookDetail(raw: RawBookDetail): BookDetail {
     formats,
     audio_status,
     primary_keyword: raw.keywords?.[0],
-    description: raw.description || raw.backCover?.body || '',
+    description: sanitizeDescription(raw.description) || sanitizeDescription(raw.backCover?.body) || '',
     book_id: raw.bookId,
     is_authentic: raw.isAuthentic,
     published_at: raw.publishedAt || undefined,
@@ -272,7 +275,7 @@ function adaptBookDetail(raw: RawBookDetail): BookDetail {
       ? {
           headline: raw.backCover.headline,
           subhead: raw.backCover.subhead,
-          body: raw.backCover.body,
+          body: sanitizeDescription(raw.backCover.body),
           bullets: raw.backCover.bullets,
           callout: raw.backCover.callout,
         }

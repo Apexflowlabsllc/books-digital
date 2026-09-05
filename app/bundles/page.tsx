@@ -98,8 +98,8 @@ export default async function BundlesPage() {
               <p className="eyebrow text-accent">$9,999 tier</p>
               <p className="font-display text-2xl text-ink">Founder Edition →</p>
               <p className="text-sm text-ink-dim">
-                Signed 636-book hardcover set + Apex Vault membership + 90-min call
-                with Brian. Application only. 100 per year.
+                Signed 636-book hardcover set + Apex Vault membership + one-hour call
+                with Brian. Application only. 100 spots ever.
               </p>
             </Link>
             <Link

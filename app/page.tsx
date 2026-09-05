@@ -97,7 +97,7 @@ export default async function HomePage() {
           * turn until touched, which is how a visitor learns it is grabbable. */}
         {firstSeries && (
           <RotatingBook
-            coverUrl={`${COVER_BASE}/s01_b01/cover_ebook.jpg?width=520&height=780&resize=cover&quality=82`}
+            wrapUrl={`${COVER_BASE}/s01_b01/cover_wrap.jpg?width=1600&quality=86`}
             title={firstSeries.name}
             seriesLabel={`Series 1 · Book 01`}
             accent={firstSeries.color_hex}

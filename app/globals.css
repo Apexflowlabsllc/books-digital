@@ -685,16 +685,28 @@ code, pre, kbd, samp, .font-mono {
    detonation opens. Paired with components/SeriesLaunchWall.tsx.
    ============================================================ */
 
+/* All twelve series in one view.
+ * The rail was a horizontal scroller, so you only ever saw five or six and had
+ * to discover the rest. It is now a fitted row: the spines share the available
+ * width and shrink to fit, so the whole wall is visible at a glance — which is
+ * the point of a wall. Below 700px it falls back to scrolling, because twelve
+ * legible spines do not fit on a phone. */
 .series-rail{
-  display:flex; gap:10px; overflow-x:auto;
-  padding:34px 4px 30px; perspective:1400px;
-  scrollbar-width:thin;
+  display:flex; gap:6px; overflow:visible;
+  padding:30px 0 26px; perspective:1600px;
+  align-items:flex-end;
+}
+@media(max-width:700px){
+  .series-rail{overflow-x:auto; gap:8px; scrollbar-width:thin;}
+  .series-spine{flex:0 0 auto !important; width:78px; height:250px;}
 }
 .series-rail::-webkit-scrollbar{height:5px}
 .series-rail::-webkit-scrollbar-thumb{background:var(--accent,#C98B3E);border-radius:9px}
 
 .series-spine{
-  position:relative; flex:0 0 auto; width:92px; height:320px;
+  position:relative;
+  /* share the row: grow to fill, shrink to fit, never wider than a real spine */
+  flex:1 1 0; min-width:0; max-width:104px; height:288px;
   display:flex; flex-direction:column; align-items:center;
   justify-content:space-between; gap:8px; padding:16px 0 14px;
   border-radius:2px 5px 5px 2px; overflow:hidden; cursor:pointer;
@@ -718,7 +730,7 @@ code, pre, kbd, samp, .font-mono {
   -webkit-tap-highlight-color:transparent;
 }
 .series-spine:hover,.series-spine:focus-visible{
-  transform:translateY(-22px) rotateY(-18deg) rotateZ(-1deg);
+  transform:translateY(-18px) rotateY(-14deg) rotateZ(-1deg);
   box-shadow:0 40px 54px -22px rgba(0,0,0,.98);
   outline:none;
 }
@@ -758,7 +770,7 @@ code, pre, kbd, samp, .font-mono {
 }
 .spine-no{
   position:relative; z-index:2;
-  font-size:22px; line-height:1; font-weight:300;
+  font-size:19px; line-height:1; font-weight:300;
   color:var(--accent,#C98B3E); text-shadow:0 1px 6px rgba(0,0,0,.9);
 }
 .spine-name{
@@ -868,13 +880,16 @@ code, pre, kbd, samp, .font-mono {
 .book3d:active{cursor:grabbing}
 .book3d:focus-visible{outline:2px solid var(--accent,#C98B3E);outline-offset:14px}
 .book3d .face{position:absolute;inset:0;border-radius:2px 4px 4px 2px}
+/* FRONT — the right 48% of the wrap (52%..100%) */
 .book3d .f-front{
   transform:translateZ(19px);overflow:hidden;
-  border:1px solid color-mix(in srgb,var(--accent,#C98B3E) 55%,transparent);
-  box-shadow:inset 0 0 60px rgba(0,0,0,.5);
+  border:1px solid rgba(0,0,0,.55);
+  box-shadow:inset 0 0 60px rgba(0,0,0,.35);
   display:flex;align-items:flex-start;padding:16px;
+  background-repeat:no-repeat;
+  background-size:208% 100%;
+  background-position:100% 50%;
 }
-.book3d .f-art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .book3d .f-front::after{
   content:"";position:absolute;inset:0;
   background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.12) 47%,transparent 56%);
@@ -883,22 +898,24 @@ code, pre, kbd, samp, .font-mono {
   position:relative;z-index:2;font-size:8.5px;letter-spacing:.24em;text-transform:uppercase;
   color:#F2EDE2;text-shadow:0 1px 8px rgba(0,0,0,.95);
 }
+/* BACK — the left 48% of the wrap (0%..48%), the real back cover with its
+ * blurb and barcode, not an invented board */
 .book3d .f-back{
   transform:translateZ(-19px) rotateY(180deg);
-  background:linear-gradient(160deg,#141118,#08080A);
-  border:1px solid rgba(255,255,255,.08);
+  border:1px solid rgba(0,0,0,.55);
+  background-repeat:no-repeat;
+  background-size:208% 100%;
+  background-position:0% 50%;
+  box-shadow:inset 0 0 60px rgba(0,0,0,.35);
 }
+/* SPINE — the middle 4% of the wrap (48%..52%), carrying the real vertical
+ * title the cover designer set. 100/4 = 2500%. */
 .book3d .f-spine{
   width:38px;left:-19px;transform:rotateY(-90deg);transform-origin:right center;
-  display:grid;place-items:center;
-  background:linear-gradient(90deg,#08080A,color-mix(in srgb,var(--accent,#C98B3E) 20%,#1c1820) 42%,#121012);
-  border-top:1px solid color-mix(in srgb,var(--accent,#C98B3E) 40%,transparent);
-  border-bottom:1px solid color-mix(in srgb,var(--accent,#C98B3E) 40%,transparent);
-}
-.book3d .spine-title{
-  writing-mode:vertical-rl;transform:rotate(180deg);
-  font-size:8.5px;letter-spacing:.24em;text-transform:uppercase;
-  color:var(--accent,#C98B3E);white-space:nowrap;
+  background-repeat:no-repeat;
+  background-size:2500% 100%;
+  background-position:50% 50%;
+  box-shadow:inset 0 0 24px rgba(0,0,0,.5);
 }
 .book3d .f-pages{
   width:36px;right:-18px;transform:rotateY(90deg);transform-origin:left center;
@@ -953,4 +970,10 @@ code, pre, kbd, samp, .font-mono {
 @media(prefers-reduced-motion:reduce){
   .tap-ripple{display:none}
   .book3d{transition:none}
+}
+
+/* screen-reader-only, for labels the artwork already carries visually */
+.sr-only{
+  position:absolute;width:1px;height:1px;padding:0;margin:-1px;
+  overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;
 }

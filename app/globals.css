@@ -841,3 +841,104 @@ code, pre, kbd, samp, .font-mono {
   box-shadow:0 10px 26px -6px rgba(0,0,0,.9);
   pointer-events:none;
 }
+
+/* ============================================================
+   THE 3D BOOK — real CSS 3D, six faces on a preserve-3d box.
+   Stays sharp at any size, costs one element, and uses the same
+   cover file the store serves everywhere else.
+   ============================================================ */
+.book-stage{perspective:1600px;display:grid;place-items:center;min-height:min(56vh,430px);touch-action:pan-y}
+.book3d{
+  position:relative;width:min(230px,52vw);height:min(340px,76vw);
+  transform-style:preserve-3d;transform:rotateY(-28deg) rotateX(6deg);
+  cursor:grab;will-change:transform;
+}
+.book3d:active{cursor:grabbing}
+.book3d:focus-visible{outline:2px solid var(--accent,#C98B3E);outline-offset:14px}
+.book3d .face{position:absolute;inset:0;border-radius:2px 4px 4px 2px}
+.book3d .f-front{
+  transform:translateZ(19px);overflow:hidden;
+  border:1px solid color-mix(in srgb,var(--accent,#C98B3E) 55%,transparent);
+  box-shadow:inset 0 0 60px rgba(0,0,0,.5);
+  display:flex;align-items:flex-start;padding:16px;
+}
+.book3d .f-art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.book3d .f-front::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.12) 47%,transparent 56%);
+}
+.book3d .f-mark{
+  position:relative;z-index:2;font-size:8.5px;letter-spacing:.24em;text-transform:uppercase;
+  color:#F2EDE2;text-shadow:0 1px 8px rgba(0,0,0,.95);
+}
+.book3d .f-back{
+  transform:translateZ(-19px) rotateY(180deg);
+  background:linear-gradient(160deg,#141118,#08080A);
+  border:1px solid rgba(255,255,255,.08);
+}
+.book3d .f-spine{
+  width:38px;left:-19px;transform:rotateY(-90deg);transform-origin:right center;
+  display:grid;place-items:center;
+  background:linear-gradient(90deg,#08080A,color-mix(in srgb,var(--accent,#C98B3E) 20%,#1c1820) 42%,#121012);
+  border-top:1px solid color-mix(in srgb,var(--accent,#C98B3E) 40%,transparent);
+  border-bottom:1px solid color-mix(in srgb,var(--accent,#C98B3E) 40%,transparent);
+}
+.book3d .spine-title{
+  writing-mode:vertical-rl;transform:rotate(180deg);
+  font-size:8.5px;letter-spacing:.24em;text-transform:uppercase;
+  color:var(--accent,#C98B3E);white-space:nowrap;
+}
+.book3d .f-pages{
+  width:36px;right:-18px;transform:rotateY(90deg);transform-origin:left center;
+  background:repeating-linear-gradient(90deg,#EDE6D6 0 1px,#C6BCA6 1px 2.5px);
+}
+.grab-note{
+  margin-top:22px;text-align:center;font-size:9.5px;letter-spacing:.2em;
+  text-transform:uppercase;color:rgba(242,237,226,.42);
+}
+
+/* ── the free first page, on real paper ────────────────────── */
+.spread{
+  display:grid;grid-template-columns:minmax(0,1fr);
+  background:#EDE6D6;color:#1A1712;border-radius:2px;overflow:hidden;
+  box-shadow:0 40px 80px -40px rgba(0,0,0,.92);
+}
+@media(min-width:880px){.spread{grid-template-columns:1fr 1fr}}
+.leaf{padding:clamp(28px,3.6vw,52px)}
+.leaf + .leaf{border-top:1px solid rgba(26,23,18,.16)}
+@media(min-width:880px){
+  .leaf + .leaf{
+    border-top:0;border-left:1px solid rgba(26,23,18,.16);
+    background:linear-gradient(90deg,rgba(26,23,18,.07),transparent 7%);
+  }
+}
+.folio{font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;color:#7A7161;margin:0 0 18px}
+.leaf h3{font-size:clamp(23px,2.7vw,33px);line-height:1.12;letter-spacing:-.02em;margin:0 0 18px;color:#14110D}
+.leaf p{margin:0 0 14px;font-size:15.5px;line-height:1.72;color:#2B261E;max-width:56ch}
+.leaf p:first-of-type::first-letter{
+  float:left;font-size:54px;line-height:.82;padding:5px 10px 0 0;color:#8A5A22;font-weight:400;
+}
+.leaf p:last-child{margin-bottom:0}
+
+/* ── foil that catches the light ───────────────────────────── */
+.foil-text{
+  background:linear-gradient(96deg,#6E4A23 0%,#F0D49A 22%,#C98B3E 40%,#FFF0CE 52%,#B0762F 68%,#6E4A23 100%);
+  background-size:220% 100%;
+  background-position:var(--foilpos,40%) 0;
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;color:transparent;
+}
+
+/* ── the tap ripple every card answers with ────────────────── */
+.tap-ripple{
+  position:absolute;border-radius:50%;pointer-events:none;z-index:3;
+  background:radial-gradient(circle,rgba(240,212,154,.42) 0%,rgba(201,139,62,.20) 42%,transparent 70%);
+  transform:translate(-50%,-50%) scale(0);opacity:.95;
+  animation:tapOut .62s cubic-bezier(.2,.7,.3,1) forwards;
+}
+@keyframes tapOut{to{transform:translate(-50%,-50%) scale(1);opacity:0}}
+
+@media(prefers-reduced-motion:reduce){
+  .tap-ripple{display:none}
+  .book3d{transition:none}
+}

@@ -4,6 +4,8 @@ import { env } from '@/lib/env';
 import { SmoothScroll } from '@/components/SmoothScroll';
 import { Cursor } from '@/components/Cursor';
 import { BackgroundLoader } from '@/components/BackgroundLoader';
+import { TactileRipple } from '@/components/TactileRipple';
+import { FoilTracker } from '@/components/FoilTracker';
 import { BooksConcierge } from '@/components/BooksConcierge';
 import { ExitIntentModalTrigger } from '@/components/EmailCaptureModal';
 import { LaunchBanner } from '@/components/LaunchBanner';
@@ -69,6 +71,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           still gets full hydration checking. */}
       <body suppressHydrationWarning>
         <BackgroundLoader />
+        <TactileRipple />
+        <FoilTracker />
         {/* Site-wide backdrop blur — sits above the shader background
             (z: -10) and below all page content (z: 2). Every route picks
             this up automatically. */}

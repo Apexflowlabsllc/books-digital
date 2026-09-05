@@ -86,7 +86,7 @@ export function Footer() {
             founder of{' '}
             <a
               href="https://spikercarpetandtilecare.com"
-              className="text-accent transition-colors hover:text-cream border-b border-[rgba(217,204,140,0.3)] hover:border-cream"
+              className="tap-safe text-accent transition-colors hover:text-cream border-b border-[rgba(217,204,140,0.3)] hover:border-cream"
               rel="noopener noreferrer me"
               target="_blank"
             >
@@ -111,7 +111,7 @@ export function Footer() {
                 <li key={l.href}>
                   <Link
                     href={l.href}
-                    className="group inline-flex items-center gap-2 text-[0.95rem] font-light text-ink-dim transition-colors hover:text-cream"
+                    className="tap-safe group inline-flex items-center gap-2 text-[0.95rem] font-light text-ink-dim transition-colors hover:text-cream"
                   >
                     <span
                       aria-hidden

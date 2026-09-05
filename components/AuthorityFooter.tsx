@@ -28,7 +28,7 @@ export function AuthorityFooter() {
               href="https://spikercarpetandtilecare.com"
               target="_blank"
               rel="noopener noreferrer me"
-              className="border-b border-[rgba(217,204,140,0.45)] text-accent transition-colors hover:border-cream hover:text-cream"
+              className="tap-safe border-b border-[rgba(217,204,140,0.45)] text-accent transition-colors hover:border-cream hover:text-cream"
             >
               Spiker Carpet and Tile Care
             </a>{' '}
@@ -47,7 +47,7 @@ export function AuthorityFooter() {
               href="https://spikercarpetandtilecare.com"
               target="_blank"
               rel="noopener noreferrer me"
-              className="border-b border-[rgba(217,204,140,0.35)] text-accent/90 transition-colors hover:border-cream hover:text-cream"
+              className="tap-safe border-b border-[rgba(217,204,140,0.35)] text-accent/90 transition-colors hover:border-cream hover:text-cream"
             >
               spikercarpetandtilecare.com
             </a>
@@ -57,14 +57,14 @@ export function AuthorityFooter() {
           <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/about-brian"
-              className="font-mono text-[10px] uppercase tracking-[0.35em] text-accent transition-colors hover:text-cream border-b border-[rgba(217,204,140,0.35)] hover:border-cream pb-1"
+              className="tap-safe font-mono text-[10px] uppercase tracking-[0.35em] text-accent transition-colors hover:text-cream border-b border-[rgba(217,204,140,0.35)] hover:border-cream pb-1"
             >
               About Brian →
             </Link>
             <span aria-hidden className="h-1 w-1 rotate-45 bg-accent/40" />
             <Link
               href="/brian-spiker-real-world-proof"
-              className="font-mono text-[10px] uppercase tracking-[0.35em] text-accent transition-colors hover:text-cream border-b border-[rgba(217,204,140,0.35)] hover:border-cream pb-1"
+              className="tap-safe font-mono text-[10px] uppercase tracking-[0.35em] text-accent transition-colors hover:text-cream border-b border-[rgba(217,204,140,0.35)] hover:border-cream pb-1"
             >
               See the receipts →
             </Link>
@@ -73,7 +73,7 @@ export function AuthorityFooter() {
               href="https://spikercarpetandtilecare.com"
               target="_blank"
               rel="noopener noreferrer me"
-              className="font-mono text-[10px] uppercase tracking-[0.35em] text-accent transition-colors hover:text-cream border-b border-[rgba(217,204,140,0.35)] hover:border-cream pb-1"
+              className="tap-safe font-mono text-[10px] uppercase tracking-[0.35em] text-accent transition-colors hover:text-cream border-b border-[rgba(217,204,140,0.35)] hover:border-cream pb-1"
             >
               spikercarpetandtilecare.com →
             </a>
@@ -96,7 +96,7 @@ export function AuthorByline({
     <div
       className={`flex flex-col gap-1.5 ${className ?? ''}`}
     >
-      <span className="font-mono text-[10px] uppercase tracking-[0.35em] text-accent/80">
+      <span className="tap-safe font-mono text-[10px] uppercase tracking-[0.35em] text-accent/80">
         By Brian Spiker
       </span>
       <span className="text-sm font-light leading-[1.55] text-ink-dim">
@@ -105,7 +105,7 @@ export function AuthorByline({
           href="https://spikercarpetandtilecare.com"
           target="_blank"
           rel="noopener noreferrer me"
-          className="text-accent transition-colors hover:text-cream border-b border-[rgba(217,204,140,0.3)] hover:border-cream"
+          className="tap-safe text-accent transition-colors hover:text-cream border-b border-[rgba(217,204,140,0.3)] hover:border-cream"
         >
           Spiker Carpet and Tile Care
         </a>
@@ -116,7 +116,7 @@ export function AuthorByline({
           href="https://apexflowlabs.com"
           target="_blank"
           rel="noopener noreferrer me"
-          className="text-accent transition-colors hover:text-cream border-b border-[rgba(217,204,140,0.3)] hover:border-cream"
+          className="tap-safe text-accent transition-colors hover:text-cream border-b border-[rgba(217,204,140,0.3)] hover:border-cream"
         >
           Apex Flow Labs
         </a>

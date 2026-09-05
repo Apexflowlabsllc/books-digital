@@ -152,7 +152,7 @@ export function RotatingBook({ wrapUrl, title, seriesLabel, accent }: Props) {
         className="book3d"
         tabIndex={0}
         role="img"
-        aria-label={`${title} — three-dimensional book, drag or use arrow keys to rotate`}
+        aria-label={`${title}, ${seriesLabel} — three-dimensional book, drag or use arrow keys to rotate`}
         style={
           {
             ['--accent' as string]: accent,
@@ -172,9 +172,10 @@ export function RotatingBook({ wrapUrl, title, seriesLabel, accent }: Props) {
           <span className="sr-only">{title}</span>
         </div>
         <div className="face f-pages" />
-        <div className="face f-front" style={{ backgroundImage: `url(${wrapUrl})` }}>
-          <span className="f-mark">{seriesLabel}</span>
-        </div>
+        {/* No label overlay: the cover already prints "SERIES 1 - BOOK 1", and
+          * drawing it again put the same words on screen twice. seriesLabel is
+          * kept for the accessible name above. */}
+        <div className="face f-front" style={{ backgroundImage: `url(${wrapUrl})` }} />
       </div>
       <p className="grab-note">Grab it · drag to turn</p>
     </div>

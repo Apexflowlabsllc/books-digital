@@ -17,6 +17,7 @@
  */
 
 import { useCallback, useEffect, useRef } from 'react';
+import { useWrapAspect, spineBackgroundSize, spineDepthRatio } from '@/lib/wrapGeometry';
 
 type Props = {
   /**
@@ -39,6 +40,9 @@ type Props = {
 
 export function RotatingBook({ wrapUrl, title, seriesLabel, accent }: Props) {
   const bookRef = useRef<HTMLDivElement>(null);
+  /* The wrap's aspect gives the real spine width, so the book is as thick as
+   * the book actually is rather than a guessed 38px. */
+  const aspect = useWrapAspect(wrapUrl);
   const state = useRef({ ry: -28, rx: 6, drag: false, lx: 0, ly: 0, touched: false });
 
   const apply = useCallback(() => {
@@ -134,12 +138,22 @@ export function RotatingBook({ wrapUrl, title, seriesLabel, accent }: Props) {
         tabIndex={0}
         role="img"
         aria-label={`${title} — three-dimensional book, drag or use arrow keys to rotate`}
-        style={{ ['--accent' as string]: accent }}
+        style={
+          {
+            ['--accent' as string]: accent,
+            /* Real thickness: spine width as a share of the cover width,
+             * applied to however wide the book renders. */
+            ['--thick' as string]: `calc(var(--bw) * ${spineDepthRatio(aspect).toFixed(4)})`,
+          } as React.CSSProperties
+        }
       >
         {/* Every face cut from the one wrap file — real back, real spine,
           * real front, in the printer's own artwork. */}
         <div className="face f-back" style={{ backgroundImage: `url(${wrapUrl})` }} />
-        <div className="face f-spine" style={{ backgroundImage: `url(${wrapUrl})` }}>
+        <div
+          className="face f-spine"
+          style={{ backgroundImage: `url(${wrapUrl})`, backgroundSize: spineBackgroundSize(aspect) }}
+        >
           <span className="sr-only">{title}</span>
         </div>
         <div className="face f-pages" />

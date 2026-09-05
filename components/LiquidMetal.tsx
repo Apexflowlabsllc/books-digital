@@ -69,24 +69,26 @@ void main(){
   vec2 rr=vec2(fbm(suv*1.3+3.4*q+vec2(1.7,9.2)+t*.5),fbm(suv*1.3+3.4*q+vec2(8.3,2.8)-t*.35));
   float f=fbm(suv*1.45+3.4*rr);
   float band2=pow(sin(f*9.0+rr.y*3.2)*.5+.5,3.6);
-  // Levels. The metal used to top out at .30 under an 84% vignette and a
-  // 24px backdrop blur, which together rendered it as flat black. The blur
-  // is gone (see app/layout.tsx); these numbers are the other half — the
-  // molten range is lifted and the fold highlights are given real contrast,
-  // so the flow is legible as metal instead of as a slightly-warm dark.
-  vec3 dark=vec3(.026,.024,.028);
-  vec3 metal=vec3(.40,.345,.255);
+  // Levels, tuned twice. Under the old 24px backdrop blur the shader read as
+  // flat black, so removing the blur meant re-tuning. The first pass over-shot
+  // and washed whole pages out to pale tan, which the catalog could not carry.
+  // These are the settled values: a DARK ground with bright molten veins.
+  // Raising the mix threshold to .34 keeps most of the field near-black, while
+  // the fold highlight goes up to .52 so the veins carry the drama instead of
+  // the midtones. Body text sits on the dark, not on the bright.
+  vec3 dark=vec3(.020,.019,.023);
+  vec3 metal=vec3(.26,.225,.165);
   vec3 lit=vec3(.94,.90,.82);
-  vec3 col=mix(dark,metal,smoothstep(.20,.82,f));
-  col=mix(col,lit,band2*.38);
-  col+=ACC*pow(1.-f,3.5)*.46;
+  vec3 col=mix(dark,metal,smoothstep(.34,.80,f));
+  col=mix(col,lit,band2*.52);
+  col+=ACC*pow(1.-f,3.5)*.38;
   // Ripple crest untouched at .42 — the ripple brightness is already right.
   col+=vec3(1.0,.90,.72)*max(crest,0.)*0.42;
   col-=vec3(.09,.07,.04)*max(-crest,0.)*0.60;
   // Vignette relaxed from .84 to .58 and pushed outward, so the edges of the
   // viewport still show the flow rather than crushing to black.
   float d2=length(uv*vec2(.70,1.));
-  col*=1.-smoothstep(.34,1.30,d2)*.58;
+  col*=1.-smoothstep(.30,1.22,d2)*.72;
   gl_FragColor=vec4(col,1.);
 }`;
 

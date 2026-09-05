@@ -7,13 +7,20 @@ import { PriceSelector } from '@/components/PriceSelector';
 import { PreviewAudio } from '@/components/PreviewAudio';
 import { PreviewVideo } from '@/components/PreviewVideo';
 import { BookReviews } from '@/components/BookReviews';
+import { env } from '@/lib/env';
+import { BookAnswers, bookAnswers } from '@/components/BookAnswers';
 import { EmailGate } from '@/components/EmailGate';
 import { JsonLdSchema } from '@/components/JsonLdSchema';
 import { ClusterHub } from '@/components/ClusterHub';
 import { ComingSoonBook } from '@/components/ComingSoonBook';
 import { getBook, getBookSeo, getCluster } from '@/lib/api';
 import { getAudioPreviewPool, getPodcastPreviewPool } from '@/lib/preview-pool';
-import { buildMetadata, fallbackBookSchema, fallbackClusterSchema } from '@/lib/seo';
+import {
+  bookAnswersFaq,
+  buildMetadata,
+  fallbackBookSchema,
+  fallbackClusterSchema,
+} from '@/lib/seo';
 import { SHOW_PODCAST_VIDEO_ON_BOOK } from '@/lib/flags';
 import { getClusterBySlug, isClusterSlug } from '@/lib/clusters';
 import { LAUNCH } from '@/lib/launch';
@@ -109,7 +116,13 @@ export default async function BookDetailPage({ params }: BookRouteProps) {
 
   return (
     <PageShell seriesColor={book.series_color}>
-      <JsonLdSchema bundle={seo} fallback={fallbackBookSchema(book)} />
+      <JsonLdSchema
+        bundle={seo}
+        fallback={[
+          ...fallbackBookSchema(book),
+          bookAnswersFaq(bookAnswers(book), `${env.siteUrl}/books/${book.slug}`),
+        ].filter(Boolean)}
+      />
 
       {/* Breadcrumb */}
       <nav aria-label="Breadcrumb" className="container-x pt-8">
@@ -196,6 +209,9 @@ export default async function BookDetailPage({ params }: BookRouteProps) {
 
       {/* Audiobook — Polly Neural narration. Authentic books play full
           length; non-authentic borrow a peer's MP3 capped at 30s. */}
+      {/* The four questions, answered before anyone scrolls. */}
+      <BookAnswers book={book} />
+
       <section className="border-y border-line bg-bg-subtle">
         <div className="container-x grid gap-6 py-10 md:grid-cols-[auto_1fr] md:items-start">
           <div className="flex items-center gap-3 text-series">

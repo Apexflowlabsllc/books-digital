@@ -497,3 +497,28 @@ export function bookCourseSchema(book: {
     },
   };
 }
+
+
+/**
+ * The book page's visible "Straight answers" block, as FAQPage.
+ *
+ * Deliberately built from the SAME function the component renders, so schema
+ * and page can never disagree. Structured data that says something the page
+ * does not is the failure mode this avoids.
+ */
+export function bookAnswersFaq(
+  answers: { q: string; a: string }[],
+  bookUrl: string,
+): unknown | null {
+  if (!answers.length) return null;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    '@id': `${bookUrl}#straight-answers`,
+    mainEntity: answers.map((x) => ({
+      '@type': 'Question',
+      name: x.q,
+      acceptedAnswer: { '@type': 'Answer', text: x.a },
+    })),
+  };
+}

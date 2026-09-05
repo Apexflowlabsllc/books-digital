@@ -7,7 +7,7 @@ import { buildMetadata } from '@/lib/seo';
 
 export const metadata = buildMetadata({
   title: 'Your account — Apex Flow Publishing House',
-  description: 'Your Apex account — library, orders, audio, settings.',
+  description: 'Your Apex Flow Publishing House account — library, downloads, Insider Pass status and order history in one place.',
   path: '/account',
 });
 

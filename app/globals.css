@@ -31,7 +31,17 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  overflow-x: hidden;
+  /* THE BLANK SCREEN.
+     `overflow-x: hidden` forces the other axis to compute as `overflow-y:
+     auto`, which turns <body> into a scroll container. With the page also
+     scrolling the viewport there were two scrollers, and past the first
+     screenful the content composited at the wrong offset — the site slid down
+     and left black behind it. Verified live: with `hidden` the nav painted
+     700px below where layout said it was; with `clip` it paints correctly.
+     `clip` clips exactly the same way but does NOT create a scroll container,
+     so overflow-y stays `visible` and the viewport is the only scroller. */
+  overflow-x: clip;
+  overflow-y: visible;
 }
 
 /* Optical sizing + tighter character for the display serif (Fraunces) */
@@ -692,36 +702,47 @@ code, pre, kbd, samp, .font-mono {
  * the point of a wall. Below 700px it falls back to scrolling, because twelve
  * legible spines do not fit on a phone. */
 .series-rail{
-  display:flex; gap:6px; overflow:visible;
-  padding:30px 0 26px; perspective:1600px;
-  align-items:flex-end;
+  /* A shelf, not a row of tiles. Spines sit at their true proportion, so the
+     rail centres them instead of stretching them to fill. */
+  --sh: clamp(210px, 27vw, 380px);
+  display:flex; gap:16px; overflow:visible;
+  padding:26px 0 22px; perspective:1600px;
+  align-items:flex-end; justify-content:center; flex-wrap:nowrap;
 }
-@media(max-width:700px){
-  .series-rail{overflow-x:auto; gap:8px; scrollbar-width:thin;}
-  .series-spine{flex:0 0 auto !important; width:78px; height:250px;}
+@media(max-width:760px){
+  .series-rail{overflow-x:auto; justify-content:flex-start; gap:14px;
+    scrollbar-width:thin; --sh:230px;}
+  .spine-slot{flex:0 0 auto;}
 }
 .series-rail::-webkit-scrollbar{height:5px}
 .series-rail::-webkit-scrollbar-thumb{background:var(--accent,#C98B3E);border-radius:9px}
 
+.spine-slot{
+  display:flex; flex-direction:column; align-items:center; gap:12px;
+  margin:0; min-width:0;
+}
+
+/* ONE SPINE, AT THE SIZE A SPINE ACTUALLY IS.
+ *
+ * Two things were wrong before. The crop was a hardcoded middle 4%, but the
+ * spine runs 1.50%-4.62% of the wrap depending on page count, so most books
+ * were showing a slice of the back cover. And the strip was then stretched to
+ * fill a 90px-wide button when a real 6x9 spine is roughly 18:1 — the
+ * designer's vertical title was smeared sideways by a factor of five.
+ *
+ * --spine-aspect is set inline from each book's own wrap. The element takes
+ * that shape, so the artwork is never distorted: what you see is the printed
+ * spine at the proportion it is printed. */
 .series-spine{
   position:relative;
-  /* share the row: grow to fill, shrink to fit, never wider than a real spine */
-  flex:1 1 0; min-width:0; max-width:104px; height:288px;
-  display:flex; flex-direction:column; align-items:center;
-  justify-content:space-between; gap:8px; padding:16px 0 14px;
-  border-radius:2px 5px 5px 2px; overflow:hidden; cursor:pointer;
-  border:none;
-  /* a real spine: rounded shoulder on the left, deep gutter on the right,
-   * and a cloth body tinted by the series accent */
-  background:
-    linear-gradient(90deg,
-      rgba(0,0,0,.72) 0%,
-      rgba(255,255,255,.10) 7%,
-      rgba(255,255,255,.03) 16%,
-      rgba(0,0,0,0) 38%,
-      rgba(0,0,0,.28) 78%,
-      rgba(0,0,0,.78) 100%),
-    linear-gradient(180deg, color-mix(in srgb, var(--accent,#C98B3E) 22%, #14121a), #0b0a0e);
+  height:var(--sh);
+  width:max(20px, calc(var(--sh) * var(--spine-aspect, 0.0533)));
+  flex:0 0 auto;
+  border:none; padding:0; overflow:hidden; cursor:pointer;
+  border-radius:1px 3px 3px 1px;
+  /* Only a fallback tint while the artwork loads — no invented cloth. */
+  background:linear-gradient(180deg,
+    color-mix(in srgb, var(--accent,#C98B3E) 26%, #14121a), #0b0a0e);
   box-shadow:
     0 22px 34px -18px rgba(0,0,0,.95),
     inset -1px 0 0 rgba(0,0,0,.8),
@@ -730,60 +751,46 @@ code, pre, kbd, samp, .font-mono {
   -webkit-tap-highlight-color:transparent;
 }
 .series-spine:hover,.series-spine:focus-visible{
-  transform:translateY(-18px) rotateY(-14deg) rotateZ(-1deg);
+  transform:translateY(-16px) rotateY(-12deg);
   box-shadow:0 40px 54px -22px rgba(0,0,0,.98);
   outline:none;
 }
-
-/* THE REAL SPINE.
- * cover_wrap.jpg is the print wrap: back | spine | front, left to right.
- * Edge detection put the spine boundaries at 48% and 52% of the width, so the
- * middle 4% is the designed spine with its own title treatment. Scaling the
- * background to 2500% (100/4) and centring it shows exactly that strip — so
- * these are the books' actual spines, not cloth with a sliver of cover. */
+/* The real spine artwork. background-size arrives inline, computed per book. */
 .series-spine .spine-wrap{
   position:absolute; inset:0; pointer-events:none; z-index:1;
   background-repeat:no-repeat;
-  background-size:2500% 100%;
   background-position:50% 50%;
-  border-radius:2px 5px 5px 2px;
+  border-radius:1px 3px 3px 1px;
 }
-/* a touch of shelf lighting over the artwork, so it sits in the scene */
+/* shelf lighting, kept subtle so it does not fight the artwork */
 .series-spine .spine-wrap::after{
   content:""; position:absolute; inset:0;
   background:linear-gradient(90deg,
-    rgba(0,0,0,.55) 0%, rgba(255,255,255,.12) 8%,
-    rgba(0,0,0,0) 34%, rgba(0,0,0,.30) 82%, rgba(0,0,0,.62) 100%);
+    rgba(0,0,0,.42) 0%, rgba(255,255,255,.10) 9%,
+    rgba(0,0,0,0) 40%, rgba(0,0,0,.22) 84%, rgba(0,0,0,.50) 100%);
 }
-/* page block: the cream edge of the paper, so it reads as a physical book */
-.series-spine::before{
-  /* page block on the leading edge — real books show paper, not a hard edge */
-  content:""; position:absolute; right:0; top:5px; bottom:5px; width:4px; z-index:2;
-  background:repeating-linear-gradient(180deg,#EDE6D6 0 2px,#C6BCA6 2px 3px);
-  opacity:.5; pointer-events:none; border-radius:0 3px 3px 0;
+
+/* The label lives UNDER the spine now. It used to be printed on top of
+   artwork that already carries the title, which doubled the type. Vertical,
+   because a 25px-wide column is what a real spine leaves you. */
+.spine-cap{
+  writing-mode:vertical-rl; transform:rotate(180deg);
+  display:flex; align-items:center; gap:9px;
+  height:118px; line-height:1;
 }
-/* headband + foil rule near the top of the spine */
-.series-spine::after{
-  content:""; position:absolute; left:9px; right:34px; top:26px; height:1px;
-  background:linear-gradient(90deg,transparent,var(--accent,#C98B3E),transparent);
-  opacity:.9; pointer-events:none;
+.spine-cap-no{
+  font-family:var(--font-mono); font-size:9.5px; letter-spacing:.12em;
+  color:var(--accent,#C98B3E); opacity:.9;
 }
-.spine-no{
-  position:relative; z-index:2;
-  font-size:19px; line-height:1; font-weight:300;
-  color:var(--accent,#C98B3E); text-shadow:0 1px 6px rgba(0,0,0,.9);
+.spine-cap-name{
+  font-size:12px; letter-spacing:.02em; color:#DCD6CB;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
-.spine-name{
-  /* the wrap artwork already carries the real title, so this is a screen-reader
-   * label only — printing it again would double the type on the spine */
-  position:absolute; width:1px; height:1px; overflow:hidden;
-  clip:rect(0 0 0 0); white-space:nowrap;
+.spine-cap-count{
+  font-family:var(--font-mono); font-size:9px; letter-spacing:.14em;
+  color:rgba(255,255,255,.34);
 }
-.spine-count{
-  position:relative; z-index:2;
-  font-size:8.5px; letter-spacing:.18em;
-  color:rgba(242,237,226,.5);
-}
+.spine-slot:hover .spine-cap-name{color:var(--accent,#C98B3E)}
 
 @keyframes rattle{
   0%,100%{transform:translate(0,0) rotate(0)}
@@ -873,21 +880,35 @@ code, pre, kbd, samp, .font-mono {
    ============================================================ */
 .book-stage{perspective:1600px;display:grid;place-items:center;min-height:min(56vh,430px);touch-action:pan-y}
 .book3d{
-  position:relative;width:min(230px,52vw);height:min(340px,76vw);
+  /* One cover of the print wrap is 1838x2775 (6.125in x 9.25in at 300dpi),
+     constant on every one of the 636 books. Giving the faces exactly that
+     aspect is what lets `background-size: auto 100%` crop the cover perfectly
+     with no measurement — the scale factor cancels out. The old 230x340 was
+     0.676 against the true 0.6623, so every face was very slightly stretched
+     and the crop drifted. */
+  --bw: min(230px,52vw);
+  position:relative;
+  width:var(--bw);
+  height:calc(var(--bw) / 0.66234);
+  /* --thick is set inline from the wrap's own aspect: real spine width over
+     real cover width. It replaces a hardcoded 38px, which made a 0.19in book
+     and a 0.59in book exactly as fat as each other. */
   transform-style:preserve-3d;transform:rotateY(-28deg) rotateX(6deg);
   cursor:grab;will-change:transform;
 }
 .book3d:active{cursor:grabbing}
 .book3d:focus-visible{outline:2px solid var(--accent,#C98B3E);outline-offset:14px}
 .book3d .face{position:absolute;inset:0;border-radius:2px 4px 4px 2px}
-/* FRONT — the right 48% of the wrap (52%..100%) */
+/* FRONT — the right cover of the wrap, cropped by aspect alone. */
 .book3d .f-front{
-  transform:translateZ(19px);overflow:hidden;
+  transform:translateZ(calc(var(--thick,22px) / 2));overflow:hidden;
   border:1px solid rgba(0,0,0,.55);
   box-shadow:inset 0 0 60px rgba(0,0,0,.35);
   display:flex;align-items:flex-start;padding:16px;
   background-repeat:no-repeat;
-  background-size:208% 100%;
+  /* auto 100% + a face at the cover's own aspect = the exact front cover,
+     whatever width the CDN served. No hardcoded percentage to drift. */
+  background-size:auto 100%;
   background-position:100% 50%;
 }
 .book3d .f-front::after{
@@ -898,27 +919,30 @@ code, pre, kbd, samp, .font-mono {
   position:relative;z-index:2;font-size:8.5px;letter-spacing:.24em;text-transform:uppercase;
   color:#F2EDE2;text-shadow:0 1px 8px rgba(0,0,0,.95);
 }
-/* BACK — the left 48% of the wrap (0%..48%), the real back cover with its
- * blurb and barcode, not an invented board */
+/* BACK — the left cover of the wrap: the real back cover with its blurb and
+ * barcode, not an invented board. */
 .book3d .f-back{
-  transform:translateZ(-19px) rotateY(180deg);
+  transform:translateZ(calc(var(--thick,22px) / -2)) rotateY(180deg);
   border:1px solid rgba(0,0,0,.55);
   background-repeat:no-repeat;
-  background-size:208% 100%;
+  background-size:auto 100%;
   background-position:0% 50%;
   box-shadow:inset 0 0 60px rgba(0,0,0,.35);
 }
-/* SPINE — the middle 4% of the wrap (48%..52%), carrying the real vertical
- * title the cover designer set. 100/4 = 2500%. */
+/* SPINE — the real spine strip, cropped per book. */
 .book3d .f-spine{
-  width:38px;left:-19px;transform:rotateY(-90deg);transform-origin:right center;
+  /* background-size comes in inline, computed from this book's own wrap: the
+     spine runs 1.50%-4.62% of the width depending on page count, so the old
+     fixed 2500% (a 4% spine) was wrong for nearly every book in the catalog. */
+  width:var(--thick,22px);left:calc(var(--thick,22px) / -2);
+  transform:rotateY(-90deg);transform-origin:right center;
   background-repeat:no-repeat;
-  background-size:2500% 100%;
   background-position:50% 50%;
   box-shadow:inset 0 0 24px rgba(0,0,0,.5);
 }
 .book3d .f-pages{
-  width:36px;right:-18px;transform:rotateY(90deg);transform-origin:left center;
+  width:var(--thick,22px);right:calc(var(--thick,22px) / -2);
+  transform:rotateY(90deg);transform-origin:left center;
   background:repeating-linear-gradient(90deg,#EDE6D6 0 1px,#C6BCA6 1px 2.5px);
 }
 .grab-note{

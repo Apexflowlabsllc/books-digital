@@ -27,6 +27,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { SeriesSummary } from '@/lib/types';
+import { useWrapAspect, spineBackgroundSize, spineAspect } from '@/lib/wrapGeometry';
 
 const BUCKET =
   'https://rleowvglnvbraslessch.supabase.co/storage/v1/render/image/public/book-assets';
@@ -41,20 +42,83 @@ function coverUrl(seriesNumber: number, bookNumber: number, w = 220) {
 }
 
 /**
- * The REAL spine.
+ * The REAL spine, at the REAL proportion.
  *
- * cover_wrap.jpg is the print wrap — back cover, spine, front cover laid out
- * left to right at 3851x2775. Edge detection across a scanline puts the spine
- * boundaries at 48% and 52% of the width, which is exactly where a 6x9 spine
- * falls, so the middle 4% of that file is the actual designed spine with its
- * own title treatment on it.
+ * Two things were wrong here. The crop assumed the spine was a fixed 4% of the
+ * wrap; measured across 33 wraps it runs from 1.50% to 4.62%, because a
+ * thicker book has a wider spine while the covers either side never change. So
+ * most spines were showing a slice of the back cover.
  *
- * Rendered as a background sized to 2500% (100/4) and centred, so the element
- * shows only that strip. That is why these read as the real books rather than
- * generic cloth with a sliver of front cover stuck on the edge.
+ * And the strip was then stretched to fill a 90px-wide button. A real 6x9
+ * spine is about 18:1 — squeezing it into 3:1 smeared the designer's vertical
+ * title sideways by a factor of five.
+ *
+ * Now the crop is computed per book from the image's own aspect, and the
+ * element is sized to the spine's true proportion so the artwork is never
+ * distorted. The series name moves out from on top of the art to a caption
+ * underneath, where it is legible and is not competing with the title already
+ * printed on the spine.
  */
 function spineWrapUrl(seriesNumber: number, bookNumber: number) {
-  return `${BUCKET}/s${pad2(seriesNumber)}_b${pad2(bookNumber)}/cover_wrap.jpg?width=1200&quality=82`;
+  return `${BUCKET}/s${pad2(seriesNumber)}_b${pad2(bookNumber)}/cover_wrap.jpg?width=1400&quality=88`;
+}
+
+/**
+ * One spine on the wall.
+ *
+ * Split into its own component so it can read its own wrap's aspect — the
+ * crop is per book, and a hook cannot run inside a loop in the parent.
+ */
+function SeriesSpine({
+  s,
+  n,
+  onLaunch,
+}: {
+  s: SeriesSummary;
+  n: number;
+  onLaunch: (el: HTMLButtonElement, s: SeriesSummary) => void;
+}) {
+  const url = n ? spineWrapUrl(n, 1) : undefined;
+  const aspect = useWrapAspect(url);
+
+  // The spine's own aspect — its width over the wrap's height. Shaping the
+  // element to this is what keeps the artwork undistorted: the element becomes
+  // the shape of the real spine, instead of the spine being stretched to fill
+  // whatever shape the element happened to be.
+  const ratio = spineAspect(aspect);
+
+  return (
+    <figure className="spine-slot">
+      <button
+        type="button"
+        className="series-spine"
+        style={
+          {
+            '--accent': s.color_hex,
+            '--spine-aspect': ratio.toFixed(4),
+          } as React.CSSProperties
+        }
+        aria-label={`${s.name} — ${s.book_count} books`}
+        onClick={(e) => onLaunch(e.currentTarget, s)}
+      >
+        {url ? (
+          <span
+            className="spine-wrap"
+            aria-hidden
+            style={{
+              backgroundImage: `url(${url})`,
+              backgroundSize: spineBackgroundSize(aspect),
+            }}
+          />
+        ) : null}
+      </button>
+      <figcaption className="spine-cap">
+        <span className="spine-cap-no">{pad2(n || 0)}</span>
+        <span className="spine-cap-name">{s.name}</span>
+        <span className="spine-cap-count">{s.book_count}</span>
+      </figcaption>
+    </figure>
+  );
 }
 
 type Props = {
@@ -269,32 +333,9 @@ export function SeriesLaunchWall({ series, numbers }: Props) {
       <canvas ref={blastRef} className="pointer-events-none fixed inset-0 z-[60]" aria-hidden />
 
       <div ref={railRef} className="series-rail">
-        {series.map((s) => {
-          const n = numbers[s.slug];
-          return (
-            <button
-              key={s.slug}
-              type="button"
-              className="series-spine"
-              style={
-                { '--accent': s.color_hex } as React.CSSProperties
-              }
-              aria-label={`${s.name} — ${s.book_count} books`}
-              onClick={(e) => launch(e.currentTarget, s)}
-            >
-              {n ? (
-                <span
-                  className="spine-wrap"
-                  aria-hidden
-                  style={{ backgroundImage: `url(${spineWrapUrl(n, 1)})` }}
-                />
-              ) : null}
-              <span className="spine-no">{n || '·'}</span>
-              <span className="spine-name">{s.name}</span>
-              <span className="spine-count">{s.book_count}</span>
-            </button>
-          );
-        })}
+        {series.map((s) => (
+          <SeriesSpine key={s.slug} s={s} n={numbers[s.slug]} onLaunch={launch} />
+        ))}
       </div>
 
       {open && (

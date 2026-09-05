@@ -1,6 +1,7 @@
 import { PageShell } from '@/components/PageShell';
 import { JsonLdSchema } from '@/components/JsonLdSchema';
 import { SeriesLaunchWall } from '@/components/SeriesLaunchWall';
+import { RotatingBook } from '@/components/RotatingBook';
 import { getCatalog, getSeriesList, getPageSeo } from '@/lib/api';
 import { buildMetadata, fallbackPageSchema } from '@/lib/seo';
 import { TERM_COUNT, PHRASE_COUNT } from '@/lib/encyclopedia';
@@ -13,6 +14,10 @@ export const metadata = buildMetadata({
 });
 
 export const revalidate = 300;
+
+/** Covers come straight from the public bucket, resized on the fly. */
+const COVER_BASE =
+  'https://rleowvglnvbraslessch.supabase.co/storage/v1/render/image/public/book-assets';
 
 /**
  * THE HOME PAGE.
@@ -39,6 +44,7 @@ export default async function HomePage() {
   const series = seriesData?.series ?? [];
   const totalBooks = catalog?.total ?? series.reduce((n, s) => n + s.book_count, 0);
   const numbers = Object.fromEntries(series.map((s, i) => [s.slug, i + 1]));
+  const firstSeries = series[0];
 
   return (
     <PageShell>
@@ -46,7 +52,8 @@ export default async function HomePage() {
 
       {/* ── THE OPENING ─────────────────────────────────────────────── */}
       <section className="relative z-10 px-6 pt-16 pb-8 sm:pt-24">
-        <div className="mx-auto w-full max-w-7xl">
+        <div className="mx-auto grid w-full max-w-7xl items-center gap-12 lg:grid-cols-[1.05fr_.95fr]">
+        <div>
           <p className="font-mono text-[10px] uppercase tracking-[0.36em] text-accent">
             {series.length} series · {totalBooks.toLocaleString()} books · 90 days each
           </p>
@@ -54,7 +61,7 @@ export default async function HomePage() {
           <h1 className="mt-6 font-display text-[clamp(44px,8vw,104px)] font-light leading-[0.94] tracking-[-0.04em] text-ink">
             Books that do
             <br />
-            the <span className="metallic-text italic">hard part</span>
+            the <span className="foil-text italic">hard part</span>
             <br />
             with you.
           </h1>
@@ -83,6 +90,19 @@ export default async function HomePage() {
           <p className="mt-5 font-mono text-[10.5px] text-ink-dim">
             Ebook · audiobook · 6×9 paperback · hardcover — every format, one catalog
           </p>
+        </div>
+
+        {/* A book you can actually pick up. Real CSS 3D — six faces, the cover
+          * wrapping the front, a spine, and a page block. It idles with a slow
+          * turn until touched, which is how a visitor learns it is grabbable. */}
+        {firstSeries && (
+          <RotatingBook
+            coverUrl={`${COVER_BASE}/s01_b01/cover_ebook.jpg?width=520&height=780&resize=cover&quality=82`}
+            title={firstSeries.name}
+            seriesLabel={`Series 1 · Book 01`}
+            accent={firstSeries.color_hex}
+          />
+        )}
         </div>
       </section>
 
@@ -123,7 +143,7 @@ export default async function HomePage() {
               ['Paperback', '$20.09', '6×9 inches, perfect bound, printed and shipped.'],
               ['Hardcover', '$34.99', '6×9 inches, case wrap, printed and shipped.'],
             ].map(([name, price, note]) => (
-              <div key={name} className="bg-bg p-6">
+              <div key={name} className="fmt-tile bg-bg p-6">
                 <dt className="font-mono text-[9.5px] uppercase tracking-[0.2em] text-accent">
                   {name}
                 </dt>
@@ -134,6 +154,56 @@ export default async function HomePage() {
               </div>
             ))}
           </dl>
+        </div>
+      </section>
+
+      {/* ── READ IT BEFORE YOU PAY FOR IT ───────────────────────────
+        * No bookstore lets you read the opening before buying. This is the
+        * actual first page of Book 1, set on paper, with no email wall. */}
+      <section className="relative z-10 px-6 pb-16">
+        <div className="mx-auto w-full max-w-7xl border-t border-line pt-14">
+          <div className="mb-8 flex flex-wrap items-baseline justify-between gap-4">
+            <h2 className="font-display text-3xl font-light text-ink sm:text-4xl">
+              Read it before you pay for it.
+            </h2>
+            <span className="font-mono text-[10.5px] uppercase tracking-[0.2em] text-ink-dim">
+              Opening spread · no email required
+            </span>
+          </div>
+
+          <div className="spread">
+            <div className="leaf">
+              <p className="folio">The Mind Reset Blueprint · Day 1</p>
+              <h3 className="font-display font-light">The day you stop negotiating</h3>
+              <p>
+                There is a conversation you have been having with yourself for years, and you have
+                been losing it. It starts the moment the alarm goes, and it sounds reasonable every
+                single time. Not today. You&rsquo;re tired. You&rsquo;ll start Monday.
+              </p>
+              <p>
+                That conversation is the whole problem. Not your discipline, not your circumstances,
+                not the hour you wake up. The negotiation itself is the thing eating your life,
+                because every round of it teaches you that your word to yourself is a draft rather
+                than a decision.
+              </p>
+            </div>
+            <div className="leaf">
+              <p className="folio">Page two</p>
+              <p>
+                So this book does not begin with motivation. Motivation is what you feel after you
+                act, not before, and building a life on it is building on weather.
+              </p>
+              <p>
+                It begins with removing the negotiation. Ninety days, one decision made once, and a
+                structure that does not ask you how you feel about it each morning. The days you
+                execute while feeling nothing are the days that rebuild you.
+              </p>
+              <p>
+                You do not need to want it. You need to do it while not wanting it. That is the
+                entire mechanism, and everything after this page is how.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { PageShell } from '@/components/PageShell';
 import { HomeHero } from '@/components/HomeHero';
+import { SeriesLaunchWall } from '@/components/SeriesLaunchWall';
 import { BookCard } from '@/components/BookCard';
 import { JsonLdSchema } from '@/components/JsonLdSchema';
 import { Reveal, RevealStagger, RevealItem } from '@/components/Reveal';
@@ -25,7 +26,7 @@ import { empty } from '@/lib/voice';
 import type { Wave } from '@/lib/types';
 
 export const metadata = buildMetadata({
-  title: 'Apex Publishing House — 636 books. 12 series. One war manual library.',
+  title: 'Apex Flow Publishing House — 636 books. 12 series. One war manual library.',
   description:
     '636 books. 12 series. Operator-grade self-help built on 13 years of operations at Spiker Carpet and Tile Care.',
   path: '/',
@@ -103,11 +104,39 @@ export default async function HomePage() {
 
   return (
     <PageShell>
-      <JsonLdSchema bundle={seo} fallback={fallbackPageSchema('/', 'Apex Publishing House')} />
+      <JsonLdSchema bundle={seo} fallback={fallbackPageSchema('/', 'Apex Flow Publishing House')} />
 
       <HomeHero books={heroCovers} totalBooks={totalBooks} />
 
-      {/* Press credibility strip — first trust signal under the hero */}
+      {/* THE WALL — the first thing under the hero, because it IS the store.
+        * Twelve series spines; tap one and it launches, detonates, and opens
+        * that series' entire 53-book shelf. Everything below this is support.
+        *
+        * Series numbers derive from catalog order rather than being hardcoded,
+        * so the cover bucket keys (s01..s12) stay correct if the catalog is
+        * reordered or extended. */}
+      {allSeries.length > 0 && (
+        <section className="relative z-10 px-6 pt-10 sm:pt-14">
+          <div className="mx-auto w-full max-w-7xl">
+            <p className="text-[10px] uppercase tracking-[0.36em] text-accent">The wall</p>
+            <div className="mt-3 flex flex-wrap items-baseline justify-between gap-4">
+              <h2 className="font-display text-4xl text-ink sm:text-5xl">
+                Twelve series. Pick your fight.
+              </h2>
+              <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-dim">
+                {allSeries.length} series ·{' '}
+                {allSeries.reduce((n, s) => n + s.book_count, 0)} books · tap one and stand back
+              </span>
+            </div>
+            <SeriesLaunchWall
+              series={allSeries}
+              numbers={Object.fromEntries(allSeries.map((s, i) => [s.slug, i + 1]))}
+            />
+          </div>
+        </section>
+      )}
+
+      {/* Press credibility strip */}
       <TrustBar />
 
       {/* The Foundation — cinematic chrome-text section */}

@@ -41,7 +41,7 @@ export function ClusterHub({ cluster, books }: ClusterHubProps) {
           {cluster.description}
         </p>
         <p className="mt-3 max-w-2xl text-sm text-ink-mute">
-          Curated from the Apex Publishing House library — direct links to every book
+          Curated from the Apex Flow Publishing House library — direct links to every book
           we publish on this topic. All formats, real prices.
         </p>
       </section>

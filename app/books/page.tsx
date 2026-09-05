@@ -8,9 +8,9 @@ import { buildMetadata, fallbackPageSchema } from '@/lib/seo';
 import { empty } from '@/lib/voice';
 
 export const metadata = buildMetadata({
-  title: 'All books — Apex Publishing House',
+  title: 'All books — Apex Flow Publishing House',
   description:
-    'The full Apex Publishing House library. 636 books across 12 series. Filter by series, wave, format, or voice intensity.',
+    'The full Apex Flow Publishing House library. 636 books across 12 series. Filter by series, wave, format, or voice intensity.',
   path: '/books',
 });
 

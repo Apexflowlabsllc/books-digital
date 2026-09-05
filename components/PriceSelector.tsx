@@ -228,7 +228,7 @@ export function PriceSelector({ book }: PriceSelectorProps) {
           look, but we never click them off our store. */}
       <p className="pt-3 text-[12px] text-ink-mute">
         Print editions also available on Amazon, Barnes &amp; Noble, and your local
-        indie bookstore — search &ldquo;Apex Publishing House&rdquo; anywhere.
+        indie bookstore — search &ldquo;Apex Flow Publishing House&rdquo; anywhere.
       </p>
     </div>
   );

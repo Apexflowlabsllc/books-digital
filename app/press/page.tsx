@@ -6,9 +6,9 @@ import { getPageSeo } from '@/lib/api';
 import { buildMetadata, fallbackPageSchema } from '@/lib/seo';
 
 export const metadata = buildMetadata({
-  title: 'Press — Apex Publishing House',
+  title: 'Press — Apex Flow Publishing House',
   description:
-    'Press kit for Apex Publishing House. Boilerplate, bio, high-res assets, and the answer to "is the rug-cleaning thing real?" — yes.',
+    'Press kit for Apex Flow Publishing House. Boilerplate, bio, high-res assets, and the answer to "is the rug-cleaning thing real?" — yes.',
   path: '/press',
 });
 

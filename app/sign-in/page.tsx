@@ -4,7 +4,7 @@ import { SignInForm } from '@/components/auth/SignInForm';
 import { buildMetadata } from '@/lib/seo';
 
 export const metadata = buildMetadata({
-  title: 'Sign in — Apex Publishing House',
+  title: 'Sign in — Apex Flow Publishing House',
   description:
     'Sign in once. Recognized on every Apex brand subdomain — books, digital, the parent site, all of them.',
   path: '/sign-in',

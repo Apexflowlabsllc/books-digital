@@ -10,7 +10,7 @@ import type { SeriesSummary, Wave } from '@/lib/types';
 import { waveLabel } from '@/lib/utils';
 
 export const metadata = buildMetadata({
-  title: 'The 12 series — Apex Publishing House',
+  title: 'The 12 series — Apex Flow Publishing House',
   description:
     '12 series across 4 waves. Foundation, Pressure, Edge, Apex. Each series picks a different battlefield.',
   path: '/series',

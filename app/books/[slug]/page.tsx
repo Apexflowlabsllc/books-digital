@@ -39,7 +39,7 @@ export async function generateMetadata({ params }: BookRouteProps) {
   const cluster = getClusterBySlug(slug);
   if (cluster) {
     return buildMetadata({
-      title: `${cluster.name} — Apex Publishing House`,
+      title: `${cluster.name} — Apex Flow Publishing House`,
       description: cluster.description,
       path: `/books/${cluster.slug}`,
     });

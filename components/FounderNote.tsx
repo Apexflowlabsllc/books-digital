@@ -84,7 +84,7 @@ export function FounderNote() {
                 Brian Spiker
               </p>
               <p className="mt-2 text-xs uppercase tracking-[0.3em] text-ink-mute">
-                Founder · Apex Publishing House
+                Founder · Apex Flow Publishing House
                 <br />
                 Owner-operator · Spiker Carpet and Tile Care
               </p>

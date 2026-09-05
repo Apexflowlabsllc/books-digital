@@ -4,7 +4,7 @@ import { ForgotPasswordForm } from '@/components/auth/ForgotPasswordForm';
 import { buildMetadata } from '@/lib/seo';
 
 export const metadata = buildMetadata({
-  title: 'Forgot password — Apex Publishing House',
+  title: 'Forgot password — Apex Flow Publishing House',
   description: 'Reset your Apex account password.',
   path: '/forgot-password',
 });

@@ -2,7 +2,7 @@ import { PageShell } from '@/components/PageShell';
 import { CatalogFilters } from '@/components/CatalogFilters';
 import { JsonLdSchema } from '@/components/JsonLdSchema';
 import { getCatalog, getPageSeo } from '@/lib/api';
-import { buildMetadata, fallbackPageSchema } from '@/lib/seo';
+import { buildMetadata, fallbackPageSchema, collectionPageSchema } from '@/lib/seo';
 import { empty } from '@/lib/voice';
 
 export const metadata = buildMetadata({
@@ -38,9 +38,22 @@ export default async function BooksPage() {
   const books = catalog?.books ?? [];
   const seriesCount = new Set(books.map((b) => b.series_slug)).size;
 
+  /* Audited live: this page carried only Organization/Person/WebPage. 636
+   * books listed and no ItemList, CollectionPage or BreadcrumbList — an engine
+   * saw a wall of links with no statement of what the list is. */
+  const collection = collectionPageSchema({
+    path: '/books',
+    name: 'All books',
+    description: `Every Apex Flow Publishing House book: ${books.length} titles across ${seriesCount} series, each a 90-day course.`,
+    items: books.map((b) => ({ url: `/books/${b.slug}`, name: b.title })),
+  });
+
   return (
     <PageShell>
-      <JsonLdSchema bundle={seo} fallback={fallbackPageSchema('/books', 'All books')} />
+      <JsonLdSchema
+        bundle={seo}
+        fallback={[...fallbackPageSchema('/books', 'All books'), ...collection]}
+      />
 
       <section className="container-x pb-2 pt-16 sm:pt-20">
         <p className="font-mono text-[10px] uppercase tracking-[0.36em] text-accent/75">

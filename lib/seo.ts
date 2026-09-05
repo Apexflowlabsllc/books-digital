@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { env } from './env';
-import type { BookDetail, SeriesDetail } from './types';
+import type { BookDetail, Format, SeriesDetail } from './types';
 import { imageProxy } from './utils';
 
 const SITE_NAME = 'Apex Flow Publishing House';
@@ -130,6 +130,27 @@ const SPIKER_BASED_ON = {
   url: SPIKER_URL,
 };
 
+
+/**
+ * Availability must reflect reality, not optimism.
+ *
+ * Every Offer emitted here was hardcoded to `InStock`. Audited against the
+ * catalog: 252 of the 636 books have no purchasable format at all. Their pages
+ * correctly tell a human "Coming soon" — and then told Google, and every
+ * answer engine, that three formats were in stock. Declaring unavailable
+ * products as InStock is a structured-data violation that carries a manual
+ * action, and it makes an AI answer confidently wrong about what can be
+ * bought.
+ *
+ * The `formats` array on BookDetail already carries the truth per format.
+ */
+function availabilityFor(book: BookDetail, format: Format): string {
+  const f = (book.formats ?? []).find((x) => x.format === format);
+  return f?.available
+    ? 'https://schema.org/InStock'
+    : 'https://schema.org/OutOfStock';
+}
+
 export function fallbackBookSchema(book: BookDetail): unknown[] {
   const url = `${env.siteUrl}/books/${book.slug}`;
   const image = imageProxy(book.cover_r2_key);
@@ -187,7 +208,7 @@ export function fallbackBookSchema(book: BookDetail): unknown[] {
             '@type': 'Offer',
             price: book.paperback_direct_price_usd.toFixed(2),
             priceCurrency: 'USD',
-            availability: 'https://schema.org/InStock',
+            availability: availabilityFor(book, 'paperback'),
           },
         }
       : null,
@@ -200,7 +221,7 @@ export function fallbackBookSchema(book: BookDetail): unknown[] {
             '@type': 'Offer',
             price: book.hardcover_direct_price_usd.toFixed(2),
             priceCurrency: 'USD',
-            availability: 'https://schema.org/InStock',
+            availability: availabilityFor(book, 'hardcover'),
           },
         }
       : null,
@@ -211,7 +232,7 @@ export function fallbackBookSchema(book: BookDetail): unknown[] {
         '@type': 'Offer',
         price: book.ebook_direct_price_usd.toFixed(2),
         priceCurrency: 'USD',
-        availability: 'https://schema.org/InStock',
+        availability: availabilityFor(book, 'ebook'),
       },
     },
     {
@@ -221,7 +242,7 @@ export function fallbackBookSchema(book: BookDetail): unknown[] {
         '@type': 'Offer',
         price: book.audiobook_direct_price_usd.toFixed(2),
         priceCurrency: 'USD',
-        availability: 'https://schema.org/InStock',
+        availability: availabilityFor(book, 'audiobook'),
       },
     },
   ].filter(Boolean);
@@ -363,4 +384,116 @@ export function fallbackClusterSchema(
       ],
     },
   ];
+}
+
+/**
+ * COLLECTION PAGES: the biggest structured-data gap on the site.
+ *
+ * Audited live: /books and /series carried only Organization, Person and
+ * WebPage. 636 books listed across twelve series and not one ItemList,
+ * CollectionPage or BreadcrumbList between them — so an engine crawling the
+ * catalog saw a page of links with no statement of what the list IS, what is
+ * in it, or where it sits in the site.
+ *
+ * Book detail pages were already strong (Book, Offer, BreadcrumbList, FAQPage,
+ * Audiobook). This brings the collection pages up to the same standard.
+ *
+ * Deliberately NOT emitted: AggregateRating and Review. The catalog API
+ * returns no rating or review data for any book, and inventing them is both
+ * dishonest and a manual-action risk. Those go in the moment real reviews
+ * exist.
+ */
+export function collectionPageSchema(input: {
+  path: string;
+  name: string;
+  description: string;
+  /** Items in list order. `url` should be site-relative. */
+  items: { url: string; name: string }[];
+  /** Optional breadcrumb trail above this page. */
+  parent?: { path: string; name: string };
+}): unknown[] {
+  const site = env.siteUrl;
+  const abs = (p: string) => `${site}${p.startsWith('/') ? p : `/${p}`}`;
+
+  const crumbs: { name: string; path: string }[] = [{ name: 'Home', path: '/' }];
+  if (input.parent) crumbs.push({ name: input.parent.name, path: input.parent.path });
+  crumbs.push({ name: input.name, path: input.path });
+
+  return [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      '@id': `${abs(input.path)}#collection`,
+      url: abs(input.path),
+      name: input.name,
+      description: input.description,
+      isPartOf: { '@id': `${site}/#website` },
+      about: { '@id': `${site}/#organization` },
+      mainEntity: {
+        '@type': 'ItemList',
+        name: input.name,
+        numberOfItems: input.items.length,
+        itemListOrder: 'https://schema.org/ItemListOrderAscending',
+        itemListElement: input.items.map((it, i) => ({
+          '@type': 'ListItem',
+          position: i + 1,
+          url: abs(it.url),
+          name: it.name,
+        })),
+      },
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: crumbs.map((c, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name: c.name,
+        item: abs(c.path),
+      })),
+    },
+  ];
+}
+
+/**
+ * EVERY BOOK IS A 90-DAY COURSE — so say so in a way a machine can read.
+ *
+ * The store's whole claim is that these are not books with a plan bolted on
+ * but sequenced 90-day programmes. Nothing in the markup said that, which
+ * meant the catalog could never surface for "90 day discipline course" or
+ * "structured programme to stop procrastinating" — queries where the intent
+ * matches this product far better than "self help book" does.
+ *
+ * Course + hasCourseInstance with a real repeatCount and duration states it
+ * plainly. Requires no data the catalog does not already have.
+ */
+export function bookCourseSchema(book: {
+  slug: string;
+  title: string;
+  description?: string;
+  series_name?: string;
+}): unknown {
+  const site = env.siteUrl;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Course',
+    '@id': `${site}/books/${book.slug}#course`,
+    name: `${book.title} — 90-day programme`,
+    description:
+      book.description ??
+      `A structured 90-day programme. Ninety numbered days, each with one truth, one action and a reflection.`,
+    url: `${site}/books/${book.slug}`,
+    provider: { '@id': `${site}/#organization` },
+    inLanguage: 'en',
+    isAccessibleForFree: false,
+    educationalLevel: 'Beginner to advanced',
+    teaches: book.series_name ?? undefined,
+    hasCourseInstance: {
+      '@type': 'CourseInstance',
+      courseMode: 'https://schema.org/SelfPaced',
+      courseWorkload: 'PT20M',
+      repeatCount: 90,
+      repeatFrequency: 'Daily',
+    },
+  };
 }

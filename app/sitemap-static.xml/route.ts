@@ -2,6 +2,7 @@ import { env } from '@/lib/env';
 import { urlsetXml } from '@/lib/xml';
 import { CLUSTERS } from '@/lib/clusters';
 import { PROBLEM_PAGES } from '@/lib/problems';
+import { BLOG_POSTS } from '@/lib/blog';
 
 export const revalidate = 3600;
 
@@ -20,6 +21,7 @@ const STATIC_PATHS: Array<{ path: string; priority: number; changefreq: string }
   { path: '/pulse', priority: 0.5, changefreq: 'monthly' },
   { path: '/problems', priority: 0.85, changefreq: 'weekly' },
   { path: '/encyclopedia', priority: 0.8, changefreq: 'weekly' },
+  { path: '/blog', priority: 0.8, changefreq: 'weekly' },
 ];
 
 // Topic cluster hubs — high-intent SEO landing pages. Each carries an
@@ -40,11 +42,18 @@ const PROBLEM_PATHS = PROBLEM_PAGES.map((p) => ({
   changefreq: 'monthly',
 }));
 
+/* Same restraint as problem pages: one entry per real, sourced blog post. */
+const BLOG_PATHS = BLOG_POSTS.map((p) => ({
+  path: `/blog/${p.slug}`,
+  priority: 0.75,
+  changefreq: 'monthly',
+}));
+
 export function GET() {
   const siteUrl = env.siteUrl.replace(/\/$/, '');
   const today = new Date().toISOString().slice(0, 10);
 
-  const entries = [...STATIC_PATHS, ...CLUSTER_PATHS, ...PROBLEM_PATHS].map((s) => ({
+  const entries = [...STATIC_PATHS, ...CLUSTER_PATHS, ...PROBLEM_PATHS, ...BLOG_PATHS].map((s) => ({
     loc: `${siteUrl}${s.path}`,
     lastmod: today,
     priority: s.priority,

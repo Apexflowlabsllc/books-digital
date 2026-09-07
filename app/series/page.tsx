@@ -7,7 +7,7 @@ import { getPageSeo, getSeriesList } from '@/lib/api';
 import { buildMetadata, fallbackPageSchema } from '@/lib/seo';
 import { empty } from '@/lib/voice';
 import type { SeriesSummary, Wave } from '@/lib/types';
-import { waveLabel } from '@/lib/utils';
+import { seriesCountLabel, waveLabel } from '@/lib/utils';
 
 export const metadata = buildMetadata({
   title: 'The 12 series — Apex Flow Publishing House',
@@ -64,7 +64,12 @@ export default async function SeriesPage() {
           <div className="mb-4 flex flex-wrap items-baseline justify-between gap-4">
             <h2 className="font-display text-2xl text-ink">The wall</h2>
             <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-dim">
-              {list.length} series · {list.reduce((n, s) => n + s.book_count, 0)} books · tap one and stand back
+              {list.length} series ·{' '}
+              {seriesCountLabel(
+                list.reduce((n, s) => n + s.book_count, 0),
+                list.reduce((n, s) => n + s.books_available, 0),
+              )}{' '}
+              · tap one and stand back
             </span>
           </div>
           <SeriesLaunchWall series={list} numbers={numbers} />
@@ -86,8 +91,11 @@ export default async function SeriesPage() {
                   <div className="mb-6 flex items-baseline justify-between">
                     <h2 className="font-display text-2xl text-ink md:text-3xl">{waveLabel(w)}</h2>
                     <span className="eyebrow text-ink-mute">
-                      {inWave.length} series · {inWave.reduce((sum, s) => sum + s.book_count, 0)}{' '}
-                      books
+                      {inWave.length} series ·{' '}
+                      {seriesCountLabel(
+                        inWave.reduce((sum, s) => sum + s.book_count, 0),
+                        inWave.reduce((sum, s) => sum + s.books_available, 0),
+                      )}
                     </span>
                   </div>
                   <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

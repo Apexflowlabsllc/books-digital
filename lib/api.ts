@@ -108,6 +108,7 @@ interface RawSeriesSummary {
   wave: Wave;
   promise: string;
   bookCount: number;
+  booksAvailable?: number;
 }
 
 interface RawBookDetail {
@@ -179,6 +180,7 @@ function adaptSeriesSummary(raw: RawSeriesSummary): SeriesSummary {
     color_hex: raw.color,
     wave: raw.wave,
     book_count: raw.bookCount,
+    books_available: raw.booksAvailable ?? 0,
     intensity: 5,
     sample_title: raw.fullTitle,
     short_desc: raw.promise,

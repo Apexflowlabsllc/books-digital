@@ -57,6 +57,13 @@ export function priceDisplay(p: FormatPrice | undefined): string {
   return `$${(p.price_cents / 100).toFixed(2)}`;
 }
 
+/** "53 books" once a series is fully real; "36 of 53 books" while it's still
+ *  filling in. Never just the planned total on its own once it stops being true. */
+export function seriesCountLabel(planned: number, available: number): string {
+  if (available >= planned) return `${planned} books`;
+  return `${available} of ${planned} books`;
+}
+
 const WAVE_LABEL: Record<Wave, string> = {
   1: 'Wave I — Foundation',
   2: 'Wave II — Pressure',

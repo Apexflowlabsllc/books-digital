@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import type { SeriesSummary } from '@/lib/types';
-import { intensityGlyphs, waveLabel } from '@/lib/utils';
+import { intensityGlyphs, seriesCountLabel, waveLabel } from '@/lib/utils';
 
 interface SeriesCardProps {
   series: SeriesSummary;
@@ -51,7 +51,7 @@ export function SeriesCard({ series }: SeriesCardProps) {
             {series.name}
           </h3>
           <p className="mt-2 text-sm text-ink-dim">
-            {series.book_count} books · {intensityGlyphs(series.intensity)}
+            {seriesCountLabel(series.book_count, series.books_available)} · {intensityGlyphs(series.intensity)}
           </p>
         </div>
 

@@ -5,7 +5,7 @@ import { BookCard } from '@/components/BookCard';
 import { JsonLdSchema } from '@/components/JsonLdSchema';
 import { getSeries, getSeriesSeo } from '@/lib/api';
 import { buildMetadata, fallbackSeriesSchema } from '@/lib/seo';
-import { intensityGlyphs, waveLabel } from '@/lib/utils';
+import { intensityGlyphs, seriesCountLabel, waveLabel } from '@/lib/utils';
 import { empty } from '@/lib/voice';
 
 interface SeriesRouteProps {
@@ -82,7 +82,7 @@ export default async function SeriesDetailPage({ params }: SeriesRouteProps) {
               <p className="mt-6 max-w-2xl text-ink-dim md:text-lg">{series.long_desc}</p>
 
               <div className="mt-8 flex flex-wrap items-center gap-6 text-sm text-ink-dim">
-                <span>{series.book_count} books</span>
+                <span>{seriesCountLabel(series.book_count, series.books_available)}</span>
                 <span aria-hidden>·</span>
                 <span>One chapter per day · 90 days per book</span>
               </div>

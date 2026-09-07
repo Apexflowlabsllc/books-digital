@@ -27,6 +27,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { SeriesSummary } from '@/lib/types';
+import { seriesCountLabel } from '@/lib/utils';
 
 const BUCKET =
   'https://rleowvglnvbraslessch.supabase.co/storage/v1/render/image/public/book-assets';
@@ -137,7 +138,7 @@ function SeriesSpine({
             '--thick': 'calc(var(--cw) * 0.0805)',
           } as React.CSSProperties
         }
-        aria-label={`${s.name} — ${s.book_count} books`}
+        aria-label={`${s.name} — ${seriesCountLabel(s.book_count, s.books_available)}`}
         onClick={(e) => onLaunch(e.currentTarget, s)}
       >
         <span className="wb-3d">
@@ -154,7 +155,7 @@ function SeriesSpine({
       </button>
       <figcaption className="shelf-cap">
         <span className="shelf-cap-name">{s.name}</span>
-        <span className="shelf-cap-count">{s.book_count} books</span>
+        <span className="shelf-cap-count">{seriesCountLabel(s.book_count, s.books_available)}</span>
       </figcaption>
     </figure>
   );
@@ -434,7 +435,7 @@ export function SeriesLaunchWall({ series, numbers }: Props) {
         >
           <header className="series-panel-head">
             <div>
-              <p className="series-kicker">{open.book_count} books · 90 days each</p>
+              <p className="series-kicker">{seriesCountLabel(open.book_count, open.books_available)} · 90 days each</p>
               <h2 className="series-title">{open.name}</h2>
             </div>
             <button type="button" className="series-close" onClick={() => setOpen(null)}>

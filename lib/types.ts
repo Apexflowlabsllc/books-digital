@@ -105,7 +105,13 @@ export interface SeriesSummary {
   glyph_svg?: string;
   color_hex: string;
   wave: Wave;
+  // Planned/reserved total (ISBNs, titles) — always 53. Layouts that render
+  // one tile per planned slot use this.
   book_count: number;
+  // What's actually readable today, computed live from is_authentic on the
+  // backend. Use this anywhere the copy claims "you get N books" — book_count
+  // there was the same shape of lie the old "636 audiobooks" claim was.
+  books_available: number;
   intensity: number; // 1-9
   sample_title: string;
   short_desc?: string;

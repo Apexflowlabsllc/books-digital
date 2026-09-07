@@ -25,7 +25,7 @@ import { useEffect, useRef } from 'react';
 
 const MAX_RIPPLES = 10;
 
-export function LiquidMetal({ accent = [0.79, 0.54, 0.24] as [number, number, number] }) {
+export function LiquidMetal({ accent = [0.80, 0.50, 0.20] as [number, number, number] }) {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -82,9 +82,13 @@ void main(){
   // Raising the mix threshold to .34 keeps most of the field near-black, while
   // the fold highlight goes up to .52 so the veins carry the drama instead of
   // the midtones. Body text sits on the dark, not on the bright.
-  vec3 dark=vec3(.020,.019,.023);
-  vec3 metal=vec3(.325,.28,.205);
-  vec3 lit=vec3(.94,.90,.82);
+  // Apex Flow Publishing House — bronze. Deliberately its own color in the
+  // family: warmer/browner than Health's clean gold, not a repeat of it.
+  // Brian's ruling: every property needs a genuinely separate color so the
+  // hub reads as twelve distinct pours, not overlapping hues.
+  vec3 dark=vec3(.035,.022,.012);
+  vec3 metal=vec3(.65,.40,.18);
+  vec3 lit=vec3(.95,.70,.40);
   vec3 col=mix(dark,metal,smoothstep(.34,.80,f));
   col=mix(col,lit,band2*.50);
   col+=ACC*pow(1.-f,3.5)*.38;

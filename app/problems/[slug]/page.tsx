@@ -111,6 +111,15 @@ export default async function ProblemPage({ params }: { params: Promise<{ slug: 
           {p.entry.definition}
         </p>
 
+        {/* The one-line gut-punch version — the same fact the books themselves
+         *  land in a single hard sentence. Only rendered when the entry
+         *  actually carries one; never filled in generically. */}
+        {p.entry.hook && (
+          <p className="mt-6 max-w-[58ch] font-display text-[20px] font-light leading-snug text-accent sm:text-[24px]">
+            {p.entry.hook}
+          </p>
+        )}
+
         <div className="mt-8 max-w-[62ch] border-l-2 border-accent/60 pl-5">
           <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-accent">
             What to do about it

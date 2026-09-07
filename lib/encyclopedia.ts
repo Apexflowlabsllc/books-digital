@@ -31,6 +31,11 @@ export type EncyclopediaEntry = {
   definition: string;
   action: string;
   saidAs: string[];
+  /** The one-line gut-punch version of the definition — the same fact the
+   *  books themselves land in one aggressive sentence. Optional: only entries
+   *  mined directly from real chapter text carry one, so this never becomes
+   *  a template filled in for its own sake. */
+  hook?: string;
 };
 
 export const ENCYCLOPEDIA: EncyclopediaEntry[] = [
@@ -867,6 +872,94 @@ export const ENCYCLOPEDIA: EncyclopediaEntry[] = [
       'stuck fighting reality',
       'I keep wishing it were different',
       'letting go of what I cannot change',
+    ],
+  },
+
+  /* ── Mined directly from the catalog's own chapter text, not written to
+   * fill a template. Each of these is a real, recurring mechanism the 90-day
+   * books name and work — the phrasing below is theirs, not invented for
+   * this page. */
+
+  {
+    term: 'Undefined standard',
+    also: 'vague goals',
+    definition:
+      'An undefined standard is a goal with no line you can point to and say "past this, I did it." "Get healthier" and "be more disciplined" are undefined — there is no day you clearly failed, so there is also no day you clearly won. A floor ends the negotiation; an undefined standard just lets the mood vote every morning.',
+    action: 'Rewrite one goal as a number you either hit or missed today. No adjectives.',
+    hook: 'The problem was never that you lack discipline. The problem is you never wrote down what discipline would even mean by five o’clock today.',
+    saidAs: [
+      'I never know if I actually did enough',
+      'my goals are too vague to fail or succeed at',
+      'how do I know if I am making progress',
+      'why do I keep moving the goalposts on myself',
+      'I say I want to be better but better than what',
+      'how to set a goal I cannot talk my way out of',
+      'I always find a way to tell myself today still counted',
+    ],
+  },
+  {
+    term: 'Productive procrastination',
+    also: 'planning as avoidance',
+    definition:
+      'Productive procrastination is doing real, effortful work that is not the work that matters, because it produces the feeling of progress without the risk of failing at the thing you actually need to do. Reorganizing the plan, color-coding the spreadsheet, and researching the "best" way to start are the most common versions — they look like diligence and function as a hiding place.',
+    action: 'Before you plan anything else today, do ten unplanned minutes of the actual task first.',
+    hook: 'You spent two hours on the font. The font did not cut your debt.',
+    saidAs: [
+      'I spend all my time planning and never doing',
+      'why do I organize instead of work',
+      'I feel productive but nothing gets finished',
+      'I have a graveyard of spreadsheets and no results',
+      'researching how to start instead of starting',
+      'I confuse being busy with making progress',
+      'why does preparing to work feel like working',
+    ],
+  },
+  {
+    term: 'Emotional inventory management',
+    also: 'over-functioning in shallow relationships',
+    definition:
+      'Emotional inventory management is spending real attention and energy managing the feelings of people who take up space in your life without actually being close to you — the acquaintance who guilt-trips, the group chat that never says anything, the relative who only calls with a request. It crowds out the small number of relationships that would actually catch you.',
+    action: 'Name the three people who would bail you out of jail. Notice how long it has been since you called any of them, and call one today.',
+    hook: 'You have a hundred and fifty people in your phone and three of them would bail you out of jail. You know which three. You have not called them in a month.',
+    saidAs: [
+      'I am close to nobody but exhausted by everyone',
+      'why do I have so many acquaintances and no real friends',
+      'I manage everyone else’s feelings and nobody manages mine',
+      'I feel guilty for not calling people I do not even like',
+      'how do I stop being everyone’s emotional support with nothing left for myself',
+      'I keep the wrong people close and take the right ones for granted',
+    ],
+  },
+  {
+    term: 'Pre-finish relapse urge',
+    also: 'backsliding before the finish line',
+    definition:
+      'The pre-finish relapse urge is the pull to abandon a commitment in its final stretch, right when the old pattern would be easiest to justify and hardest to notice. It rarely arrives as a dramatic collapse — it shows up as one small, reasonable-sounding exception a day or two before the finish line, precisely when momentum feels safest to spend.',
+    action: 'In the last few days of anything you are finishing, expect one plausible-sounding exception to show up, and treat it as the test, not a reasonable request.',
+    hook: 'This is the moment you were warned about. Not a dramatic collapse — a four-second flicker where the old reflex says it costs nothing. It cost you three years last time.',
+    saidAs: [
+      'why do I want to quit right before I finish something',
+      'I sabotage myself right at the end',
+      'the closer I get to done the more I want to stop',
+      'why does the last mile feel like the hardest one',
+      'I gave up right before it would have worked',
+      'how do I stay disciplined in the final stretch',
+    ],
+  },
+  {
+    term: 'Complacency plateau',
+    also: 'the comfortable stall',
+    definition:
+      'The complacency plateau is the stretch where standing still has gone on long enough that it starts to feel like peace instead of what it is — a stall. The body and the nervous system adapt to the new, lower baseline, which is exactly what makes it dangerous: it stops registering as a problem.',
+    action: 'Name one metric that has not moved in 30 days. That is the plateau. Pick the smallest possible action that would move it this week.',
+    hook: 'Nobody warns you that the plateau is not a gentle rest stop. It is a trap designed by your own biology.',
+    saidAs: [
+      'I have not made progress in months and I do not know why',
+      'I got comfortable and stopped improving',
+      'how do I tell the difference between resting and stalling',
+      'why does standing still start to feel okay',
+      'I plateaued and do not know how to get moving again',
+      'how do I break out of a rut that does not feel like a rut',
     ],
   },
 ];

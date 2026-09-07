@@ -8,12 +8,15 @@ import { TERM_COUNT, PHRASE_COUNT } from '@/lib/encyclopedia';
 import { catalogPrices } from '@/lib/pricing';
 import { catalogFacts } from '@/lib/catalogFacts';
 
-export const metadata = buildMetadata({
-  title: 'Apex Flow Publishing House',
-  description:
-    'Twelve series. A 636-title programme, releasing book by book. Every one a 90-day course. Pick your fight and the shelf opens.',
-  path: '/',
-});
+export async function generateMetadata() {
+  const catalog = await getCatalog();
+  const facts = catalogFacts(catalog?.books ?? []);
+  return buildMetadata({
+    title: 'Apex Flow Publishing House',
+    description: `${facts.titlesAvailable} books live now, more releasing book by book. Every one a real 90-day course. Pick your fight and the shelf opens.`,
+    path: '/',
+  });
+}
 
 export const revalidate = 300;
 
@@ -29,7 +32,8 @@ const COVER_BASE =
  * foundation, launch offer, featured carousel, marquee, reviews, founder note,
  * ecosystem — before a visitor reached anything they could act on.
  *
- * The catalog IS the pitch here: twelve series, 636 books, every one a 90-day
+ * The catalog IS the pitch here: twelve series, a real number of books live
+ * right now (not the full 636-title programme yet), every one a 90-day
  * course. So the page is the wall, the proof, and the way in. Nothing else
  * competes with it above the fold.
  *

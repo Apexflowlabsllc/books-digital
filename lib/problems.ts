@@ -44,6 +44,11 @@ const LEAD = [
   'Comfort zone',
   'Willpower depletion',
   'Perfectionism',
+  'Undefined standard',
+  'Productive procrastination',
+  'Emotional inventory management',
+  'Pre-finish relapse urge',
+  'Complacency plateau',
 ];
 
 export function problemSlug(term: string): string {

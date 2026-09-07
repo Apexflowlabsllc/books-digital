@@ -19,6 +19,9 @@ export async function GET(req: Request) {
   const tag = url.searchParams.get('tag');
   if (!tag) return NextResponse.json({ error: 'tag query param required' }, { status: 400 });
 
-  revalidateTag(tag);
+  // { expire: 0 } — never serve stale here. This route is called right after
+  // a backend catalog sync specifically to make the change visible now, not
+  // eventually; the "max" stale-while-revalidate profile would defeat that.
+  revalidateTag(tag, { expire: 0 });
   return NextResponse.json({ revalidated: tag, now: Date.now() });
 }

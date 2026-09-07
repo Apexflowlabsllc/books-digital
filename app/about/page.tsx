@@ -62,7 +62,7 @@ export default async function AboutPage() {
           <div className="grid gap-4 md:grid-cols-3">
             <Block
               title="The library"
-              body="A 636-title library across 12 series, releasing book by book. Pick your fight."
+              body="An expanding library across 12 series, releasing book by book. Pick your fight."
               href="/books"
             />
             <Block

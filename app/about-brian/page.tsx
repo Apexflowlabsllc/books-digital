@@ -6,11 +6,12 @@ import { CountUp } from '@/components/CountUp';
 import { Reveal } from '@/components/Reveal';
 import { getCatalog, getPageSeo } from '@/lib/api';
 import { buildMetadata, fallbackPageSchema } from '@/lib/seo';
+import { catalogFacts } from '@/lib/catalogFacts';
 
 export const metadata = buildMetadata({
   title: 'Brian Spiker — carpet guy since 2013, writes books at night',
   description:
-    'Brian Spiker. Cleans carpets for a living — Spiker Carpet and Tile Care, since 2013. Carpet cleaning, upholstery, tile and grout, pet odors with enzyme treatment. Writing a 636-title library in between jobs.',
+    'Brian Spiker. Cleans carpets for a living — Spiker Carpet and Tile Care, since 2013. Carpet cleaning, upholstery, tile and grout, pet odors with enzyme treatment. Writing an expanding self-help library in between jobs.',
   path: '/about-brian',
 });
 
@@ -18,11 +19,16 @@ export const revalidate = 3600;
 
 export default async function AboutBrianPage() {
   const [catalog, seo] = await Promise.all([
-    getCatalog({ limit: 1 }),
+    getCatalog(),
     getPageSeo('/about-brian'),
   ]);
 
-  const totalBooks = catalog?.total ?? 0;
+  /* "Books shipped" was reading catalog.total — the full 636-row catalog,
+   * not what's actually finished — so it showed 636 under a "Live count"
+   * label. titlesAvailable is the real figure. */
+  const facts = catalogFacts(catalog?.books ?? []);
+  const totalBooks = facts.titlesAvailable;
+  const totalPlanned = facts.titlesPlanned || 636;
 
   return (
     <PageShell>
@@ -69,7 +75,7 @@ export default async function AboutBrianPage() {
             )}
           </StatBlock>
           <StatBlock label="Books planned" sub="12 series × 53 books">
-            <CountUp to={636} className="font-display text-6xl text-accent md:text-7xl" />
+            <CountUp to={totalPlanned} className="font-display text-6xl text-accent md:text-7xl" />
           </StatBlock>
         </Reveal>
       </section>
@@ -113,7 +119,7 @@ export default async function AboutBrianPage() {
               thought.
             </p>
             <p>
-              Now there&apos;s 636 titles planned. 12 series. Hundreds are out already, and the rest land book by book.
+              Now there&apos;s {totalPlanned} titles planned across 12 series. {totalBooks} are out already, and the rest land book by book.
             </p>
           </div>
         </div>

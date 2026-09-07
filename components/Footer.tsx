@@ -82,7 +82,7 @@ export function Footer() {
             </p>
           </div>
           <p className="mt-5 text-sm font-light leading-[1.7] text-ink-dim max-w-xs">
-            A 636-title library across 12 series, releasing book by book. Written by Brian Spiker —
+            An expanding library across 12 series, releasing book by book. Written by Brian Spiker —
             founder of{' '}
             <a
               href="https://spikercarpetandtilecare.com"

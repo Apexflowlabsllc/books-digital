@@ -36,14 +36,15 @@ export function seriesNumberFromBook(book: BookSummary | BookDetail): number | n
   return n ?? null;
 }
 
-// First series that hasn't been written yet. S06 (Unstoppable Blueprint)
-// and everything after gets the Coming Soon treatment. Flip this number
-// up as Brian finishes each series.
-export const FIRST_COMING_SOON_SERIES = 6;
-
+// Coming-soon used to be a hard series-number cutoff (S06+), but the
+// manuscript pipeline no longer finishes a series all at once — S06-S08
+// are now fully real while S01/S03/S04/S05 are still partial and S09-S12
+// haven't started. is_authentic is the real, per-book signal (synced from
+// actual storage by scripts/apex/sync-authentic-from-storage.mjs on the
+// backend) — trust that instead of guessing from series number.
 export function isComingSoonBook(book: BookSummary | BookDetail): boolean {
-  const n = seriesNumberFromBook(book);
-  return n !== null && n >= FIRST_COMING_SOON_SERIES;
+  const authentic = (book as BookDetail).is_authentic;
+  return authentic !== true;
 }
 
 /* Wave → planned drop window. Brian's roadmap from the homepage

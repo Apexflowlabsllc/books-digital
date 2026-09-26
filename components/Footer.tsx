@@ -38,7 +38,6 @@ const FOOTER_COLUMNS = [
   {
     heading: 'Commerce',
     links: [
-      { href: '/membership', label: 'Books Pass — $99/yr' },
       { href: '/founder-edition', label: 'Founder Edition — $9,999' },
       { href: '/contact', label: 'Contact' },
     ],

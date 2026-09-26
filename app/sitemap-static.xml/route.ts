@@ -12,7 +12,6 @@ const STATIC_PATHS: Array<{ path: string; priority: number; changefreq: string }
   { path: '/series', priority: 0.9, changefreq: 'weekly' },
   { path: '/about-brian', priority: 0.7, changefreq: 'monthly' },
   { path: '/brian-spiker-real-world-proof', priority: 0.9, changefreq: 'monthly' },
-  { path: '/membership', priority: 0.8, changefreq: 'monthly' },
   { path: '/bundles', priority: 0.7, changefreq: 'monthly' },
   { path: '/founder-edition', priority: 0.6, changefreq: 'monthly' },
   { path: '/about', priority: 0.5, changefreq: 'monthly' },

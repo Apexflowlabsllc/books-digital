@@ -21,7 +21,6 @@ const FACTS = [
   ['Library size', '636-title programme · 12 series · 53 titles per series · releasing book by book'],
   ['Cadence', 'One short chapter per day · 90 chapters per book'],
   ['Pricing', 'Ebook $6.99 · Paperback $14.99 · Hardcover $24.99 · Audiobook $14.99'],
-  ['Insider Pass', '$99 / year — the whole library as it releases, audio as it is narrated, 20% off every Apex brand'],
   ['Founder Edition', '$9,999 — 100 founding spots ever · application only'],
   ['Audiobook narration', 'AI-narrated · supervised by Brian'],
 ];

@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Geist, Fraunces, JetBrains_Mono } from 'next/font/google';
 import { env } from '@/lib/env';
 import dynamic from 'next/dynamic';
+import Script from 'next/script';
 import { DeferUntilIdle } from '@/components/DeferUntilIdle';
 
 /* Split out of the first-load bundle. None of these paint anything a visitor
@@ -127,6 +128,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               anytime, shows live countdown. */}
           <LaunchPill />
         </DeferUntilIdle>
+        {/* Apex Flow Arcade: the Play button (four free games, one score, one Apex ID), lifted so it clears the sale pill in this corner. Loads after the page is idle. */}
+        <Script src="https://www.apexflowlabs.com/embed/apex-arcade.js" data-side="left" data-bottom="92" strategy="lazyOnload" />
       </body>
     </html>
   );

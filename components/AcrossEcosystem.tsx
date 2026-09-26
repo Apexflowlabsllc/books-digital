@@ -155,8 +155,7 @@ export function AcrossEcosystem() {
             </h2>
           </div>
           <p className="md:col-span-5 max-w-[44ch] text-[17px] leading-[1.55] text-white">
-            When you join the Apex Books Insider Pass, you get a 20% discount across every sister
-            brand. One customer, twelve doors.
+            One customer, twelve doors. Every sister brand is one click away.
           </p>
         </div>
 

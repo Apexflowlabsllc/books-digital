@@ -19,7 +19,6 @@ const LINKS = [
   { href: '/series', label: 'Series' },
   { href: '/about-brian', label: 'Brian' },
   { href: '/brian-spiker-real-world-proof', label: 'Proof' },
-  { href: '/membership', label: 'Pass' },
   { href: '/bundles', label: 'Bundles' },
   /* Locked rule: every Apex Flow store carries Pulse. */
   { href: '/pulse', label: 'Pulse' },

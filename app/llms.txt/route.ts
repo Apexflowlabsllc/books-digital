@@ -70,7 +70,6 @@ treatment for the oils that bake wet-dog smell into carpet fibers.
 - ${url}/series — all 12 series grouped into 4 waves
 - ${url}/about-brian — founder bio (entity hub)
 - ${url}/brian-spiker-real-world-proof — verified receipts (Spiker reviews + 13-year operating proof)
-- ${url}/membership — Books Pass at $99/yr
 - ${url}/bundles — series bundles
 - ${url}/founder-edition — $9,999 application-only tier
 

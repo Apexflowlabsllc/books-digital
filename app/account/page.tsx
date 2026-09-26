@@ -7,7 +7,7 @@ import { buildMetadata } from '@/lib/seo';
 
 export const metadata = buildMetadata({
   title: 'Your account — Apex Flow Publishing House',
-  description: 'Your Apex Flow Publishing House account — library, downloads, Insider Pass status and order history in one place.',
+  description: 'Your Apex Flow Publishing House account — library, downloads and order history in one place.',
   path: '/account',
 });
 
@@ -41,9 +41,8 @@ export default async function AccountPage() {
           <span className="metallic-text">Hey,</span> {user.email}.
         </h1>
         <p className="mt-4 max-w-2xl text-sm leading-[1.65] text-ink-dim md:text-base">
-          This is your Apex account home. Your library, your orders, your audio. Right
-          now it&rsquo;s mostly empty — the Pass + paywall ship next, after which your
-          purchased books and audiobooks will show up here.
+          This is your Apex account home. Your library, your orders, your audio. Your
+          purchased books and audiobooks show up here.
         </p>
       </section>
 
@@ -51,12 +50,12 @@ export default async function AccountPage() {
         <div className="grid gap-6 md:grid-cols-3">
           <div className="border border-line bg-bg-subtle p-6">
             <p className="eyebrow mb-2">Library</p>
-            <p className="font-display text-2xl text-ink">Coming with the Pass</p>
+            <p className="font-display text-2xl text-ink">Your books</p>
             <p className="mt-2 text-sm text-ink-dim">
-              The whole library, plus every audiobook as it is narrated, once you have an active Insider Pass.
+              Books and audiobooks you buy will be listed here.
             </p>
-            <Link href="/membership" className="cta-secondary mt-5 inline-flex">
-              <span>See the Pass</span>
+            <Link href="/books" className="cta-secondary mt-5 inline-flex">
+              <span>Browse the catalog</span>
             </Link>
           </div>
 

@@ -8,7 +8,7 @@ import { buildMetadata, fallbackPageSchema } from '@/lib/seo';
 export const metadata = buildMetadata({
   title: 'Founder Edition — $9,999 · 100 spots ever · application only',
   description:
-    'Founder Edition — $9,999. Signed 636-book hardcover set, Apex Vault membership across every Apex store, one-hour private call with Brian, your name in the next book’s Founding Operators appendix. Only 100 spots ever sold. Application only.',
+    'Founder Edition — $9,999. Signed 636-book hardcover set, one-hour private call with Brian, your name in the next book’s Founding Operators appendix. Only 100 spots ever sold. Application only.',
   path: '/founder-edition',
 });
 
@@ -21,10 +21,6 @@ const DELIVERABLES = [
   {
     title: 'The 12-Series Complete Hardcover Set',
     body: 'All 636 titles, hardcover, signed by Brian, shipped in a custom case as each one releases. Yes, all 636. Yes, the case is heavy. Yes, you need a shelf.',
-  },
-  {
-    title: 'Apex Vault membership',
-    body: 'The top tier, across the whole ecosystem. Books, Digital, and every Apex storefront we launch — you’re in, at founding rate, for as long as you keep the membership active.',
   },
   {
     title: 'One-Hour Call With Brian',
@@ -153,11 +149,11 @@ export default async function FounderEditionPage() {
             />
             <Faq
               q="Do I get the audiobook versions too?"
-              a="Yes. The Apex Vault membership covers every audiobook across every Apex store while it is active. The hardcover set is the physical version; the membership is the audio + future books."
+              a="The hardcover set is the physical version of every title. Audiobooks are sold separately in the catalog."
             />
             <Faq
               q="When does my number ship?"
-              a="Book by book, as each title releases. The shelf and signature plate ship after acceptance. The Apex Vault membership is active the same day you’re accepted."
+              a="Book by book, as each title releases. The shelf and signature plate ship after acceptance."
             />
             <Faq
               q="Can I email Brian before I apply?"

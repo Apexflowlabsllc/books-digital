@@ -21,6 +21,10 @@ const config: NextConfig = {
       },
     ],
   },
+  // Memberships were withdrawn from every Apex site (2026-09-25). Temporary redirect: a membership may come back in another form.
+  async redirects() {
+    return [{ source: '/membership', destination: '/', permanent: false }];
+  },
   experimental: {
     optimizePackageImports: ['lucide-react', 'framer-motion'],
   },

@@ -23,7 +23,6 @@ export const cta = {
   buy: 'Buy now',
   read: 'Read sample',
   listen: 'Hear the first chapter',
-  membership: 'Get the Books Pass',
   apply: 'Apply for Founder Edition',
   freeChapter: 'Send me chapter one',
   startSeries: 'Start with book one',
@@ -32,8 +31,6 @@ export const cta = {
 
 export const tone = {
   buyHelper: 'One-time. No subscription. The book is yours.',
-  membershipHelper:
-    'One annual fee. Full audiobook library + 20% off hardcovers + monthly bonus episode. Cancel any time — but you will not.',
   founderHelper:
     'Application only. 100 per year. If you have to ask why $9,999, this is not for you.',
   freeChapterHelper:

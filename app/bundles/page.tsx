@@ -34,7 +34,7 @@ const BUNDLES = [
     name: 'The Twelve — Ebook Library',
     price: '$499',
     note: '636-title library · all 12 series · ebook',
-    body: 'The complete library in ebook — all 636 titles as they release. Every series. Every chapter. For the reader who wants the whole catalog in one purchase instead of a membership.',
+    body: 'The complete library in ebook — all 636 titles as they release. Every series. Every chapter. For the reader who wants the whole catalog in one purchase.',
     sku: 'twelve-series-ebook',
   },
   {
@@ -90,7 +90,7 @@ export default async function BundlesPage() {
 
       <section className="border-t border-line bg-bg-subtle">
         <div className="container-x py-16">
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4">
             <Link
               href="/founder-edition"
               className="flex flex-col gap-2 border border-accent/40 bg-bg p-8 hover:border-accent transition-colors"
@@ -98,19 +98,8 @@ export default async function BundlesPage() {
               <p className="eyebrow text-accent">$9,999 tier</p>
               <p className="font-display text-2xl text-ink">Founder Edition →</p>
               <p className="text-sm text-ink-dim">
-                Signed 636-book hardcover set + Apex Vault membership + one-hour call
+                Signed 636-book hardcover set + one-hour call
                 with Brian. Application only. 100 spots ever.
-              </p>
-            </Link>
-            <Link
-              href="/membership"
-              className="flex flex-col gap-2 border border-line bg-bg p-8 hover:border-accent transition-colors"
-            >
-              <p className="eyebrow">Books Pass</p>
-              <p className="font-display text-2xl text-ink">$99/yr — full audiobook library →</p>
-              <p className="text-sm text-ink-dim">
-                Want unlimited audio + 20% off hardcovers instead of a bundle? The Pass
-                is the better deal if you read continuously.
               </p>
             </Link>
           </div>

@@ -12,7 +12,7 @@ export async function generateMetadata() {
   const catalog = await getCatalog();
   const facts = catalogFacts(catalog?.books ?? []);
   return buildMetadata({
-    title: 'Apex Flow Publishing House',
+    title: 'Apex Flow Publishing House | 90-Day Action Books',
     description: `${facts.titlesAvailable} books live now, more releasing book by book. Every one a real 90-day course. Pick your fight and the shelf opens.`,
     path: '/',
   });

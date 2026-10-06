@@ -93,10 +93,10 @@ export default async function HomePage() {
               See all {facts.titlesAvailable.toLocaleString()} books
             </a>
             <a
-              href="/encyclopedia"
+              href="#read-sample"
               className="rounded-sm border border-line px-7 py-4 font-mono text-[11px] uppercase tracking-[0.14em] text-ink"
             >
-              The encyclopedia
+              Read a free sample
             </a>
           </div>
 
@@ -170,7 +170,7 @@ export default async function HomePage() {
       {/* ── READ IT BEFORE YOU PAY FOR IT ───────────────────────────
         * No bookstore lets you read the opening before buying. This is the
         * actual first page of Book 1, set on paper, with no email wall. */}
-      <section className="relative z-10 px-6 pb-16">
+      <section id="read-sample" className="relative z-10 scroll-mt-24 px-6 pb-16">
         <div className="mx-auto w-full max-w-7xl border-t border-line pt-14">
           <div className="mb-8 flex flex-wrap items-baseline justify-between gap-4">
             <h2 className="font-display text-3xl font-light text-ink sm:text-4xl">

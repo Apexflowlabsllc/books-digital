@@ -183,17 +183,28 @@ export function Footer() {
         <p className="font-mono uppercase tracking-[0.3em]">
           © {new Date().getUTCFullYear()} Apex Flow Publishing House · All rights reserved
         </p>
-        <p className="font-mono uppercase tracking-[0.3em]">
-          Original business ·{' '}
-          <a
-            href="https://spikercarpetandtilecare.com"
-            className="text-accent/80 hover:text-cream transition-colors"
-            rel="noopener noreferrer me"
-            target="_blank"
-          >
-            spikercarpetandtilecare.com
-          </a>
-        </p>
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-6">
+          <p className="font-mono uppercase tracking-[0.3em]">
+            Contact ·{' '}
+            <a
+              href="mailto:support@apexflowlabs.com"
+              className="text-accent/80 hover:text-cream transition-colors"
+            >
+              support@apexflowlabs.com
+            </a>
+          </p>
+          <p className="font-mono uppercase tracking-[0.3em]">
+            Original business ·{' '}
+            <a
+              href="https://spikercarpetandtilecare.com"
+              className="text-accent/80 hover:text-cream transition-colors"
+              rel="noopener noreferrer me"
+              target="_blank"
+            >
+              spikercarpetandtilecare.com
+            </a>
+          </p>
+        </div>
       </div>
     </footer>
   );

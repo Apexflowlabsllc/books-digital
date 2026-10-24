@@ -21,6 +21,9 @@ const STATIC_PATHS: Array<{ path: string; priority: number; changefreq: string }
   { path: '/problems', priority: 0.85, changefreq: 'weekly' },
   { path: '/encyclopedia', priority: 0.8, changefreq: 'weekly' },
   { path: '/blog', priority: 0.8, changefreq: 'weekly' },
+  ...['/privacy', '/terms', '/refunds', '/cookies', '/accessibility', '/editorial-policy', '/disclaimer', '/report-content', '/privacy-request'].map(
+    (path) => ({ path, priority: 0.3, changefreq: 'yearly' }),
+  ),
 ];
 
 // Topic cluster hubs — high-intent SEO landing pages. Each carries an

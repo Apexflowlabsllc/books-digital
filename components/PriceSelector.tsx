@@ -201,7 +201,7 @@ export function PriceSelector({ book }: PriceSelectorProps) {
       <BuyButton
         format="paperback"
         label="Buy paperback"
-        helper="Signed by Brian · shipping included · 5-7 days"
+        helper="Printed on demand · shipping included · about 5-7 days"
         priceUsd={book.paperback_direct_price_usd}
         icon={<BookOpen className="h-5 w-5" />}
         onBuy={handleBuy}
@@ -210,12 +210,18 @@ export function PriceSelector({ book }: PriceSelectorProps) {
       <BuyButton
         format="hardcover"
         label="Buy hardcover"
-        helper="Signed by Brian · shipping included · 5-7 days"
+        helper="Printed on demand · shipping included · about 5-7 days"
         priceUsd={book.hardcover_direct_price_usd}
         icon={<BookMarked className="h-5 w-5" />}
         onBuy={handleBuy}
         busy={isPending && pendingFormat === 'hardcover'}
       />
+
+      <p className="pt-1 text-[12px] leading-relaxed text-ink-dim">
+        Prices in USD; the total is shown on Stripe checkout before you pay. Ebooks and audiobooks are digital files, and once downloaded
+        the sale is final except as described in our{' '}
+        <a href="/refunds" className="underline underline-offset-2">Refunds and delivery</a> policy. Audiobooks use AI narration.
+      </p>
 
       {error ? (
         <p role="alert" className="text-xs text-accent">

@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Geist, Fraunces, JetBrains_Mono } from 'next/font/google';
 import { env } from '@/lib/env';
 import dynamic from 'next/dynamic';
-import Script from 'next/script';
+import { ConsentBanner } from '@/components/legal/ConsentBanner';
 import { DeferUntilIdle } from '@/components/DeferUntilIdle';
 
 /* Split out of the first-load bundle. None of these paint anything a visitor
@@ -87,6 +87,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           hydrates. Scoped to this element only — the rest of the tree
           still gets full hydration checking. */}
       <body suppressHydrationWarning>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[10100] focus:rounded focus:bg-accent focus:px-4 focus:py-3 focus:font-semibold focus:text-bg"
+        >
+          Skip to main content
+        </a>
         <BackgroundLoader />
         <DeferUntilIdle>
           <TactileRipple />
@@ -129,7 +135,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <LaunchPill />
         </DeferUntilIdle>
         {/* Apex Flow Arcade: the Play button (four free games, one score, one Apex ID), lifted so it clears the sale pill in this corner. Loads after the page is idle. */}
-        <Script src="https://www.apexflowlabs.com/embed/apex-arcade.js" data-side="left" data-bottom="92" strategy="lazyOnload" />
+        {/* Loads only after the visitor presses "Accept optional" (never with Global Privacy Control). */}
+        <ConsentBanner arcadeSrc="https://www.apexflowlabs.com/embed/apex-arcade.js" arcadeSide="left" arcadeBottom="92" />
       </body>
     </html>
   );

@@ -76,7 +76,7 @@ export function FounderApplicationForm() {
 
       <div>
         <label htmlFor="shipping" className="eyebrow mb-2 block">
-          Shipping address for the 636-book set
+          Shipping address (used only if you are accepted)
         </label>
         <textarea
           id="shipping"
@@ -97,8 +97,11 @@ export function FounderApplicationForm() {
           {error}
         </p>
       ) : (
-        <p className="text-xs text-ink-mute">
-          Application only. 100 spots ever. Brian reads every one.
+        <p className="text-xs leading-relaxed text-ink-dim">
+          Application only. 100 spots ever. Brian reads every one. Submitting this form does not charge you and is not a purchase; written
+          terms are sent for you to accept before you pay anything. We use what you enter only to review your application and, if you are
+          accepted, to fulfil it (see the <a href="/privacy" className="underline underline-offset-2">Privacy Policy</a>). Do not include
+          anything sensitive in the &ldquo;why&rdquo; box.
         </p>
       )}
     </form>

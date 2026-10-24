@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
-import { launchCountdownLabel } from '@/lib/launch';
+import { LAUNCH, launchCountdownLabel } from '@/lib/launch';
 
 const STORAGE_KEY = 'apex-launch-banner-dismissed';
 
@@ -36,7 +36,7 @@ export function LaunchBanner() {
     }
   }, []);
 
-  if (hidden) return null;
+  if (hidden || !LAUNCH.active) return null;
 
   const dismiss = () => {
     try {

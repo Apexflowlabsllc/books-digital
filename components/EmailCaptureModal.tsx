@@ -158,8 +158,7 @@ export function EmailCaptureModal({
                   </h2>
                   <p className="mt-4 text-sm text-ink-dim">
                     Check inbox + promo tab. Use this code at checkout for{' '}
-                    <span className="text-accent">15% off your first order</span> — one-time, no
-                    expiry on next visit:
+                    <span className="text-accent">15% off your first order</span>, one use per customer:
                   </p>
                   <div className="mt-6 rounded-[1rem] border border-accent/40 bg-bg/60 p-5 text-center font-mono text-2xl tracking-[0.4em] text-accent">
                     {code}
@@ -228,8 +227,9 @@ export function EmailCaptureModal({
                       {error}
                     </p>
                   ) : (
-                    <p className="mt-3 text-[11px] uppercase tracking-[0.24em] text-ink-mute">
-                      One-time only · unsubscribe in one click
+                    <p className="mt-3 text-xs leading-relaxed text-ink-dim">
+                      We use your email to send chapter one and your code. Every email we send has an unsubscribe link. See our{' '}
+                      <a href="/privacy" className="underline underline-offset-2">Privacy Policy</a>.
                     </p>
                   )}
                 </>

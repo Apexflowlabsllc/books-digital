@@ -51,8 +51,8 @@ export default async function ContactPage() {
           />
           <Card
             label="Support / fulfillment"
-            email="support@apexflowlabs.com"
-            body="Missing audiobook download, broken Pass access, refund? Backend support team — usually replies within 24 hours."
+            email="info@apexflowlabs.com"
+            body="Missing audiobook download, order problem, refund? Backend support team — usually replies within 24 hours."
           />
         </div>
       </section>

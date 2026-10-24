@@ -33,7 +33,7 @@ export function BooksConcierge() {
     {
       id: 'sys-1',
       role: 'assistant',
-      body: "Books Concierge. Ask me which book to start with, or what the 12 series cover. I'll point — I won't pitch.",
+      body: "I'm the Books Concierge, an AI assistant (not Brian, not a person, and I can be wrong). Ask me which book to start with, or what the 12 series cover. I'm not a counselor or adviser. If you're in crisis, call or text 988 (US).",
     },
   ]);
   const [input, setInput] = useState('');
@@ -95,12 +95,12 @@ export function BooksConcierge() {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        data-cursor-label={open ? 'Close' : 'Ask Brian'}
+        data-cursor-label={open ? 'Close' : 'Ask the AI'}
         className={cn(
           'fixed bottom-6 right-6 z-[8000] flex h-14 w-14 items-center justify-center rounded-full border border-accent bg-bg-raised shadow-[0_18px_40px_-10px_rgba(217,204,140,0.55)] transition-transform duration-300 hover:scale-105 md:bottom-8 md:right-8',
           open && 'rotate-90',
         )}
-        aria-label="Open Books Concierge"
+        aria-label="Open Books Concierge (AI assistant)"
       >
         {open ? (
           <X className="h-6 w-6 text-accent" />
@@ -146,7 +146,7 @@ export function BooksConcierge() {
               <div>
                 <p className="text-sm font-medium text-ink">Books Concierge</p>
                 <p className="text-[10px] uppercase tracking-[0.28em] text-ink-mute">
-                  Trained on the 12 series
+                  AI assistant · not Brian · see Privacy
                 </p>
               </div>
             </header>

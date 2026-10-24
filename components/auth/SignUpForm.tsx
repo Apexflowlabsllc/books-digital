@@ -82,11 +82,11 @@ export function SignUpForm() {
 
       <p className="mt-5 text-[12px] leading-[1.55] text-ink-mute">
         By creating an account you agree to our{' '}
-        <Link href="/legal/terms" className="underline underline-offset-2 hover:text-ink">
+        <Link href="/terms" className="underline underline-offset-2 hover:text-ink">
           Terms
         </Link>{' '}
         and{' '}
-        <Link href="/legal/privacy" className="underline underline-offset-2 hover:text-ink">
+        <Link href="/privacy" className="underline underline-offset-2 hover:text-ink">
           Privacy
         </Link>
         .

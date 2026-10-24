@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { AuthorityFooter } from './AuthorityFooter';
+import { LegalLinks } from './legal/LegalLinks';
 
 // Apex Flow Labs ecosystem — canonical 12-brand list with subdomain URLs.
 // Every brand lives at {brand}.apexflowlabs.com. Books is the current site.
@@ -174,6 +175,8 @@ export function Footer() {
           })}
         </ul>
       </div>
+
+      <LegalLinks />
 
       <div className="section-divider container-x !my-0 !py-0">
         <span />

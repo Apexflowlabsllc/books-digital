@@ -23,7 +23,13 @@ const config: NextConfig = {
   },
   // Memberships were withdrawn from every Apex site (2026-09-25). Temporary redirect: a membership may come back in another form.
   async redirects() {
-    return [{ source: '/membership', destination: '/', permanent: false }];
+    return [
+      { source: '/membership', destination: '/', permanent: false },
+      // Older links pointed at /legal/*; the legal pages live at the top level.
+      { source: '/legal/terms', destination: '/terms', permanent: false },
+      { source: '/legal/privacy', destination: '/privacy', permanent: false },
+      { source: '/legal/refund-policy', destination: '/refunds', permanent: false },
+    ];
   },
   experimental: {
     optimizePackageImports: ['lucide-react', 'framer-motion'],

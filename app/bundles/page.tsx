@@ -41,7 +41,7 @@ const BUNDLES = [
     name: 'The Full Arsenal',
     price: '$1,499',
     note: '636-title library · ebook + audiobook',
-    body: 'Every book, every format — ebook and audiobook, delivered as each one releases. The whole 90-day program across all 12 fronts. The cheapest path to the entire library without picking the Pass.',
+    body: 'Every book, every format — ebook and audiobook, delivered as each one releases. The whole 90-day program across all 12 fronts. The lowest-priced way to get the entire library in both formats.',
     sku: 'twelve-series-everything',
   },
 ];
@@ -72,6 +72,13 @@ export default async function BundlesPage() {
               <p className="mt-3 font-display text-3xl text-ink">{b.name}</p>
               <p className="mt-2 font-display text-5xl text-accent">{b.price}</p>
               <p className="mt-4 flex-1 text-sm text-ink-dim">{b.body}</p>
+              {b.sku.startsWith('twelve-series') ? (
+                <p className="mt-4 text-xs leading-relaxed text-ink-dim">
+                  Includes titles that are not published yet. You get what exists now, and each other title by email when it releases; no date is
+                  promised. If you have not received what you paid for and do not want to wait, we refund the undelivered portion. See{' '}
+                  <Link href="/refunds" className="underline underline-offset-2">Refunds and delivery</Link>.
+                </p>
+              ) : null}
               <form
                 action={`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/checkout/start`}
                 method="post"
@@ -82,6 +89,10 @@ export default async function BundlesPage() {
                 <button type="submit" className="cta-primary w-full">
                   Buy {b.price}
                 </button>
+                <p className="mt-2 text-xs text-ink-dim">
+                  Digital files, delivered by email. USD. Final price shown on Stripe checkout.{' '}
+                  <Link href="/refunds" className="underline underline-offset-2">Refund policy</Link>
+                </p>
               </form>
             </div>
           ))}

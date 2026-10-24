@@ -5,7 +5,10 @@
  */
 
 export const LAUNCH = {
-  active: true,
+  // Off 2026-10-24: the promo's own end date (endsAt, 2026-06-02) passed months ago, so advertising
+  // "Launch Week" 30% off would now be a false sale claim. Flip back to true only with a new endsAt
+  // and only if the discount really is honored at checkout.
+  active: false,
   code: 'APEX30',
   percent: 30,
   headline: 'Launch Week — 30% off everything.',

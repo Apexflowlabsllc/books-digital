@@ -7,10 +7,11 @@ interface ReviewTileProps {
 }
 
 const SOURCE_LABEL: Record<ReviewExcerpt['source'], string> = {
-  spiker: 'Spiker Carpet and Tile Care customer',
+  spiker: 'Customer of Brian’s cleaning business (not a review of the books)',
   amazon: 'Amazon verified',
   goodreads: 'Goodreads',
   'verified-reader': 'Verified reader',
+  reader: 'Reader review (purchase not verified)',
 };
 
 export function ReviewTile({ review, showSource = true }: ReviewTileProps) {

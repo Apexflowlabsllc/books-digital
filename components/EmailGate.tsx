@@ -96,7 +96,9 @@ export function EmailGate({ bookId, bookSlug, bookTitle, utmSource }: EmailGateP
           {error}
         </p>
       ) : (
-        <p className="mt-3 text-xs text-ink-mute">{tone.freeChapterHelper}</p>
+        <p className="mt-3 text-xs leading-relaxed text-ink-dim">
+          {tone.freeChapterHelper} We use your email only to send what you asked for; every email has an unsubscribe link. See our <a href="/privacy" className="underline underline-offset-2">Privacy Policy</a>.
+        </p>
       )}
     </form>
   );

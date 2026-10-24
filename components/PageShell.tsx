@@ -40,7 +40,7 @@ export async function PageShell({ children, className, seriesColor }: PageShellP
       style={seriesColor ? ({ '--series-color': seriesColor } as React.CSSProperties) : undefined}
     >
       <Nav userEmail={userEmail} />
-      <main className="flex-1">{children}</main>
+      <main id="main-content" tabIndex={-1} className="flex-1 focus:outline-none">{children}</main>
       <AuthorityFooter />
       <Footer />
     </div>

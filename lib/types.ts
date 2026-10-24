@@ -36,7 +36,7 @@ export interface ReviewExcerpt {
   id: string;
   body: string;
   author: string;
-  source: 'spiker' | 'amazon' | 'goodreads' | 'verified-reader';
+  source: 'spiker' | 'amazon' | 'goodreads' | 'verified-reader' | 'reader';
   rating?: number;
 }
 

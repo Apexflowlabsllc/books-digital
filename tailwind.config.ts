@@ -14,7 +14,7 @@ const config: Config = {
         ink: {
           DEFAULT: '#FFFFFF',
           dim: '#B8B8B8',
-          mute: '#6F6F6F',
+          mute: '#8A8A8A', // was #6F6F6F (3.6:1 on #0a0a0a); this is 5.7:1, above the 4.5:1 AA minimum
         },
         line: 'rgba(255, 255, 255, 0.12)',
 

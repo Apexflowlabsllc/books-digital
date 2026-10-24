@@ -16,10 +16,11 @@ interface BookReviewsProps {
 }
 
 const SOURCE_LABEL: Record<Review['source'], string> = {
-  spiker: 'Spiker Carpet and Tile Care customer',
+  spiker: 'Customer of Brian’s cleaning business (not a review of this book)',
   amazon: 'Amazon verified',
   goodreads: 'Goodreads',
   'verified-reader': 'Verified reader',
+  reader: 'Reader review (purchase not verified)',
 };
 
 // Reviews block — patterned after components/apex/Reviews.tsx in
@@ -38,12 +39,13 @@ export function BookReviews({ bookSlug, bookTitle, initial, summary }: BookRevie
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
 
-  const avg =
-    summary?.averageRating ??
-    (reviews.length
-      ? reviews.reduce((s, r) => s + (r.rating ?? 0), 0) / reviews.length
-      : 0);
-  const count = summary?.count ?? reviews.length;
+  // Ratings are about THIS book only: customer quotes about Brian's cleaning
+  // business ('spiker') are shown, labelled, but never counted in the rating.
+  // The backend summary is not used, because it cannot be checked here.
+  const rated = reviews.filter((r) => r.source !== 'spiker' && typeof r.rating === 'number');
+  void summary;
+  const avg = rated.length ? rated.reduce((s, r) => s + (r.rating ?? 0), 0) / rated.length : 0;
+  const count = rated.length;
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -67,7 +69,7 @@ export function BookReviews({ bookSlug, bookTitle, initial, summary }: BookRevie
 
       if (data.thankYouCode) {
         setSuccess(
-          `Filed. Thank-you code for 20% off your next order: ${data.thankYouCode}`,
+          `Filed. Thank-you code for 20% off your next order: ${data.thankYouCode} (given for submitting a review, whatever your rating).`,
         );
       } else {
         setSuccess('Filed. Reads after moderation — usually within 48 hours.');
@@ -80,7 +82,8 @@ export function BookReviews({ bookSlug, bookTitle, initial, summary }: BookRevie
             rating,
             body,
             author: email.replace(/^(.).+@(.+)$/, '$1***@$2'),
-            source: 'verified-reader',
+            // Only claim "verified" when the order system says so.
+            source: data.verified_purchase ? 'verified-reader' : 'reader',
           },
           ...reviews,
         ]);
@@ -172,17 +175,20 @@ export function BookReviews({ bookSlug, bookTitle, initial, summary }: BookRevie
                   type="email"
                   required
                   placeholder="Your email"
+                  aria-label="Your email (not shown in full)"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full rounded-[0.75rem] border border-line bg-bg px-4 py-2.5 text-sm text-ink placeholder:text-ink-mute focus:border-accent focus:outline-none"
                 />
                 <input
+                  aria-label="Review headline (optional)"
                   placeholder="Headline (optional) — e.g. 'Read this if you ship'"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   className="w-full rounded-[0.75rem] border border-line bg-bg px-4 py-2.5 text-sm text-ink placeholder:text-ink-mute focus:border-accent focus:outline-none"
                 />
                 <textarea
+                  aria-label="Your review"
                   placeholder="Tell future readers what hit and what didn't. R-rated welcome."
                   value={body}
                   onChange={(e) => setBody(e.target.value)}
@@ -204,6 +210,12 @@ export function BookReviews({ bookSlug, bookTitle, initial, summary }: BookRevie
                 ) : null}
                 <span>{submitting ? 'Submitting' : 'Submit review'}</span>
               </button>
+              <p className="basis-full text-xs text-ink-dim">
+                Reviewers get a 20% discount code for submitting a review, whether it is positive or negative. Your email is used to send the
+                code and is not shown in full. Reviews are moderated, and approved text is published. See the{' '}
+                <a href="/editorial-policy" className="underline underline-offset-2">Editorial policy</a> and{' '}
+                <a href="/privacy" className="underline underline-offset-2">Privacy Policy</a>.
+              </p>
               {error ? <p className="text-xs text-accent-hot">{error}</p> : null}
               {success ? <p className="text-xs text-accent">{success}</p> : null}
             </div>
@@ -212,7 +224,7 @@ export function BookReviews({ bookSlug, bookTitle, initial, summary }: BookRevie
 
         {reviews.length === 0 ? (
           <p className="rounded-[1.5rem] border border-line bg-bg/50 p-8 text-sm text-ink-dim">
-            No reviews yet. Be the first — first reviewer on each book gets a 20% code.
+            No reviews yet. Be the first. Reviewers get a 20% code for submitting a review, positive or negative.
           </p>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

@@ -66,9 +66,21 @@ export default async function FounderEditionPage() {
             <span className="text-accent">$9,999. Founding tier. Only 100 spots ever.</span>
           </>
         }
-        primary={{ href: '#apply', label: 'Reserve a spot' }}
+        primary={{ href: '#apply', label: 'Apply' }}
         secondary={{ href: '/bundles', label: 'Or just grab a bundle' }}
       />
+
+      <section className="container-x pt-12">
+        <div className="max-w-3xl border border-accent/40 bg-bg-subtle p-6 text-sm leading-[1.65] text-ink-dim">
+          <p className="eyebrow mb-2 text-accent">Read before you apply</p>
+          <ul className="list-disc space-y-2 pl-5">
+            <li>Applying does not charge you and is not a purchase. Nothing is paid through this page.</li>
+            <li>If you are accepted, you are sent the written terms before you pay: what is included, what ships and when, and your refund rights. You owe nothing if you do not accept them.</li>
+            <li>The 636-title library is a planned program. Most titles are not published yet. Hardcovers ship one title at a time as each is released, and no date is promised for any unpublished title.</li>
+            <li>Results from the books or the call are not guaranteed. See <a href="/disclaimer" className="text-accent underline underline-offset-4">Not therapy or advice</a> and <a href="/refunds" className="text-accent underline underline-offset-4">Refunds and delivery</a>.</li>
+          </ul>
+        </div>
+      </section>
 
       <section className="container-x py-16">
         <div className="mb-10 max-w-2xl">

@@ -14,8 +14,10 @@ export const BUSINESS = {
   location: 'Galt, California, United States',
   /** Public contact for legal, privacy, takedown and support requests. */
   contactEmail: 'info@apexflowlabs.com',
-  /** Business mailing address. Omitted until a business address is confirmed (never a personal address). */
+  /** Business mailing address: paid PostNet mailbox (never a personal address). */
   mailingAddress: "10400 Twin Cities Rd, Ste 20, Galt, CA 95632, United States" as string | null,
+  phone: '916-720-3292',
+  phoneHref: 'tel:+19167203292',
 } as const;
 
 export const CONSENT_KEY = 'apex-books-consent';

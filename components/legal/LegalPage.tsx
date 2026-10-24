@@ -22,7 +22,7 @@ export function LegalPage({ title, children }: { title: string; children: ReactN
 export function ContactLine() {
   return (
     <p>
-      Email <a href={`mailto:${BUSINESS.contactEmail}`}>{BUSINESS.contactEmail}</a>
+      Email <a href={`mailto:${BUSINESS.contactEmail}`}>{BUSINESS.contactEmail}</a>, call <a href={BUSINESS.phoneHref}>{BUSINESS.phone}</a>
       {BUSINESS.mailingAddress ? (
         <>
           {' '}

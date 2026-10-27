@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import { AuthorityFooter } from './AuthorityFooter';
 
-// Apex Flow Labs ecosystem — canonical 12-brand list with subdomain URLs.
-// Every brand lives at {brand}.apexflowlabs.com. Books is the current site.
+// Apex Flow Labs ecosystem — brand list. Stores live at {brand}.apexflowlabs.com;
+// Apex Companion AI and Spiker Carpet & Tile Care are standalone domains. Books is the current site.
 const ECOSYSTEM_BRANDS: Array<{ label: string; href: string; external?: boolean; current?: boolean }> = [
   { label: 'Apex Flow Labs',    href: 'https://www.apexflowlabs.com',          external: true },
   { label: 'Apex Books',        href: 'https://books.apexflowlabs.com',        external: true, current: true },
@@ -11,11 +11,10 @@ const ECOSYSTEM_BRANDS: Array<{ label: string; href: string; external?: boolean;
   { label: 'Apex Beauty',       href: 'https://beauty.apexflowlabs.com',       external: true },
   { label: 'Apex Pets',         href: 'https://pets.apexflowlabs.com',         external: true },
   { label: 'Apex Apparel',      href: 'https://gear.apexflowlabs.com',         external: true },
-  { label: 'Apex Affiliates',   href: 'https://partners.apexflowlabs.com',     external: true },
+  { label: 'Apex Affiliates',   href: 'https://affiliates.apexflowlabs.com',     external: true },
   { label: 'Apex Companion AI', href: 'https://www.apexcompanion.ai/',         external: true },
-  { label: 'Apex Warfare AI',   href: 'https://warfare.apexflowlabs.com',      external: true },
   { label: 'Apex Kids',         href: 'https://kids.apexflowlabs.com',         external: true },
-  { label: 'Spiker',            href: 'https://spiker.apexflowlabs.com',       external: true },
+  { label: 'Spiker Carpet & Tile Care', href: 'https://spikercarpetandtilecare.com', external: true },
 ];
 
 const FOOTER_COLUMNS = [

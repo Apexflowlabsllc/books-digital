@@ -79,7 +79,7 @@ const BRANDS = [
   },
   {
     brand: 'Apex Affiliates',
-    href: 'https://partners.apexflowlabs.com',
+    href: 'https://affiliates.apexflowlabs.com',
     blurb:
       'The most high-level affiliate program on the market. Highest paying commissions for those elite enough to promote the best in the world.',
     pitch: 'Join the army →',
@@ -98,16 +98,6 @@ const BRANDS = [
     colors: ['#06B6D4', '#22D3EE', '#67E8F9'],
   },
   {
-    brand: 'Apex Warfare AI',
-    href: 'https://warfare.apexflowlabs.com',
-    blurb:
-      '100% business accountability and tactical intelligence. Know your numbers, kill your excuses, and level up at all times.',
-    pitch: 'Enter the bunker →',
-    accent: '#DC2626',
-    glow: '0 100 50',
-    colors: ['#DC2626', '#B91C1C', '#991B1B'],
-  },
-  {
     brand: 'Apex Kids',
     href: 'https://kids.apexflowlabs.com',
     blurb:
@@ -118,8 +108,8 @@ const BRANDS = [
     colors: ['#FDE047', '#FEF08A', '#FEF9C3'],
   },
   {
-    brand: 'Spiker',
-    href: 'https://spiker.apexflowlabs.com',
+    brand: 'Spiker Carpet & Tile Care',
+    href: 'https://spikercarpetandtilecare.com',
     blurb:
       'The Spiker Standard for service businesses — cleaning, contracting, lawn, pool, handyman. Operator-grade SOPs and pricing built for crews that actually run jobs.',
     pitch: 'Build to the standard →',
@@ -150,12 +140,12 @@ export function AcrossEcosystem() {
                 letterSpacing: '-0.035em',
               }}
             >
-              Eleven more{' '}
-              <span className="italic text-accent">Apex Flow Labs</span> companies — plus Spiker.
+              The whole{' '}
+              <span className="italic text-accent">Apex Flow Labs</span> family — plus Spiker.
             </h2>
           </div>
           <p className="md:col-span-5 max-w-[44ch] text-[17px] leading-[1.55] text-white">
-            One customer, twelve doors. Every sister brand is one click away.
+            One customer, many doors. Every sister brand is one click away.
           </p>
         </div>
 

@@ -9,6 +9,7 @@ import { PreviewVideo } from '@/components/PreviewVideo';
 import { BookReviews } from '@/components/BookReviews';
 import { env } from '@/lib/env';
 import { BookAnswers, bookAnswers } from '@/components/BookAnswers';
+import { BookBackCover } from '@/components/BookBackCover';
 import { EmailGate } from '@/components/EmailGate';
 import { JsonLdSchema } from '@/components/JsonLdSchema';
 import { ClusterHub } from '@/components/ClusterHub';
@@ -211,6 +212,7 @@ export default async function BookDetailPage({ params }: BookRouteProps) {
           length; non-authentic borrow a peer's MP3 capped at 30s. */}
       {/* The four questions, answered before anyone scrolls. */}
       <BookAnswers book={book} />
+      <BookBackCover book={book} />
 
       <section className="border-y border-line bg-bg-subtle">
         <div className="container-x grid gap-6 py-10 md:grid-cols-[auto_1fr] md:items-start">

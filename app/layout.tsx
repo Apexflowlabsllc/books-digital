@@ -129,6 +129,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <LaunchPill />
         </DeferUntilIdle>
         {/* Apex Flow Arcade: the Play button (four free games, one score, one Apex ID), lifted so it clears the sale pill in this corner. Loads after the page is idle. */}
+        <Script src="/pulse-status.js" strategy="afterInteractive" />
         <Script src="https://www.apexflowlabs.com/embed/apex-arcade.js" data-side="left" data-bottom="92" strategy="lazyOnload" />
       </body>
     </html>

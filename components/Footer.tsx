@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import { AuthorityFooter } from './AuthorityFooter';
 
-// Apex Flow Labs ecosystem — brand list. Stores live at {brand}.apexflowlabs.com;
-// Apex Companion AI and Spiker Carpet & Tile Care are standalone domains. Books is the current site.
+// Apex Flow Labs ecosystem — brand list. Stores live at {brand}.apexflowlabs.com.
+// RAINBO replaces the retired Companion product; Spiker remains standalone.
 const ECOSYSTEM_BRANDS: Array<{ label: string; href: string; external?: boolean; current?: boolean }> = [
   { label: 'Apex Flow Labs',    href: 'https://www.apexflowlabs.com',          external: true },
   { label: 'Apex Books',        href: 'https://books.apexflowlabs.com',        external: true, current: true },
@@ -12,7 +12,7 @@ const ECOSYSTEM_BRANDS: Array<{ label: string; href: string; external?: boolean;
   { label: 'Apex Pets',         href: 'https://pets.apexflowlabs.com',         external: true },
   { label: 'Apex Apparel',      href: 'https://gear.apexflowlabs.com',         external: true },
   { label: 'Apex Affiliates',   href: 'https://affiliates.apexflowlabs.com',     external: true },
-  { label: 'Apex Companion AI', href: 'https://www.apexcompanion.ai/',         external: true },
+  { label: 'RAINBO', href: 'https://rainbo.apexflowlabs.com',                  external: true },
   { label: 'Apex Kids',         href: 'https://kids.apexflowlabs.com',         external: true },
   { label: 'Spiker Carpet & Tile Care', href: 'https://spikercarpetandtilecare.com', external: true },
 ];
@@ -178,6 +178,7 @@ export function Footer() {
         <span />
       </div>
 
+      <p data-apex-pulse-account="auto" suppressHydrationWarning className="container-x py-3 text-xs text-ink-mute">Apex Flow Pulse · checking status</p>
       <div className="container-x relative flex flex-col gap-3 py-7 text-xs text-ink-mute md:flex-row md:items-center md:justify-between">
         <p className="font-mono uppercase tracking-[0.3em]">
           © {new Date().getUTCFullYear()} Apex Flow Publishing House · All rights reserved

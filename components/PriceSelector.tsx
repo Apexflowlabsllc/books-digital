@@ -112,10 +112,13 @@ export function PriceSelector({ book }: PriceSelectorProps) {
             ...(LAUNCH.active ? { promotionCode: LAUNCH.code } : {}),
           }),
         });
-        if (res.status === 404 || res.status === 405) {
-          throw new Error('Checkout route not deployed yet — backend will signal when live.');
+        if (!res.ok) {
+          const problem = await res.json().catch(() => null) as { error?: { code?: string; message?: string } } | null;
+          if (res.status === 400 && problem?.error?.code === 'bad_request' && problem.error.message) {
+            throw new Error(problem.error.message);
+          }
+          throw new Error('Checkout is unavailable. Please try again later.');
         }
-        if (!res.ok) throw new Error(`checkout ${res.status}`);
         const data = (await res.json()) as { checkout_url?: string; url?: string };
         // Backend returns checkout_url; accept legacy `url` too.
         const target = data.checkout_url ?? data.url;
@@ -163,31 +166,35 @@ export function PriceSelector({ book }: PriceSelectorProps) {
       <BuyButton
         format="ebook"
         label="Buy ebook"
-        helper="Instant download · ePub + PDF"
+        helper="EPUB download"
         priceUsd={book.ebook_direct_price_usd}
         icon={<Download className="h-5 w-5" />}
         onBuy={handleBuy}
         busy={isPending && pendingFormat === 'ebook'}
       />
-      <BuyButton
-        format="audiobook"
-        label="Buy audiobook"
-        helper="Instant download · MP3"
-        priceUsd={book.audiobook_direct_price_usd}
-        icon={<Headphones className="h-5 w-5" />}
-        onBuy={handleBuy}
-        busy={isPending && pendingFormat === 'audiobook'}
-      />
-      <BuyButton
-        format="bundle"
-        label="Bundle — ebook + audiobook"
-        helper="Best deal · both formats, one click"
-        priceUsd={book.bundle_direct_price_usd}
-        icon={<Layers className="h-5 w-5" />}
-        highlight
-        onBuy={handleBuy}
-        busy={isPending && pendingFormat === 'bundle'}
-      />
+      {book.audio_status === 'live' && (
+        <>
+          <BuyButton
+            format="audiobook"
+            label="Buy audiobook"
+            helper="Instant download · MP3"
+            priceUsd={book.audiobook_direct_price_usd}
+            icon={<Headphones className="h-5 w-5" />}
+            onBuy={handleBuy}
+            busy={isPending && pendingFormat === 'audiobook'}
+          />
+          <BuyButton
+            format="bundle"
+            label="Bundle — ebook + audiobook"
+            helper="Best deal · both formats, one click"
+            priceUsd={book.bundle_direct_price_usd}
+            icon={<Layers className="h-5 w-5" />}
+            highlight
+            onBuy={handleBuy}
+            busy={isPending && pendingFormat === 'bundle'}
+          />
+        </>
+      )}
 
       {/* Digital / physical divider */}
       <div className="flex items-center gap-3 pt-2">

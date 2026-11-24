@@ -61,9 +61,11 @@ export interface BookDetail extends BookSummary {
   hardcover_direct_price_usd: number;
   // When each format went live on Amazon — informational only for now.
   published_at?: string;
-  sample_chapter: {
+  // Whole-manuscript length, only when explicitly supplied by the backend.
+  word_count?: number;
+  sample_chapter?: {
     title: string;
-    body: string; // ~400 word excerpt from chapter 1
+    body: string; // Actual excerpt supplied by the manuscript pipeline.
     word_count: number;
   };
   audiobook?: {

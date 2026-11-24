@@ -118,6 +118,9 @@ interface RawBookDetail {
   subtitle?: string;
   bookNumber: number;
   description: string;
+  wordCount?: number;
+  freeChapterTitle?: string;
+  freeChapterText?: string;
   // Backend may or may not return these depending on deploy state.
   isAuthentic?: boolean;
   publishedAt?: string | null;
@@ -152,7 +155,7 @@ interface RawBookDetail {
   paperback?: { isbn?: string; priceUsd?: number };
   hardcover?: { isbn?: string; priceUsd?: number };
   ebook?: { priceUsd?: number; epubUrl?: string };
-  audiobook?: { mp3Url?: string; durationSeconds?: number };
+  audiobook?: { mp3Url?: string | null; durationSeconds?: number };
   podcast?: { episodeUrl?: string };
   coverImageUrl?: string;
   audiobookCoverUrl?: string;
@@ -188,9 +191,11 @@ function adaptSeriesSummary(raw: RawSeriesSummary): SeriesSummary {
 }
 
 function adaptBookDetail(raw: RawBookDetail): BookDetail {
-  // Audio gating: mp3Url is empty string ('') on every book until R2 migration
-  // lands. Treat empty / missing as 'queued' so the empty-state copy fires.
-  const hasAudio = !!raw.audiobook?.mp3Url;
+  // Older responses can contain another title's recording. Require this
+  // book's fulfillment URL and honor an explicit unavailable flag.
+  const ownAudioUrl = `https://www.apexflowlabs.com/api/v1/books/audio/${raw.bookId}/audiobook.mp3`;
+  const hasAudio = raw.isAuthentic === true && raw.audioAvailable !== false
+    && raw.audiobook?.mp3Url === ownAudioUrl;
   const audio_status: BookSummary['audio_status'] = hasAudio ? 'live' : 'queued';
 
   // Synthesise the formats[] array from the per-format objects.
@@ -207,20 +212,18 @@ function adaptBookDetail(raw: RawBookDetail): BookDetail {
     a: b.body,
   }));
 
-  // Sample chapter: until the manuscript pipeline exposes a real excerpt,
-  // surface the description body as the day-one teaser.
-  /* Same stale boilerplate reaches the reader through the sample teaser and
-   * the back-cover body, so both go through the sanitiser too. */
-  const sampleBody = sanitizeDescription(raw.description || raw.backCover?.body || '');
-  const sample_chapter = {
-    title: 'Day 1',
+  // A sales description is not a manuscript excerpt. Preserve real chapter
+  // text without applying the marketing-copy sanitizer to the author's prose.
+  const sampleBody = typeof raw.freeChapterText === 'string' ? raw.freeChapterText.trim() : '';
+  const sample_chapter = sampleBody ? {
+    title: raw.freeChapterTitle?.trim() || 'Chapter excerpt',
     body: sampleBody,
     word_count: sampleBody.split(/\s+/).filter(Boolean).length,
-  };
+  } : undefined;
 
   const audiobook = hasAudio
     ? {
-        full_url: raw.audiobook!.mp3Url,
+        full_url: ownAudioUrl,
         duration_seconds: raw.audiobook!.durationSeconds,
       }
     : undefined;
@@ -263,6 +266,7 @@ function adaptBookDetail(raw: RawBookDetail): BookDetail {
     paperback_direct_price_usd: raw.paperbackDirectPriceUsd ?? 14.99,
     hardcover_direct_price_usd: raw.hardcoverDirectPriceUsd ?? 24.99,
     sample_chapter,
+    word_count: Number.isSafeInteger(raw.wordCount) && raw.wordCount! > 0 ? raw.wordCount : undefined,
     audiobook,
     podcast_episode_url: raw.podcast?.episodeUrl || undefined,
     // Video lives at the same path, .mp4 instead of .mp3. The backend

@@ -15,7 +15,7 @@ import { JsonLdSchema } from '@/components/JsonLdSchema';
 import { ClusterHub } from '@/components/ClusterHub';
 import { ComingSoonBook } from '@/components/ComingSoonBook';
 import { getBook, getBookSeo, getCluster } from '@/lib/api';
-import { getAudioPreviewPool, getPodcastPreviewPool } from '@/lib/preview-pool';
+import { getPodcastPreviewPool } from '@/lib/preview-pool';
 import {
   bookAnswersFaq,
   buildMetadata,
@@ -86,10 +86,9 @@ export default async function BookDetailPage({ params }: BookRouteProps) {
     );
   }
 
-  const [book, seo, audioPool, podcastPool] = await Promise.all([
+  const [book, seo, podcastPool] = await Promise.all([
     getBook(slug),
     getBookSeo(slug),
-    getAudioPreviewPool(),
     getPodcastPreviewPool(),
   ]);
 
@@ -107,12 +106,7 @@ export default async function BookDetailPage({ params }: BookRouteProps) {
     );
   }
 
-  // Authenticity gates whether the player shows full audio or a 30s
-  // preview from a borrowed peer. Per backend handoff: when
-  // is_authentic === true, the file is real and lives in R2 for this
-  // book; when false, the backend's cycling fallback returns a peer's
-  // file — frontend caps that at 30s and prompts purchase.
-  const audioAuthentic = book.is_authentic === true;
+  const hasAudiobook = book.audio_status === 'live';
   const podcastAuthentic = book.is_authentic === true;
 
   return (
@@ -177,8 +171,10 @@ export default async function BookDetailPage({ params }: BookRouteProps) {
             <span>By Brian Spiker</span>
             <span aria-hidden>·</span>
             <span title="Voice intensity">{intensityGlyphs(book.voice_intensity)}</span>
-            <span aria-hidden>·</span>
-            <span>{book.sample_chapter?.word_count?.toLocaleString() ?? '~38,000'} words · 90 chapters</span>
+            {book.word_count ? <>
+              <span aria-hidden>·</span>
+              <span>{book.word_count.toLocaleString('en-US')} words</span>
+            </> : null}
           </div>
 
           <p className="mt-6 max-w-prose text-ink whitespace-pre-line">{book.description}</p>
@@ -208,38 +204,38 @@ export default async function BookDetailPage({ params }: BookRouteProps) {
         </div>
       </section>
 
-      {/* Audiobook — Polly Neural narration. Authentic books play full
-          length; non-authentic borrow a peer's MP3 capped at 30s. */}
       {/* The four questions, answered before anyone scrolls. */}
       <BookAnswers book={book} />
       <BookBackCover book={book} />
 
-      <section className="border-y border-line bg-bg-subtle">
-        <div className="container-x grid gap-6 py-10 md:grid-cols-[auto_1fr] md:items-start">
-          <div className="flex items-center gap-3 text-series">
-            <Headphones className="h-8 w-8" aria-hidden />
-            <div>
-              <p className="font-display text-2xl text-ink">
-                Hear a 30-sec preview
-              </p>
-              <p className="text-xs text-ink-mute">
-                Audiobook · ${book.audiobook_direct_price_usd.toFixed(2)}
-              </p>
+      {hasAudiobook && (
+        <section className="border-y border-line bg-bg-subtle">
+          <div className="container-x grid gap-6 py-10 md:grid-cols-[auto_1fr] md:items-start">
+            <div className="flex items-center gap-3 text-series">
+              <Headphones className="h-8 w-8" aria-hidden />
+              <div>
+                <p className="font-display text-2xl text-ink">
+                  Hear a 30-sec preview
+                </p>
+                <p className="text-xs text-ink-mute">
+                  Audiobook · ${book.audiobook_direct_price_usd.toFixed(2)}
+                </p>
+              </div>
             </div>
+            <PreviewAudio
+              kind="audiobook"
+              ownSlug={book.slug}
+              isAuthentic
+              ownAudioUrl={book.audiobook?.full_url}
+              pool={[]}
+              alwaysCap
+              buyHref="#buy"
+              buyLabel={`Buy the audiobook — $${book.audiobook_direct_price_usd.toFixed(2)}`}
+              title={`${book.title} — audiobook`}
+            />
           </div>
-          <PreviewAudio
-            kind="audiobook"
-            ownSlug={book.slug}
-            isAuthentic={audioAuthentic}
-            ownAudioUrl={book.audiobook?.full_url}
-            pool={audioPool}
-            alwaysCap
-            buyHref="#buy"
-            buyLabel={`Buy the audiobook — $${book.audiobook_direct_price_usd.toFixed(2)}`}
-            title={`${book.title} — audiobook`}
-          />
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Podcast video — feature-flagged off per Brian's 2026-05-25
           directive (video generation paused). Code stays wired so we can
@@ -259,7 +255,7 @@ export default async function BookDetailPage({ params }: BookRouteProps) {
               poster={imageProxy(book.cover_r2_key) || undefined}
               title={`${book.title} — podcast video`}
               buyHref="#buy"
-              buyLabel={`Buy the audiobook — $${book.audiobook_direct_price_usd.toFixed(2)}`}
+              buyLabel={hasAudiobook ? `Buy the audiobook — $${book.audiobook_direct_price_usd.toFixed(2)}` : 'View available formats'}
             />
           </div>
         </section>
@@ -279,7 +275,7 @@ export default async function BookDetailPage({ params }: BookRouteProps) {
             ownAudioUrl={book.podcast_episode_url}
             pool={podcastPool}
             buyHref="#buy"
-            buyLabel={`Buy the audiobook — $${book.audiobook_direct_price_usd.toFixed(2)}`}
+            buyLabel={hasAudiobook ? `Buy the audiobook — $${book.audiobook_direct_price_usd.toFixed(2)}` : 'View available formats'}
             title={`${book.title} — podcast episode`}
           />
         </div>
@@ -289,9 +285,9 @@ export default async function BookDetailPage({ params }: BookRouteProps) {
       <section className="container-x py-16">
         <div className="grid gap-10 md:grid-cols-[3fr_2fr] md:gap-16">
           <article>
-            <p className="eyebrow mb-3">Sample · {book.sample_chapter?.title ?? 'Chapter 1'}</p>
+            <p className="eyebrow mb-3">{book.sample_chapter ? `Sample · ${book.sample_chapter.title}` : 'Before you choose'}</p>
             <h2 className="font-display text-3xl text-ink md:text-4xl">
-              First 400 words. The hook is the whole pitch.
+              {book.sample_chapter ? 'A look inside the book.' : 'Read a chapter first.'}
             </h2>
             <div className="prose prose-invert mt-6 max-w-none text-base leading-relaxed text-ink-dim">
               {(book.sample_chapter?.body ?? '').split(/\n\n+/).map((p, i) => (
@@ -317,7 +313,7 @@ export default async function BookDetailPage({ params }: BookRouteProps) {
             <div className="border border-line bg-bg-subtle p-5 text-sm">
               <p className="eyebrow mb-2">FYI</p>
               <ul className="space-y-2 text-ink-dim">
-                <li>· 35-40k words. 90 chapters. One per day of the 90-day program.</li>
+                {book.word_count ? <li>· {book.word_count.toLocaleString('en-US')} words in the book.</li> : null}
                 <li>· Audiobook narrated via supervised Polly Neural.</li>
                 <li>· Bundle = ebook + audiobook, instant download, one click.</li>
               </ul>

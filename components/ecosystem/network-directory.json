@@ -1,0 +1,153 @@
+{
+  "version": "2026-11-24.1",
+  "parent": {
+    "name": "Apex Flow Labs",
+    "url": "https://www.apexflowlabs.com"
+  },
+  "arcade": {
+    "name": "Luke’s Arcade",
+    "url": "https://www.apexflowlabs.com/embed/arcade"
+  },
+  "groups": [
+    {
+      "label": "Software & AI",
+      "sites": [
+        {
+          "id": "ai",
+          "name": "Apex Flow AI",
+          "url": "https://apexflowaivideogenerator.com"
+        },
+        {
+          "id": "3d",
+          "name": "Apex Flow 3D Studio",
+          "url": "https://3d.apexflowlabs.com"
+        },
+        {
+          "id": "shield",
+          "name": "Apex Flow Shield",
+          "url": "https://shield.apexflowlabs.com"
+        },
+        {
+          "id": "rainbo",
+          "name": "RAINBO",
+          "url": "https://rainbo.apexflowlabs.com"
+        },
+        {
+          "id": "pulse",
+          "name": "Apex Flow Pulse",
+          "url": "https://pulse.apexflowlabs.com"
+        },
+        {
+          "id": "scheduler",
+          "name": "Apex Flow Scheduler",
+          "url": "https://scheduler.apexflowlabs.com"
+        },
+        {
+          "id": "webscraper",
+          "name": "Apex Flow Web Scraper",
+          "url": "https://webscraper.apexflowlabs.com"
+        }
+      ]
+    },
+    {
+      "label": "Business & services",
+      "sites": [
+        {
+          "id": "digital",
+          "name": "Apex Flow Digital",
+          "url": "https://digital.apexflowlabs.com"
+        },
+        {
+          "id": "affiliates",
+          "name": "Apex Flow Affiliates",
+          "url": "https://affiliates.apexflowlabs.com"
+        },
+        {
+          "id": "partner-cloud",
+          "name": "Apex Flow Partner Cloud",
+          "url": "https://partner-cloud.apexflowlabs.com"
+        },
+        {
+          "id": "revenue",
+          "name": "Apex Flow Revenue",
+          "url": "https://revenue.apexflowlabs.com"
+        },
+        {
+          "id": "press",
+          "name": "Apex Flow Press",
+          "url": "https://press.apexflowlabs.com"
+        },
+        {
+          "id": "spiker",
+          "name": "Spiker Carpet & Tile Care",
+          "url": "https://www.spikercarpetandtilecare.com"
+        }
+      ]
+    },
+    {
+      "label": "Shops & everyday",
+      "sites": [
+        {
+          "id": "beauty",
+          "name": "Apex Flow Beauty",
+          "url": "https://beauty.apexflowlabs.com"
+        },
+        {
+          "id": "health",
+          "name": "Apex Flow Health",
+          "url": "https://health.apexflowlabs.com"
+        },
+        {
+          "id": "pets",
+          "name": "Apex Flow Pets",
+          "url": "https://pets.apexflowlabs.com"
+        },
+        {
+          "id": "gear",
+          "name": "Apex Flow Gear",
+          "url": "https://gear.apexflowlabs.com"
+        },
+        {
+          "id": "lukas-deans",
+          "name": "Lukas Dean’s",
+          "url": "https://lukasdeans.com"
+        },
+        {
+          "id": "bug-out",
+          "name": "Apex Flow Bug Out",
+          "url": "https://www.apexflowlabs.com/bug-out"
+        }
+      ]
+    },
+    {
+      "label": "Media & learning",
+      "sites": [
+        {
+          "id": "audio",
+          "name": "Apex Flow Audio",
+          "url": "https://audio.apexflowlabs.com"
+        },
+        {
+          "id": "publishing",
+          "name": "Apex Flow Publishing House",
+          "url": "https://books.apexflowlabs.com"
+        },
+        {
+          "id": "academy",
+          "name": "Apex Flow Academy",
+          "url": "https://academy.apexflowlabs.com"
+        },
+        {
+          "id": "kids",
+          "name": "Apex Flow Kids",
+          "url": "https://kids.apexflowlabs.com"
+        },
+        {
+          "id": "media",
+          "name": "Apex Flow Media",
+          "url": "https://media.apexflowlabs.com"
+        }
+      ]
+    }
+  ]
+}

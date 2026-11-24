@@ -1,3 +1,4 @@
+import NetworkFooter from "../components/ecosystem/NetworkFooter";
 import type { Metadata, Viewport } from 'next';
 import { Geist, Fraunces, JetBrains_Mono } from 'next/font/google';
 import { env } from '@/lib/env';
@@ -131,6 +132,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Apex Flow Arcade: the Play button (four free games, one score, one Apex ID), lifted so it clears the sale pill in this corner. Loads after the page is idle. */}
         <Script src="/pulse-status.js" strategy="afterInteractive" />
         <Script src="https://www.apexflowlabs.com/embed/apex-arcade.js" data-side="left" data-bottom="92" strategy="lazyOnload" />
+        <NetworkFooter site="publishing" />
       </body>
     </html>
   );

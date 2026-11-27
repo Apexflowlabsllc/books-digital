@@ -1,0 +1,10 @@
+{
+  "routes": [
+    {
+      "src": "/(\\.env.*|\\.git/.*|\\.aws/.*|wp-admin.*|wp-login\\.php|wp-includes/.*|xmlrpc\\.php|phpmyadmin.*|vendor/phpunit/.*|cgi-bin/.*)",
+      "mitigate": {
+        "action": "deny"
+      }
+    }
+  ]
+}
